@@ -8,6 +8,9 @@
 const char* ssid = "Zain_B530_A013";      
 const char* password = "F8BLmiFRedB"; 
 
+//const char* ssid = "Galaxy S20+2db9";      
+//const char* password = "55555555";
+
 // --- تعريف دبابيس المحركات ---
 #define PWMA 42   
 #define AIN1 41   
@@ -38,7 +41,10 @@ int baseSpeed = 210;
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
+bool serviceStarted = false;
+
 void setup() {
+  Serial.begin(115200);
   // استدعاء دوال الإعداد من الملفات الأخرى
   setupMotors();
   setupSensors();
@@ -46,18 +52,21 @@ void setup() {
 }
 
 void loop() {
-  // 1. معالجة الشبكة وأوامر PuTTY (من ملف Network)
-  handleNetwork();
-
-  // 2. فحص زر التشغيل (من ملف Motors)
+  // 1. فحص زر التشغيل (من ملف Motors)
   checkLimitSwitch();
 
-  // 3. خوارزمية التتبع (من ملفي Sensors و PID)
+  // 2. خوارزمية التتبع (من ملفي Sensors و PID)
   if (isRunning) {
     calculateError();
     calculatePID();
   }
 
-  // 4. إرسال البيانات إلى PuTTY (من ملف Network)
-  printDebugData();
+  // 3. إرسال البيانات إلى PuTTY (من ملف Network)
+  // 4. معالجة الشبكة وأوامر PuTTY (من ملف Network)
+  if (serviceStarted) {
+    printDebugData();
+    handleNetwork();
+  } else { 
+    TurnOnService();
+  }
 }
