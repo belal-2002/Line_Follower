@@ -1,0 +1,63 @@
+#include <WiFi.h>
+#include <ESPmDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include <TelnetStream.h>
+
+// --- إعدادات شبكة الواي فاي ---
+const char* ssid = "Zain_B530_A013";      
+const char* password = "F8BLmiFRedB"; 
+
+// --- تعريف دبابيس المحركات ---
+#define PWMA 42   
+#define AIN1 41   
+#define AIN2 40   
+#define PWMB 19   
+#define BIN1 21   
+#define BIN2 20   
+#define STBY 39   
+
+// --- تعريف مفتاح التشغيل ---
+#define LIMIT_SWITCH 17  
+
+// --- تعريف دبابيس وأوزان الحساسات الـ 12 ---
+const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
+const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 55};
+
+// --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
+bool isRunning = false;
+
+float Kp = 40.0;
+float Ki = 0.005;
+float Kd = 0.1;
+
+float P = 0, I = 0, D = 0, lastError = 0;
+float currentError = 0;
+
+int baseSpeed = 210;
+int leftMotorSpeed = 0;
+int rightMotorSpeed = 0;
+
+void setup() {
+  // استدعاء دوال الإعداد من الملفات الأخرى
+  setupMotors();
+  setupSensors();
+  setupNetwork();
+}
+
+void loop() {
+  // 1. معالجة الشبكة وأوامر PuTTY (من ملف Network)
+  handleNetwork();
+
+  // 2. فحص زر التشغيل (من ملف Motors)
+  checkLimitSwitch();
+
+  // 3. خوارزمية التتبع (من ملفي Sensors و PID)
+  if (isRunning) {
+    calculateError();
+    calculatePID();
+  }
+
+  // 4. إرسال البيانات إلى PuTTY (من ملف Network)
+  printDebugData();
+}
