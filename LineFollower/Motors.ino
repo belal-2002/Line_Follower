@@ -24,7 +24,6 @@ void checkLimitSwitch() {
         analogWrite(PWMA, 0);
         analogWrite(PWMB, 0);
         I = 0; // تصفير الخطأ التراكمي للـ Ki حتى لا يجن الروبوت عند التشغيل القادم
-        TelnetStream.println("\n>>> ROBOT STOPPED BY SWITCH <<<");
       }
       
       while(digitalRead(LIMIT_SWITCH) == LOW); 
