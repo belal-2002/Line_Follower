@@ -4,7 +4,7 @@
 #include <ArduinoOTA.h>
 #include <TelnetStream.h>
 
-// --- إعدادات شبكة الواي فاي الخاصة بك ---
+// --- إعدادات شبكة الواي فاي ---
 const char* ssid = "Zain_B530_A013";      
 const char* password = "F8BLmiFRedB"; 
 
@@ -17,132 +17,154 @@ const char* password = "F8BLmiFRedB";
 #define BIN2 20   
 #define STBY 39   
 
-// --- تعريف دبابيس مفاتيح التحكم ---
+// --- تعريف مفتاح التشغيل ---
 #define LIMIT_SWITCH 17  
-#define DIP_SWITCH_1 18  
 
-// --- متغيرات حالة النظام الموحدة ---
-bool isRunning = false;  // حالة الروبوت الموحدة
-bool rampDone = false;   // لضمان تنفيذ التسارع مرة واحدة
+// --- تعريف دبابيس الحساسات الـ 12 ---
+const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
 
-void startWiFiAndOTA() {
-  // استخدام السيريال العادي هنا لأن Telnet لم يعمل بعد
-  Serial.print("Connecting to WiFi...");
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Connection Failed! Rebooting...");
-    delay(5000);
-    ESP.restart(); 
-  }
+// أوزان الحساسات لحساب الخطأ (من أقصى اليسار إلى أقصى اليمين)
+const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 55};
 
-  // الآن فقط يمكننا تشغيل TelnetStream
-  TelnetStream.begin(); 
-  
-  Serial.println("Connected!");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
+// --- متغيرات حالة النظام ---
+bool isRunning = false;
 
-  ArduinoOTA.onStart([]() {
-    digitalWrite(STBY, LOW);
-    TelnetStream.println("OTA Update Started. Motors Disabled.");
-  });
-  
-  ArduinoOTA.onEnd([]() { TelnetStream.println("\nOTA Update Finished!"); });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    // استخدمنا السيريال هنا لتخفيف الضغط اللاسلكي
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    TelnetStream.printf("Error[%u]: ", error);
-  });
+// --- متغيرات الـ PID والسرعة ---
+float Kp = 35.0;  // القيمة الابتدائية (عدلها من PuTTY)
+float Ki = 0.005;
+float Kd = 0.1;
 
-  ArduinoOTA.begin();
-}
+float P = 0, I = 0, D = 0, lastError = 0;
+int baseSpeed = 210; // السرعة الأساسية المعتمدة للاختبار
 
 void setup() {
-  Serial.begin(115200);
-
   pinMode(PWMA, OUTPUT); pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
   pinMode(PWMB, OUTPUT); pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
-  
   pinMode(LIMIT_SWITCH, INPUT_PULLUP);
-  pinMode(DIP_SWITCH_1, INPUT_PULLUP);
+  
+  for (int i = 0; i < 12; i++) {
+    pinMode(sensorPins[i], INPUT);
+  }
+
   digitalWrite(STBY, LOW);
 
-  // تشغيل الواي فاي وتجهيز الـ Telnet
-  startWiFiAndOTA();
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    delay(5000);
+    ESP.restart();
+  }
+
+  ArduinoOTA.begin();
+  TelnetStream.begin();
+}
+
+// دالة لمعالجة أوامر الكيبورد من PuTTY
+void handleTelnetCommands() {
+  if (TelnetStream.available()) {
+    char c = TelnetStream.read();
+    
+    // تعديل Kp
+    if (c == 'q') Kp += 0.1;
+    if (c == 'a') Kp -= 0.1;
+    // تعديل Ki
+    if (c == 'w') Ki += 0.01;
+    if (c == 's') Ki -= 0.01;
+    // تعديل Kd
+    if (c == 'e') Kd += 0.1;
+    if (c == 'd') Kd -= 0.1;
+
+    // منع القيم من النزول تحت الصفر
+    if (Kp < 0) Kp = 0;
+    if (Ki < 0) Ki = 0;
+    if (Kd < 0) Kd = 0;
+  }
 }
 
 void loop() {
-  // 1. مراقبة التحديثات اللاسلكية دائماً
+  // 1. الاستماع لتحديثات الهواء وأوامر الكيبورد
   ArduinoOTA.handle();
+  handleTelnetCommands();
 
-  // 2. قراءة كبسة التشغيل والإيقاف (Limit Switch)
-  if (digitalRead(LIMIT_SWITCH) == LOW) {
-    delay(50); // Debounce
-    if (digitalRead(LIMIT_SWITCH) == LOW) {
-      
-      isRunning = !isRunning; // عكس الحالة
-      
-      if (isRunning) {
-        TelnetStream.println("-------------------------");
-        TelnetStream.println("Robot STARTING!");
-        digitalWrite(STBY, HIGH); // تفعيل المحركات
-        rampDone = false; // تصفير التسارع ليبدأ من جديد
-      } else {
-        digitalWrite(STBY, LOW);  // إيقاف المحركات
-        TelnetStream.println("Robot FORCE STOPPED by user!");
-        TelnetStream.println("-------------------------");
-      }
-      
-      while(digitalRead(LIMIT_SWITCH) == LOW); // انتظار رفع الإصبع
+  // 2. قراءة الحساسات وحساب الخطأ (Error)
+  long weightedSum = 0;
+  long sum = 0;
+  int rawValues[12];
+  
+  for (int i = 0; i < 12; i++) {
+    rawValues[i] = analogRead(sensorPins[i]);
+    
+    // نأخذ القراءات التي تدل على لون أسود فقط (تجاهل اللون الأبيض والتشويش)
+    // القيمة 2000 هي عتبة (Threshold) يمكن تعديلها
+    if (rawValues[i] > 2000) {
+      weightedSum += (long)rawValues[i] * sensorWeights[i];
+      sum += rawValues[i];
     }
   }
 
-  // 3. خوارزمية التسارع والمحركات
+  float currentError = 0;
+  
+  // إذا كان الروبوت يرى الخط، احسب الخطأ
+  if (sum > 0) {
+    currentError = (float)weightedSum / (float)sum;
+    lastError = currentError; // تذكر آخر خطأ
+  } else {
+    // إذا فقد الخط تماماً، استمر في الدوران بناءً على آخر اتجاه (ذاكرة الروبوت)
+    currentError = (lastError > 0) ? 60 : -60; 
+  }
+
+  // 3. حساب معادلة الـ PID
+  P = currentError;
+  I = I + currentError;
+  D = currentError - lastError;
+  
+  float PID_Value = (Kp * P) + (Ki * I) + (Kd * D);
+
+  // 4. تطبيق الـ PID على سرعة المحركات
+  int leftMotorSpeed  = baseSpeed + PID_Value;
+  int rightMotorSpeed = baseSpeed - PID_Value;
+
+  // تقييد السرعة بين 0 و 255
+  if (leftMotorSpeed > 255) leftMotorSpeed = 255;
+  if (leftMotorSpeed < 0) leftMotorSpeed = 0;
+  if (rightMotorSpeed > 255) rightMotorSpeed = 255;
+  if (rightMotorSpeed < 0) rightMotorSpeed = 0;
+
+  // 5. التحكم بالتشغيل والإيقاف (Limit Switch) وإعطاء أوامر للمحركات
+  if (digitalRead(LIMIT_SWITCH) == LOW) {
+    delay(50); 
+    if (digitalRead(LIMIT_SWITCH) == LOW) {
+      isRunning = !isRunning; 
+      
+      if (isRunning) {
+        digitalWrite(STBY, HIGH);
+        digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
+        digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);  
+      } else {
+        digitalWrite(STBY, LOW);  
+        analogWrite(PWMA, 0);
+        analogWrite(PWMB, 0);
+        I = 0; // تصفير الخطأ التراكمي عند التوقف
+      }
+      while(digitalRead(LIMIT_SWITCH) == LOW); 
+    }
+  }
+
   if (isRunning) {
-    int dir = digitalRead(DIP_SWITCH_1);
+    analogWrite(PWMA, leftMotorSpeed);
+    analogWrite(PWMB, rightMotorSpeed);
+  }
+
+  // 6. إرسال البيانات إلى PuTTY (كل 150 ملي ثانية لكي لا تتجمد الشاشة)
+  static unsigned long lastPrintTime = 0;
+  if (millis() - lastPrintTime > 1000) {
+    // طباعة قيم PID الحالية
+    TelnetStream.printf("Kp:%.1f  Ki:%.2f  Kd:%.1f  |  ", Kp, Ki, Kd);
+    TelnetStream.println();
+    // طباعة الخطأ والسرعات
+    //TelnetStream.printf("Err:%4.1f | M_Left:%3d  M_Right:%3d\n", currentError, leftMotorSpeed, rightMotorSpeed);
     
-    // تحديد الاتجاه 
-    if (dir == HIGH) { // للأمام
-      digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
-      digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);  
-    } else { // للخلف
-      digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW);  
-      digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
-    }
-
-    // تنفيذ تسلسل التسارع والتباطؤ مرة واحدة عند التشغيل
-    if (!rampDone) {
-      TelnetStream.println("Starting Acceleration Ramp (0 to 255)...");
-      
-      // التسارع
-      for (int speed = 0; speed <= 255; speed++) {
-        analogWrite(PWMA, speed);
-        analogWrite(PWMB, speed);
-        delay(10); 
-      }
-      
-      TelnetStream.println("Max Speed Reached! Holding for 0.5s...");
-      delay(500); 
-
-      TelnetStream.println("Starting Deceleration Ramp (255 to 0)...");
-      // التباطؤ
-      for (int speed = 255; speed >= 0; speed--) {
-        analogWrite(PWMA, speed);
-        analogWrite(PWMB, speed);
-        delay(10);
-      }
-      
-      rampDone = true;
-      isRunning = false; // إيقاف النظام تلقائياً بعد انتهاء الاختبار
-      digitalWrite(STBY, LOW);
-      TelnetStream.println("Ramp Test Completed Successfully.");
-      TelnetStream.println("Waiting for OTA or Limit Switch press...");
-      TelnetStream.println("-------------------------");
-    }
+    lastPrintTime = millis();
   }
 }
