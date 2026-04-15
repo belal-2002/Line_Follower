@@ -23,12 +23,12 @@ void handleNetwork() {
   // معالجة أوامر الكيبورد لتعديل PID
   if (TelnetStream.available()) {
     char c = TelnetStream.read();
-    if (c == 'q') Kp += 0.1;
-    if (c == 'a') Kp -= 0.1;
+    if (c == 'q') Kp += 1;
+    if (c == 'a') Kp -= 1;
     if (c == 'w') Ki += 0.001;
     if (c == 's') Ki -= 0.001;
-    if (c == 'e') Kd += 0.1;
-    if (c == 'd') Kd -= 0.1;
+    if (c == 'e') Kd += 1;
+    if (c == 'd') Kd -= 1;
 
     if (Kp < 0) Kp = 0;
     if (Ki < 0) Ki = 0;
