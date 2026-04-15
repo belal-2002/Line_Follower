@@ -69,8 +69,8 @@ void handleTelnetCommands() {
     if (c == 'q') Kp += 0.1;
     if (c == 'a') Kp -= 0.1;
     // تعديل Ki
-    if (c == 'w') Ki += 0.01;
-    if (c == 's') Ki -= 0.01;
+    if (c == 'w') Ki += 0.001;
+    if (c == 's') Ki -= 0.001;
     // تعديل Kd
     if (c == 'e') Kd += 0.1;
     if (c == 'd') Kd -= 0.1;
