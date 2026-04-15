@@ -31,20 +31,20 @@ const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 5
 bool isRunning = false;
 
 float Kp = 40.0;
-float Ki = 0.005;
-float Kd = 0.1;
+float Ki = 0.001;
+float Kd = 60;
 
 float P = 0, I = 0, D = 0, lastError = 0;
 float currentError = 0;
 
-int baseSpeed = 210;
+int baseSpeed = 150;
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
 bool serviceStarted = false;
 
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   // استدعاء دوال الإعداد من الملفات الأخرى
   setupMotors();
   setupSensors();
