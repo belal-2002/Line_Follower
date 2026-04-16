@@ -26,9 +26,10 @@ void checkLimitSwitch() {
         digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);  
       } else {
         digitalWrite(STBY, LOW);  
-        analogWrite(PWMA, 0);
-        analogWrite(PWMB, 0);
-        I = 0; // تصفير الخطأ التراكمي للـ Ki حتى لا يجن الروبوت عند التشغيل القادم
+        ledcWrite(PWMA, 0); // التعديل هنا
+        ledcWrite(PWMB, 0); // التعديل هنا
+
+        // I = 0; // تصفير الخطأ التراكمي للـ Ki حتى لا يجن الروبوت عند التشغيل القادم
       }
       
       while(digitalRead(LIMIT_SWITCH) == LOW); 
