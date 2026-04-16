@@ -32,8 +32,8 @@ const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 5
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
 bool isRunning = false;
 
-float Kp = 40.0;
-float Kd = 60;
+float Kp = 10.0;
+float Kd = 0.0;
 
 float P = 0;
 float D = 0;
