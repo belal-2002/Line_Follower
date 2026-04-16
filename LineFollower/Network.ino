@@ -25,13 +25,10 @@ void handleNetwork() {
     char c = TelnetStream.read();
     if (c == 'q') Kp += 1;
     if (c == 'a') Kp -= 1;
-    //if (c == 'w') Ki += 0.001;
-    //if (c == 's') Ki -= 0.001;
     if (c == 'e') Kd += 1;
     if (c == 'd') Kd -= 1;
 
     if (Kp < 0) Kp = 0;
-    //if (Ki < 0) Ki = 0;
     if (Kd < 0) Kd = 0;
   }
 }
