@@ -33,10 +33,11 @@ const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 5
 bool isRunning = false;
 
 float Kp = 40.0;
-//float Ki = 0.001;
 float Kd = 60;
 
-float P = 0, I = 0, D = 0, lastError = 0;
+float P = 0;
+float D = 0;
+float lastError = 0;
 float currentError = 0;
 
 int baseSpeed = 800;
@@ -61,7 +62,7 @@ void loop() {
   // 2. خوارزمية التتبع (من ملفي Sensors و PID)
   if (isRunning) {
     calculateError();
-    calculatePID();
+    calculatePD();
   }
 
   // 3. إرسال البيانات إلى PuTTY (من ملف Network)
