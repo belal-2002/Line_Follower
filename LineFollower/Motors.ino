@@ -1,10 +1,15 @@
 void setupMotors() {
-  pinMode(PWMA, OUTPUT); pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
-  pinMode(PWMB, OUTPUT); pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
+  pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
+  pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
   pinMode(LIMIT_SWITCH, INPUT_PULLUP);
-  
+
+  // --- التعديل الاحترافي للتردد والدقة ---
+  ledcAttach(PWMA, 10000, 10); 
+  ledcAttach(PWMB, 10000, 10);
+
   digitalWrite(STBY, LOW); // الإيقاف التام في البداية
+
 }
 
 void checkLimitSwitch() {
