@@ -1,9 +1,15 @@
 void calculatePID() {
+  unsigned long currentTime = micros();
+  float dt = (currentTime - lastTime) / 1000000.0; 
+  lastTime = currentTime;
+
+  // حماية من قسمة الصفر أو بطء اللوب
+  if (dt <= 0.0) dt = 0.001;
+
   P = currentError;
-  I = I + currentError;
-  D = currentError - lastError;
+  D = (currentError - lastError) / dt;
   
-  float PID_Value = (Kp * P) + (Ki * I) + (Kd * D);
+  float PID_Value = (Kp * P) + (Kd * D);
 
   leftMotorSpeed  = baseSpeed + PID_Value;
   rightMotorSpeed = baseSpeed - PID_Value;
