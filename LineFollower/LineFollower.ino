@@ -41,11 +41,17 @@ float lastError = 0;
 float currentError = 0;
 
 int baseSpeed = 800;
+int tankTurnSpeed = 800; // سرعة دوران المحركات العكسية عند زاوية 90 (عدلها حسب قوة محركاتك)
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
+// --- متغيرات نظام التحكم الهجين ---
+enum RobotState { NORMAL_PD, SHARP_LEFT, SHARP_RIGHT };
+RobotState currentState = NORMAL_PD;
+
 bool serviceStarted = false;
-bool lineLost = false; // متغير لمعرفة حالة فقدان الخط
+//bool lineLost = false; // متغير لمعرفة حالة فقدان الخط
+bool isLineLost = false;
 
 void setup() {
   //Serial.begin(115200);
