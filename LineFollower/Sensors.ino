@@ -13,7 +13,7 @@ void calculateError() {
     rawValues[i] = analogRead(sensorPins[i]);
     
     // فلترة اللون الأسود
-    if (rawValues[i] > 2000) {
+    if (rawValues[i] > 1700) {
       weightedSum += (long)rawValues[i] * sensorWeights[i];
       sum += rawValues[i];
     }
