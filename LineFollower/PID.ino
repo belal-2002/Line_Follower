@@ -3,7 +3,7 @@ void calculatePID() {
   float dt = (currentTime - lastTime) / 1000000.0; 
   static unsigned long lastTime = currentTime;
 
-  // حماية من قسمة الصفر أو بطء اللوب
+// حماية من القسمة على صفر أو التوقف المفاجئ
   if (dt <= 0.0) dt = 0.001;
 
   P = currentError;
@@ -15,12 +15,15 @@ void calculatePID() {
   rightMotorSpeed = baseSpeed - PID_Value;
 
   // تقييد السرعة حتى لا تتجاوز 1023 أو تنزل عن الصفر
-  if (leftMotorSpeed > 1023) leftMotorSpeed = 1023;
-  if (leftMotorSpeed < 0) leftMotorSpeed = 0;
-  if (rightMotorSpeed > 1023) rightMotorSpeed = 1023;
-  if (rightMotorSpeed < 0) rightMotorSpeed = 0;
+  leftMotorSpeed = constrain(leftMotorSpeed, 0, 1023);
+  rightMotorSpeed = constrain(rightMotorSpeed, 0, 1023);
 
-  // إرسال السرعة المحسوبة للمحركات
-  analogWrite(PWMA, leftMotorSpeed);
-  analogWrite(PWMB, rightMotorSpeed);
+  // حل صراع الـ PWM: إرسال السرعة باستخدام ledcWrite
+  ledcWrite(PWMA, leftMotorSpeed);
+  ledcWrite(PWMB, rightMotorSpeed);
+
+  // 6. تحديث الخطأ السابق في نهاية الدورة فقط! (وهذا يضمن عمل الـ D بشكل صحيح)
+  if (!lineLost) {
+    lastError = currentError;
+  }
 }
