@@ -7,9 +7,11 @@
 // --- إعدادات شبكة الواي فاي ---
 const char* ssid = "Zain_B530_A013";      
 const char* password = "F8BLmiFRedB"; 
+//192.168.8.28
 
 //const char* ssid = "Galaxy S20+2db9";      
 //const char* password = "55555555";
+//10.245.67.71
 
 // --- تعريف دبابيس المحركات ---
 #define PWMA 42   
@@ -37,7 +39,7 @@ float Kd = 60;
 float P = 0, I = 0, D = 0, lastError = 0;
 float currentError = 0;
 
-int baseSpeed = 150;
+int baseSpeed = 800;
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
