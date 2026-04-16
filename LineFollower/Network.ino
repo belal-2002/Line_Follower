@@ -25,13 +25,13 @@ void handleNetwork() {
     char c = TelnetStream.read();
     if (c == 'q') Kp += 1;
     if (c == 'a') Kp -= 1;
-    if (c == 'w') Ki += 0.001;
-    if (c == 's') Ki -= 0.001;
+    //if (c == 'w') Ki += 0.001;
+    //if (c == 's') Ki -= 0.001;
     if (c == 'e') Kd += 1;
     if (c == 'd') Kd -= 1;
 
     if (Kp < 0) Kp = 0;
-    if (Ki < 0) Ki = 0;
+    //if (Ki < 0) Ki = 0;
     if (Kd < 0) Kd = 0;
   }
 }
@@ -47,7 +47,8 @@ void printDebugData() {
       }
 
       TelnetStream.print("\t");
-      TelnetStream.printf("Kp:%.1f Ki:%.3f Kd:%.1f | ", Kp, Ki, Kd);
+      //TelnetStream.printf("Kp:%.1f Ki:%.3f Kd:%.1f | ", Kp, Ki, Kd);
+      TelnetStream.printf("Kp:%.1f Kd:%.1f | ", Kp, Kd);
       TelnetStream.print("\t");
       TelnetStream.printf("Err:%4.1f | ML:%d MR:%d\n", currentError, leftMotorSpeed, rightMotorSpeed);
       TelnetStream.println();
