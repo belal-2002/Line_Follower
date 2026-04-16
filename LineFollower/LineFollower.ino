@@ -44,6 +44,7 @@ int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
 bool serviceStarted = false;
+bool lineLost = false; // متغير لمعرفة حالة فقدان الخط
 
 void setup() {
   //Serial.begin(115200);
