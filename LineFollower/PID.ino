@@ -1,7 +1,7 @@
 void calculatePID() {
   unsigned long currentTime = micros();
   float dt = (currentTime - lastTime) / 1000000.0; 
-  lastTime = currentTime;
+  static unsigned long lastTime = currentTime;
 
   // حماية من قسمة الصفر أو بطء اللوب
   if (dt <= 0.0) dt = 0.001;
