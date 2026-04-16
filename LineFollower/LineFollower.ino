@@ -44,9 +44,6 @@ int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
 bool serviceStarted = false;
-unsigned long lastTime = 0;
-
-
 
 void setup() {
   //Serial.begin(115200);
