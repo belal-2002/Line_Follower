@@ -28,8 +28,6 @@ void checkLimitSwitch() {
         digitalWrite(STBY, LOW);  
         ledcWrite(PWMA, 0); // التعديل هنا
         ledcWrite(PWMB, 0); // التعديل هنا
-
-        // I = 0; // تصفير الخطأ التراكمي للـ Ki حتى لا يجن الروبوت عند التشغيل القادم
       }
       
       while(digitalRead(LIMIT_SWITCH) == LOW); 
