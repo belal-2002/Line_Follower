@@ -1,29 +1,33 @@
-void calculatePID() {
+void calculatePD() { 
+  // تم تغيير الاسم إلى PD ليعكس الواقع العلمي
   unsigned long currentTime = micros();
-  float dt = (currentTime - lastTime) / 1000000.0; 
-  static unsigned long lastTime = currentTime;
+  static unsigned long lastTime = 0;
+  float dt = (currentTime - lastTime) / 1000000.0;
+  lastTime = currentTime;
 
-// حماية من القسمة على صفر أو التوقف المفاجئ
-  if (dt <= 0.0) dt = 0.001;
+  if (dt <= 0.0) dt = 0.001; 
 
-  P = currentError;
-  D = (currentError - lastError) / dt;
-  
-  float PID_Value = (Kp * P) + (Kd * D);
+  float P = currentError;
+  float D = 0; // تصفير افتراضي
 
-  leftMotorSpeed  = baseSpeed + PID_Value;
-  rightMotorSpeed = baseSpeed - PID_Value;
-
-  // تقييد السرعة حتى لا تتجاوز 1023 أو تنزل عن الصفر
-  leftMotorSpeed = constrain(leftMotorSpeed, 0, 1023);
-  rightMotorSpeed = constrain(rightMotorSpeed, 0, 1023);
-
-  // حل صراع الـ PWM: إرسال السرعة باستخدام ledcWrite
-  ledcWrite(PWMA, leftMotorSpeed);
-  ledcWrite(PWMB, rightMotorSpeed);
-
-  // 6. تحديث الخطأ السابق في نهاية الدورة فقط! (وهذا يضمن عمل الـ D بشكل صحيح)
+  // هندسة فقدان الخط 
+  if (lineLost) {
+    D = 0; // إبطال التفاضل تماماً لحظة الخروج
+  } else {
+    D = (currentError - lastError) / dt; // حساب معدل التغير الرياضي السليم
+  }
+  // تحديث الخطأ السابق
   if (!lineLost) {
     lastError = currentError;
   }
+  // حساب معادلة الـ PD الخالصة والسريعة
+  float PD_Value = (Kp * P) + (Kd * D);
+
+  // تقييد السرعة (أقصى قيمة لـ 10-bit هي 1023)
+  int leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, 1023);
+  int rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, 1023);
+
+  // إرسال السرعة للمحركات
+  ledcWrite(PWMA, leftMotorSpeed);
+  ledcWrite(PWMB, rightMotorSpeed);
 }
