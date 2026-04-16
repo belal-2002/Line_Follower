@@ -33,7 +33,7 @@ const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 5
 bool isRunning = false;
 
 float Kp = 40.0;
-float Ki = 0.001;
+//float Ki = 0.001;
 float Kd = 60;
 
 float P = 0, I = 0, D = 0, lastError = 0;
@@ -44,6 +44,9 @@ int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
 bool serviceStarted = false;
+unsigned long lastTime = 0;
+
+
 
 void setup() {
   //Serial.begin(115200);
