@@ -43,15 +43,18 @@
   float lastError = 0;
   float currentError = 0;
 
+  unsigned long currentTime = 0;
+  static unsigned long lastTime = 0;
+  float dt;
+
 //Sensors
   const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 55};
   int rawValues[12];  
   long weightedSum = 0;
   long sum = 0;
-  bool isLineLost = false;
-
-  //bool leftRadar = false;
-  //bool rightRadar = false;
+  bool lineLost = false;
+  bool goRight = false;
+  bool goLeft = false;
 
 
 
@@ -75,7 +78,6 @@ void loop() {
   loopSwitch();
   if (isRunning) {
     calculateError();
-    calculatePD();
   } else { 
     if (serviceStarted) {
       loopPrint();
