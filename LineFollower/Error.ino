@@ -3,7 +3,7 @@ void calculateError() {
   sum = 0;
 
   for (int i = 0; i < 12; i++) {
-    if (sensorValue[i] > 1200) {
+    if (sensorValue[i] > lineThreshold) {
       weightedSum += (long)sensorValue[i] * sensorWeights[i];
       sum += sensorValue[i];
     }
