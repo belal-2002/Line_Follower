@@ -1,22 +1,3 @@
-void setupNetwork() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-
-  //ArduinoOTA.begin();
-  //TelnetStream.begin();
-}
-void TurnOnService() {
-  if (WiFi.status() == WL_CONNECTED) {
-    ArduinoOTA.setHostname("Belal_Line_Follower");     // اسم الروبوت على الشبكة
-    ArduinoOTA.setPassword("789");      // كلمة المرور السرية
-
-    // بدء الخدمات بعد ضبط الحماية
-    ArduinoOTA.begin();
-    TelnetStream.begin();
-    serviceStarted = true; 
-  }
-}
-
 void handleNetwork() {
   ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
 
@@ -29,15 +10,15 @@ void handleNetwork() {
     if (c == 's') Kd -= 1;
     if (c == 'e') baseSpeed += 50;
     if (c == 'd') baseSpeed -= 50;
-    if (c == 'r') tankTurnSpeed += 50;
-    if (c == 'f') tankTurnSpeed -= 50;
+    if (c == 'r') turnSpeed += 50;
+    if (c == 'f') turnSpeed -= 50;
 
     if (Kp < 0) Kp = 0;
     if (Kd < 0) Kd = 0;
   }
 }
 
-void printDebugData() {
+void printData() {
   static unsigned long lastPrintTime = 0;
   if (millis() - lastPrintTime > 500) {
 
@@ -49,7 +30,7 @@ void printDebugData() {
 
       TelnetStream.print("\t");
       //TelnetStream.printf("Kp:%.1f Ki:%.3f Kd:%.1f | ", Kp, Ki, Kd);
-      TelnetStream.printf("Kp:%.1f  Kd:%.1f  Speed:%d  TSpeed:%d", Kp, Kd, baseSpeed, tankTurnSpeed);
+      TelnetStream.printf("Kp:%.1f  Kd:%.1f  Speed:%d  TSpeed:%d", Kp, Kd, baseSpeed, turnSpeed);
       TelnetStream.print("\t");
       TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
 
