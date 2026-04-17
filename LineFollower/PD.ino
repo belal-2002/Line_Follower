@@ -19,6 +19,7 @@ void calculatePD() { // يعمل الآن كمتحكم هجين (Hybrid PD)
     ledcWrite(PWMB, tankTurnSpeed);
     
     lastError = -40; // زرع ذاكرة وهمية في حال فقدان الخط لضمان استمرار الدوران
+    delay(250);
     return; // الخروج من الدالة (إعدام الـ PD مؤقتاً)
   } 
   else if (currentState == SHARP_RIGHT) {
@@ -30,6 +31,8 @@ void calculatePD() { // يعمل الآن كمتحكم هجين (Hybrid PD)
     ledcWrite(PWMB, tankTurnSpeed);
     
     lastError = 40; 
+
+    delay(250);
     return; // الخروج من الدالة
   }
 
