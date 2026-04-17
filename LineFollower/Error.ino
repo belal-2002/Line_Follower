@@ -15,10 +15,10 @@ void calculateError() {
 
     if (currentError > 0){
       goRight = true;
-      goLeft = false;
+      //goLeft = false;
     } else {
       goRight = false;
-      goLeft = true;
+      //goLeft = true;
     }
   
   } else {
