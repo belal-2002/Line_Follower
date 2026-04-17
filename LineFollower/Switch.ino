@@ -7,13 +7,12 @@ void loopSwitch() {
       
       if (isRunning) {
         digitalWrite(STBY, HIGH);
-        // الدوران للأمام
-        digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
-        digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);  
       } else {
         digitalWrite(STBY, LOW);  
-        ledcWrite(PWMA, 0); // التعديل هنا
-        ledcWrite(PWMB, 0); // التعديل هنا
+        digitalWrite(AIN1, LOW);  digitalWrite(AIN2, LOW); 
+        digitalWrite(BIN1, LOW); digitalWrite(BIN2, LOW);  
+        ledcWrite(PWMA, 0);
+        ledcWrite(PWMB, 0);
       }
       
       while(digitalRead(LIMIT_SWITCH) == LOW); 
