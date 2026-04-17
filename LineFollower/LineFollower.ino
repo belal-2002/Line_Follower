@@ -40,6 +40,7 @@
 
   float P = 0;
   float D = 0;
+  float PD_Value =0;
   float lastError = 0;
   float currentError = 0;
 
@@ -49,10 +50,10 @@
 
 //Sensors
   const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 55};
-  int rawValues[12];  
+  int sensorValue[12];  
   long weightedSum = 0;
   long sum = 0;
-  bool lineLost = false;
+  bool lineAvailable = true;
   bool goRight = false;
   bool goLeft = false;
 
@@ -76,8 +77,11 @@ void setup() {
 
 void loop() {
   loopSwitch();
+  loopSensors();
   if (isRunning) {
     calculateError();
+    if (lineAvailable) calculatePD();
+    loopMotor();
   } else { 
     if (serviceStarted) {
       loopPrint();
