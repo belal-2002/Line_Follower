@@ -3,19 +3,16 @@ void loopPrint() {
   if (millis() - lastPrintTime > 500) {
 
       for (int i = 0; i < 12; i++) {
-        int sensorValue = analogRead(sensorPins[i]); // قراءة القيمة التناظرية
-        TelnetStream.print(sensorValue);             // طباعة الرقم
-        TelnetStream.print("\t");                    // وضع مسافة (Tab) لترتيب الأرقام في أعمدة
+        TelnetStream.print(sensorValue[i]);  
+        TelnetStream.print("\t");               
       }
 
       TelnetStream.print("\t");
-      //TelnetStream.printf("Kp:%.1f Ki:%.3f Kd:%.1f | ", Kp, Ki, Kd);
       TelnetStream.printf("Kp:%.1f  Kd:%.1f  Speed:%d  TSpeed:%d", Kp, Kd, baseSpeed, turnSpeed);
       TelnetStream.print("\t");
-      TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
+      //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
 
       TelnetStream.println();
-
     lastPrintTime = millis();
   }
 
@@ -34,5 +31,7 @@ void loopPrint() {
 
     if (Kp < 0) Kp = 0;
     if (Kd < 0) Kd = 0;
+    if (baseSpeed < 0) baseSpeed = 0;
+    if (turnSpeed < 0) turnSpeed = 0;
   }
 }
