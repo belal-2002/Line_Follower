@@ -34,9 +34,9 @@
 
   float Kp = 40.0;
   float Kd = 60.0;
-
-  int baseSpeed = 400;
-  int turnSpeed = 400;
+  int maximumSpeed = 1023;   //600;
+  int baseSpeed = 800;  //200;
+  int turnSpeed = 800;  //400;
 
   float P = 0;
   float D = 0;
@@ -57,7 +57,7 @@
   bool goRight = false;
   //bool goLeft = false;
 
-  int lineThreshold = 1200;
+  int lineThreshold = 1300;
 
 
 
@@ -83,8 +83,8 @@ void loop() {
   if (isRunning) {
     calculateError();
     if (lineAvailable) calculatePD();
-    loopMotor();
-  } else { 
+      loopMotor();
+    } else { 
     if (serviceStarted) {
       loopPrint();
     } else { 
