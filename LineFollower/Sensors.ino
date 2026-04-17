@@ -1,35 +1,9 @@
-void calculateError() {
-  weightedSum = 0;
-  sum = 0;
-
+void loopSensors() {
   // 1. قراءة جميع الحساسات
   for (int i = 0; i < 12; i++) {
-    rawValues[i] = analogRead(sensorPins[i]);
+    sensorValue[i] = analogRead(sensorPins[i]);
   }
-  rawValues[1] -= 270;
-  rawValues[10] -= 270;
-
-  for (int i = 0; i < 12; i++) {
-    if (rawValues[i] > 1200) {
-      weightedSum += (long)rawValues[i] * sensorWeights[i];
-      sum += rawValues[i];
-    }
-  }
-
-  if (sum > 0) {
-    currentError = (float)weightedSum / (float)sum;
-    lineLost = false;
-
-    if (currentError > 0){
-      goRight = true;
-      goLeft = false;
-    } else {
-      goRight = false;
-      goLeft = true;
-    }
-    
-    calculatePD();
-  } else {
-    lineLost = true; // الروبوت فقد الخط كلياً في المسار الطبيعي
-  }
+  sensorValue[1] -= 270;
+  sensorValue[10] -= 270;
 }
+
