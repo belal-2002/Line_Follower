@@ -18,8 +18,18 @@ void calculateError() {
 
   if (sum > 0) {
     currentError = (float)weightedSum / (float)sum;
-    isLineLost = false;
+    lineLost = false;
+
+    if (currentError > 0){
+      goRight = true;
+      goLeft = false;
+    } else {
+      goRight = false;
+      goLeft = true;
+    }
+    
+    calculatePD();
   } else {
-    isLineLost = true; // الروبوت فقد الخط كلياً في المسار الطبيعي
+    lineLost = true; // الروبوت فقد الخط كلياً في المسار الطبيعي
   }
 }
