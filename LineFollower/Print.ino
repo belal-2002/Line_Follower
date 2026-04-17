@@ -1,12 +1,13 @@
 void loopPrint() {
   static unsigned long lastPrintTime = 0;
-  if (millis() - lastPrintTime > 500) {
-
+  if (millis() - lastPrintTime > 1500) {
+/*
       for (int i = 0; i < 12; i++) {
         TelnetStream.print(sensorValue[i]);  
         TelnetStream.print("\t");               
       }
-
+      TelnetStream.println();
+*/
       for (int i = 0; i < 12; i++) {
         if (sensorValue[i] > lineThreshold) {
           TelnetStream.print(1);  
@@ -18,7 +19,7 @@ void loopPrint() {
       }
 
       TelnetStream.print("\t");
-      TelnetStream.printf("Kp:%.1f  Kd:%.1f  Speed:%d  TSpeed:%d", Kp, Kd, baseSpeed, turnSpeed);
+      TelnetStream.printf("Kp:%.1f  Kd:%.1f  maximumSpeed:%d  Speed:%d  TSpeed:%d", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed);
       TelnetStream.print("\t");
       //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
 
@@ -34,14 +35,17 @@ void loopPrint() {
     if (c == 'a') Kp -= 1;
     if (c == 'w') Kd += 1;
     if (c == 's') Kd -= 1;
-    if (c == 'e') baseSpeed += 50;
-    if (c == 'd') baseSpeed -= 50;
-    if (c == 'r') turnSpeed += 50;
-    if (c == 'f') turnSpeed -= 50;
+    if (c == 'e') maximumSpeed += 50;
+    if (c == 'd') maximumSpeed -= 50;
+    if (c == 'r') baseSpeed += 50;
+    if (c == 'f') baseSpeed -= 50;
+    if (c == 't') turnSpeed += 50;
+    if (c == 'g') turnSpeed -= 50;
 
     if (Kp < 0) Kp = 0;
     if (Kd < 0) Kd = 0;
     if (baseSpeed < 0) baseSpeed = 0;
     if (turnSpeed < 0) turnSpeed = 0;
+    if (maximumSpeed < 0) maximumSpeed = 0;
   }
 }
