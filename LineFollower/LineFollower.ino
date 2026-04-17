@@ -66,8 +66,7 @@ void loop() {
     calculatePD();
   } else { 
     if (serviceStarted) {
-      printData();
-      handleNetwork();
+      loopPrint();
     } else { 
       turnOnService();
     }
