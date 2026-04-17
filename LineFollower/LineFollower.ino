@@ -57,6 +57,8 @@
   bool goRight = false;
   //bool goLeft = false;
 
+  int lineThreshold = 1200;
+
 
 
 int leftMotorSpeed = 0;
