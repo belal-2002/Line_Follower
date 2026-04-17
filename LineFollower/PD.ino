@@ -1,52 +1,18 @@
 void calculatePD() {
-  // 1. حساب الزمن الدقيق (dt)
-  unsigned long currentTime = micros();
-  static unsigned long lastTime = 0;
-  float dt = (currentTime - lastTime) / 1000000.0;
+  // حساب الزمن الدقيق (dt)
+  P = 0;
+  D = 0;
+  lastTime = 0;
+  currentTime = micros();
+
+  dt = (currentTime - lastTime) / 1000000.0;
   lastTime = currentTime;
-  if (dt <= 0.0) dt = 0.001; 
 
-  // ==========================================
-  // المقاطعة العنيفة: التفاف 90 درجة (Tank Turn)
-  // ==========================================
-  if (currentState == SHARP_LEFT) {
-    // عكس المحرك الأيسر للخلف، ودفع الأيمن للأمام
-    digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW); 
-    digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
-    
-    ledcWrite(PWMA, turnSpeed);
-    ledcWrite(PWMB, turnSpeed);
-    
-    lastError = -40; // زرع ذاكرة وهمية في حال فقدان الخط لضمان استمرار الدوران
-    delay(250);
-    return; // الخروج من الدالة (إعدام الـ PD مؤقتاً)
-  } 
-  else if (currentState == SHARP_RIGHT) {
-    // دفع المحرك الأيسر للأمام، وعكس الأيمن للخلف
-    digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
-    digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
-    
-    ledcWrite(PWMA, turnSpeed);
-    ledcWrite(PWMB, turnSpeed);
-    
-    lastError = 40; 
-
-    delay(250);
-    return; // الخروج من الدالة
+  if (dt <= 0.0){
+    dt = 0.001;
   }
 
-  // ==========================================
-  // الحالة الطبيعية: تتبع المسار السلس (Pure PD)
-  // ==========================================
-  
-  // إرجاع المحركات للاتجاه الأمامي الطبيعي
-  digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
-  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
-
-  float P = 0;
-  float D = 0;
-
-  if (isLineLost) {
+  if (lineLost) {
     // ذاكرة الروبوت: استخدام قيمة P قوية للعودة إذا قفز عن الخط
     P = (lastError > 0) ? 60.0 : -60.0; 
     D = 0; // إبطال التفاضل لمنع الصدمة
@@ -58,15 +24,8 @@ void calculatePD() {
   // حساب المعادلة
   float PD_Value = (Kp * P) + (Kd * D);
 
-  // تقييد السرعة وإرسالها للمحركات (10-bit)
-  int leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, 1023);
-  int rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, 1023);
-
-  ledcWrite(PWMA, leftMotorSpeed);
-  ledcWrite(PWMB, rightMotorSpeed);
-
   // تحديث الذاكرة للمستقبل
-  if (!isLineLost) {
+  if (!lineLost) {
     lastError = currentError;
   }
 }
