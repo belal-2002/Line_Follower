@@ -4,8 +4,8 @@ void loopMotor() {
   digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
   digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
   // تقييد السرعة وإرسالها للمحركات (10-bit)
-  leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, 1023);
-  rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, 1023);
+  leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, maximumSpeed);
+  rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, maximumSpeed);
 
   ledcWrite(PWMA, leftMotorSpeed);
   ledcWrite(PWMB, rightMotorSpeed);
