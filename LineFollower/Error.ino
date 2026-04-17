@@ -16,7 +16,7 @@ void calculateError() {
     if (currentError > 0){
       goRight = true;
       //goLeft = false;
-    } else {
+    } else if (currentError < 0) {
       goRight = false;
       //goLeft = true;
     }
