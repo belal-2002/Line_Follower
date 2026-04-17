@@ -1,5 +1,4 @@
-void calculatePD() { // يعمل الآن كمتحكم هجين (Hybrid PD)
-  
+void calculatePD() {
   // 1. حساب الزمن الدقيق (dt)
   unsigned long currentTime = micros();
   static unsigned long lastTime = 0;
@@ -15,8 +14,8 @@ void calculatePD() { // يعمل الآن كمتحكم هجين (Hybrid PD)
     digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW); 
     digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
     
-    ledcWrite(PWMA, tankTurnSpeed);
-    ledcWrite(PWMB, tankTurnSpeed);
+    ledcWrite(PWMA, turnSpeed);
+    ledcWrite(PWMB, turnSpeed);
     
     lastError = -40; // زرع ذاكرة وهمية في حال فقدان الخط لضمان استمرار الدوران
     delay(250);
@@ -27,8 +26,8 @@ void calculatePD() { // يعمل الآن كمتحكم هجين (Hybrid PD)
     digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
     digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
     
-    ledcWrite(PWMA, tankTurnSpeed);
-    ledcWrite(PWMB, tankTurnSpeed);
+    ledcWrite(PWMA, turnSpeed);
+    ledcWrite(PWMB, turnSpeed);
     
     lastError = 40; 
 
