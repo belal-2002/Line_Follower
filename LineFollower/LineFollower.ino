@@ -41,7 +41,7 @@ float lastError = 0;
 float currentError = 0;
 
 int baseSpeed = 800;
-int tankTurnSpeed = 800; // سرعة دوران المحركات العكسية عند زاوية 90 (عدلها حسب قوة محركاتك)
+int turnSpeed = 800; // سرعة دوران المحركات العكسية عند زاوية 90 (عدلها حسب قوة محركاتك)
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
 
@@ -50,33 +50,26 @@ enum RobotState { NORMAL_PD, SHARP_LEFT, SHARP_RIGHT };
 RobotState currentState = NORMAL_PD;
 
 bool serviceStarted = false;
-//bool lineLost = false; // متغير لمعرفة حالة فقدان الخط
 bool isLineLost = false;
 
 void setup() {
   //Serial.begin(115200);
-  // استدعاء دوال الإعداد من الملفات الأخرى
   setupMotors();
   setupSensors();
   setupNetwork();
 }
 
 void loop() {
-  // 1. فحص زر التشغيل (من ملف Motors)
-  checkLimitSwitch();
-
-  // 2. خوارزمية التتبع (من ملفي Sensors و PID)
+  loopSwitch();
   if (isRunning) {
     calculateError();
     calculatePD();
-  }
-
-  // 3. إرسال البيانات إلى PuTTY (من ملف Network)
-  // 4. معالجة الشبكة وأوامر PuTTY (من ملف Network)
-  if (serviceStarted) {
-    printDebugData();
-    handleNetwork();
   } else { 
-    TurnOnService();
+    if (serviceStarted) {
+      printData();
+      handleNetwork();
+    } else { 
+      turnOnService();
+    }
   }
 }
