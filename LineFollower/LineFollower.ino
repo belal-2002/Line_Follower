@@ -55,7 +55,7 @@
   long sum = 0;
   bool lineAvailable = true;
   bool goRight = false;
-  bool goLeft = false;
+  //bool goLeft = false;
 
 
 
