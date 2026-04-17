@@ -15,7 +15,9 @@ void loopSwitch() {
         ledcWrite(PWMB, 0);
       }
       
-      while(digitalRead(LIMIT_SWITCH) == LOW); 
+      while(digitalRead(LIMIT_SWITCH) == LOW) {
+        yield(); // يسمح لمعالج ESP32 بإبقاء اتصال الواي فاي حياً
+      }
     }
   }
 }
