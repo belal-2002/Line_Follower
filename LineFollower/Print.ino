@@ -7,6 +7,16 @@ void loopPrint() {
         TelnetStream.print("\t");               
       }
 
+      for (int i = 0; i < 12; i++) {
+        if (sensorValue[i] > lineThreshold) {
+          TelnetStream.print(1);  
+          TelnetStream.print("\t");
+        } else {
+          TelnetStream.print(0);  
+          TelnetStream.print("\t");
+        }
+      }
+
       TelnetStream.print("\t");
       TelnetStream.printf("Kp:%.1f  Kd:%.1f  Speed:%d  TSpeed:%d", Kp, Kd, baseSpeed, turnSpeed);
       TelnetStream.print("\t");
