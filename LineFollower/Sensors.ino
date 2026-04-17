@@ -1,8 +1,4 @@
-void setupSensors() {
-  for (int i = 0; i < 12; i++) {
-    pinMode(sensorPins[i], INPUT);
-  }
-}
+
 
 void calculateError() {
   long weightedSum = 0;
