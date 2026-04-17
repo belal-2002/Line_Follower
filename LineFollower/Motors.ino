@@ -1,3 +1,39 @@
+
+
+  // إرجاع المحركات للاتجاه الأمامي الطبيعي
+  digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
+  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
+
+  // تقييد السرعة وإرسالها للمحركات (10-bit)
+  int leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, 1023);
+  int rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, 1023);
+
+  ledcWrite(PWMA, leftMotorSpeed);
+  ledcWrite(PWMB, rightMotorSpeed);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // ==========================================
   // المقاطعة العنيفة: التفاف 90 درجة (Tank Turn)
   // ==========================================
