@@ -35,8 +35,8 @@
   float Kp = 40.0;
   float Kd = 60.0;
 
-  int baseSpeed = 800;
-  int turnSpeed = 800;
+  int baseSpeed = 400;
+  int turnSpeed = 400;
 
   float P = 0;
   float D = 0;
