@@ -4,6 +4,6 @@ void loopSensors() {
     sensorValue[i] = analogRead(sensorPins[i]);
   }
   //sensorValue[1] -= 270;
-  sensorValue[10] -= 270;
+  //sensorValue[10] -= 270;
 }
 
