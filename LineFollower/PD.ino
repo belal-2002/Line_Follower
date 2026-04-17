@@ -1,7 +1,6 @@
 void calculatePD() {
   P = 0;
   D = 0;
-  lastTime = 0;
   currentTime = micros();
 
   dt = (currentTime - lastTime) / 1000000.0;
