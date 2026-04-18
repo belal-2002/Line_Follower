@@ -3,7 +3,7 @@ void calculatePD() {
   D = 0;
   currentTime = micros();
 
-  dt = (currentTime - lastTime) / 1000000.0;
+  dt = (float) (currentTime - lastTime) / 1000000.0;
   lastTime = currentTime;
 
   if (dt <= 0.0){
