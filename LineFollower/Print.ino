@@ -19,7 +19,7 @@ void loopPrint() {
       }
 
       TelnetStream.print("\t");
-      TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  Err:%d", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, PD_Value);
+      TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  Err:%.2f", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, PD_Value);
       TelnetStream.print("\t");
       //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
 
