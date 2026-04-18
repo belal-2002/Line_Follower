@@ -32,11 +32,11 @@
 //PD
   bool isRunning = false;
 
-  float Kp = 40.0;
-  float Kd = 60.0;
-  int maximumSpeed = 1023;   //600;
-  int baseSpeed = 800;  //200;
-  int turnSpeed = 800;  //400;
+  float Kp = 1.15;
+  float Kd = 15.0;
+  int maximumSpeed = 625;  //1023;   
+  int baseSpeed = 275;  //800;  
+  int turnSpeed = 600;  //800;  
 
   float P = 0;
   float D = 0;
@@ -49,7 +49,8 @@
   float dt;
 
 //Sensors
-  const int sensorWeights[12] = {-55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 55};
+  //const int sensorWeights[12] = {-465, -296, -178, -127, -76, -25, 25, 76, 127, 178, 296, 465};
+  const int sensorWeights[12] = {-698, -444, -267, -190, -114, -38, 38, 114, 190, 267, 444, 698};
   int sensorValue[12];  
   long weightedSum = 0;
   long sum = 0;
@@ -57,7 +58,7 @@
   bool goRight = false;
   //bool goLeft = false;
 
-  int lineThreshold = 1300;
+  int lineThreshold = 1333;
 
 
 
@@ -84,11 +85,11 @@ void loop() {
     calculateError();
     if (lineAvailable) calculatePD();
       loopMotor();
-    } else { 
+    } //else { 
     if (serviceStarted) {
       loopPrint();
     } else { 
       turnOnService();
     }
-  }
+  //}
 }
