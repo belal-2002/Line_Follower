@@ -17,8 +17,10 @@ void loopMotor() {
     
       ledcWrite(PWMA, turnSpeed);
       ledcWrite(PWMB, turnSpeed);
-    
-      lastError = 40; 
+
+      //lastError = 750;
+      //lastError = 500;
+      lastError = -750; 
     } else {
       // عكس المحرك الأيسر للخلف، ودفع الأيمن للأمام
       digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW); 
@@ -26,8 +28,10 @@ void loopMotor() {
     
       ledcWrite(PWMA, turnSpeed);
       ledcWrite(PWMB, turnSpeed);
-    
-      lastError = -40;
+      
+      //lastError = -750;
+      //lastError = -500;
+      lastError = 750;
     }
   }
 }
