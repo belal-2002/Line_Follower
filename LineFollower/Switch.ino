@@ -1,8 +1,6 @@
 void loopSwitch() {
-  // 1. نقرأ حالة الزر 
   if (digitalRead(LIMIT_SWITCH) == LOW) {
     
-    // 2. نتحقق هل مر وقت كافٍ منذ آخر مرة تم فيها تفعيل الزر بنجاح؟
     if (millis() - lastButtonPress > debounceDelay) {
       
       isRunning = !isRunning; 
@@ -17,7 +15,6 @@ void loopSwitch() {
         ledcWrite(PWMB, 0);
       }
       
-      // 3. تحديث توقيت آخر ضغطة لتفعيل مؤقت التجاهل
       lastButtonPress = millis();
     }
   }
