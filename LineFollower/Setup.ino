@@ -2,7 +2,6 @@ void setupMotors() {
   pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
   pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
-  pinMode(LIMIT_SWITCH, INPUT_PULLUP);
 
   // --- التعديل الاحترافي للتردد والدقة ---
   ledcAttach(PWMA, 10000, 10); 
@@ -13,6 +12,12 @@ void setupMotors() {
   digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
   ledcWrite(PWMA, 0);
   ledcWrite(PWMB, 0);
+
+  pinMode(LIMIT_SWITCH, INPUT_PULLUP);
+  pinMode(STRATEGY_1_PIN, INPUT_PULLUP);
+  pinMode(STRATEGY_2_PIN, INPUT_PULLUP);
+  pinMode(STRATEGY_3_PIN, INPUT_PULLUP);
+
 }
 
 void setupSensors() {
