@@ -22,8 +22,11 @@
   #define BIN2 20   
   #define STBY 39   
 
-// --- تعريف مفتاح التشغيل ---
+// ---  تعريف مفتاح التشغيل ودبابيس الاستراتيجيات  ---
   #define LIMIT_SWITCH 17  
+  #define STRATEGY_1_PIN 18
+  #define STRATEGY_2_PIN 47
+  #define STRATEGY_3_PIN 48
 
 // --- تعريف دبابيس الحساسات الـ 12 ---
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
@@ -63,7 +66,6 @@
   //bool goLeft = false;
 
   int lineThreshold = 1333;
-
 
 
 int leftMotorSpeed = 0;
