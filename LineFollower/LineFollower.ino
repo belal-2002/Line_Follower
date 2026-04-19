@@ -29,6 +29,10 @@
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
+  unsigned long lastButtonPress = 0;
+  const unsigned long debounceDelay = 2500;
+
+
 //PD
   bool isRunning = false;
 
