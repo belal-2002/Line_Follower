@@ -39,6 +39,7 @@
   bool bit2 = false;
   bool bit3 = false;
   int strategy = 0;
+  int caseMotor = 0;
 
 
 //PD
