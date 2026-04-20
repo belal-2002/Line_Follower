@@ -38,10 +38,12 @@
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
-  int strategy = 0;
-  int caseMotor = 0;
+  byte strategy = 0;
+  byte caseMotor = 0;
   int sensorBit = 0;
- 
+  byte rightSensor = 0;
+  byte leftSensor = 0;
+  byte allSensor = 0;
 
 //PD
   bool isRunning = false;
@@ -93,8 +95,7 @@ void loop() {
   loopStrategy();
   if (isRunning) {
     calculateError();
-    if (lineAvailable) calculatePD();
-      loopMotor();
+    loopMotor();
     } //else {  
     if (serviceStarted) {
       loopPrint();
