@@ -15,10 +15,10 @@ void setupMotors() {
 }
 
 void setupSwitch() {
-  pinMode(LIMIT_SWITCH, INPUT_PULLUP);
-  pinMode(STRATEGY_1_PIN, INPUT_PULLUP);
-  pinMode(STRATEGY_2_PIN, INPUT_PULLUP);
-  pinMode(STRATEGY_3_PIN, INPUT_PULLUP);
+  pinMode(limitSwitch, INPUT_PULLUP);
+  pinMode(switchPin1, INPUT_PULLUP);
+  pinMode(switchPin2, INPUT_PULLUP);
+  pinMode(switchPin3, INPUT_PULLUP);
 }
 
 void setupSensors() {
