@@ -12,12 +12,13 @@ void setupMotors() {
   digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
   ledcWrite(PWMA, 0);
   ledcWrite(PWMB, 0);
+}
 
+void setupSwitch() {
   pinMode(LIMIT_SWITCH, INPUT_PULLUP);
   pinMode(STRATEGY_1_PIN, INPUT_PULLUP);
   pinMode(STRATEGY_2_PIN, INPUT_PULLUP);
   pinMode(STRATEGY_3_PIN, INPUT_PULLUP);
-
 }
 
 void setupSensors() {
