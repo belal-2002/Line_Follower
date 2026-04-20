@@ -1,5 +1,4 @@
 void loopPrint() {
-  static unsigned long lastPrintTime = 0;
   if (millis() - lastPrintTime > 1500) {
 /*
       for (int i = 0; i < 12; i++) {
