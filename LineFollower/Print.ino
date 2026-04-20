@@ -7,15 +7,12 @@ void loopPrint() {
       }
       TelnetStream.println();
 */
-      for (int i = 0; i < 12; i++) {
-        if (sensorValue[i] > lineThreshold) {
-          TelnetStream.print(1);  
-          TelnetStream.print("\t");
-        } else {
-          TelnetStream.print(0);  
-          TelnetStream.print("\t");
-        }
-      }
+  String output = "";
+  for (int i = 0; i < 12; i++) {
+    output += bitRead(sensorBit, 11 - i);
+    output += "\t";
+  }
+  TelnetStream.print(output);
 
       TelnetStream.print("\t");
       TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  Err:%.2f", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, PD_Value);
