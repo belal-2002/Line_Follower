@@ -31,7 +31,6 @@ void loopSwitch() {
     }
   }
 
-
   if (digitalRead(LIMIT_SWITCH) == LOW) {
     
     if (millis() - lastButtonPress > debounceDelay) {
