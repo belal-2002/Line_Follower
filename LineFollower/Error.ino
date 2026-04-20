@@ -20,15 +20,20 @@ void calculateError() {
     }
 
     if (currentError > 0){
-      // الدوران لليمين
-      caseMotor = 1;
+      goRight = true;
     } else if (currentError < 0) {
-      // الدوران لليسار
-      caseMotor = 2;
+      goRight = false;
     }
   
   } else {
     lineAvailable = false; // الروبوت فقد الخط كلياً في المسار الطبيعي
+    if (goRight){
+      // الدوران لليمين
+      caseMotor = 1;
+    } else {
+      // الدوران لليسار
+      caseMotor = 2;
+    }
   }
   lineWasFound = lineAvailable;
 }
