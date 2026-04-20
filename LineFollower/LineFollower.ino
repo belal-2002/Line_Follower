@@ -92,11 +92,12 @@ void setup() {
 void loop() {
   loopSwitch();
   loopSensors();
+  loopStrategy();
   if (isRunning) {
     calculateError();
     if (lineAvailable) calculatePD();
       loopMotor();
-    } //else { 
+    } //else {  
     if (serviceStarted) {
       loopPrint();
     } else { 
