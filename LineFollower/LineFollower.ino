@@ -55,13 +55,14 @@
   static unsigned long lastTime = 0;
   float dt;
 
-//Sensors
+//Error
   //const int sensorWeights[12] = {-465, -296, -178, -127, -76, -25, 25, 76, 127, 178, 296, 465};
   const int sensorWeights[12] = {-698, -444, -267, -190, -114, -38, 38, 114, 190, 267, 444, 698};
   int sensorValue[12];  
   long weightedSum = 0;
   long sum = 0;
   bool lineAvailable = true;
+  bool lineWasFound = true;
   bool goRight = false;
   //bool goLeft = false;
 
@@ -80,6 +81,7 @@ bool serviceStarted = false;
 void setup() {
   //Serial.begin(115200);
   setupMotors();
+  setupSwitch();
   setupSensors();
   setupNetwork();
 }
