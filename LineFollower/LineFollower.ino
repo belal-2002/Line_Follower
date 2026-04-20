@@ -69,6 +69,7 @@
   long sum = 0;
   bool lineAvailable = true;
   bool lineWasFound = true;
+  bool goRight = false;
 
   int lineThreshold = 1333;
 
