@@ -40,7 +40,8 @@
   bool bit3 = false;
   int strategy = 0;
   int caseMotor = 0;
-
+  int sensorBit = 0;
+ 
 
 //PD
   bool isRunning = false;
@@ -63,13 +64,11 @@
 
 //Error
   const int sensorWeights[12] = {-698, -444, -267, -190, -114, -38, 38, 114, 190, 267, 444, 698};
-  int sensorValue[12];  
+  int sensorValue[12]; 
   long weightedSum = 0;
   long sum = 0;
   bool lineAvailable = true;
   bool lineWasFound = true;
-  bool goRight = false;
-  //bool goLeft = false;
 
   int lineThreshold = 1333;
 
