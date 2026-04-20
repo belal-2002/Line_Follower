@@ -14,4 +14,4 @@ void calculatePD() {
   D = (currentError - lastError) / dt;
   lastError = currentError; 
   PD_Value = (Kp * P) + (Kd * D);
-}
+}1
