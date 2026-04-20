@@ -11,6 +11,7 @@ void calculateError() {
 
   if (sum > 0) {
     currentError = (float)weightedSum / (float)sum;
+    caseMotor = 0;
     lineAvailable = true;
 
     if (!lineWasFound) {
@@ -19,11 +20,11 @@ void calculateError() {
     }
 
     if (currentError > 0){
-      goRight = true;
-      //goLeft = false;
+      // الدوران لليمين
+      caseMotor = 1;
     } else if (currentError < 0) {
-      goRight = false;
-      //goLeft = true;
+      // الدوران لليسار
+      caseMotor = 2;
     }
   
   } else {
