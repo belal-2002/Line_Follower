@@ -11,8 +11,8 @@ void calculateError() {
 
   if (sum > 0) {
     currentError = (float)weightedSum / (float)sum;
-    caseMotor = 0;
     lineAvailable = true;
+    caseMotor = 0;
 
     if (!lineWasFound) {
       lastTime = micros();       
