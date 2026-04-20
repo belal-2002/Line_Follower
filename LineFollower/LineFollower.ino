@@ -32,11 +32,13 @@
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
+  static unsigned long lastPrintTime = 0;
   unsigned long lastButtonPress = 0;
-  const unsigned long debounceDelay = 2500;
-  bool switch1 = false;
-  bool switch2 = false;
-  bool switch3 = false;
+  const unsigned long debounceDelay = 300;
+  bool bit1 = false;
+  bool bit2 = false;
+  bool bit3 = false;
+  int strategy = 0;
 
 
 //PD
@@ -46,7 +48,7 @@
   float Kd = 15.0;
   int maximumSpeed = 625;  //1023;   
   int baseSpeed = 275;  //800;  
-  int turnSpeed = 600;  //800;  
+  int turnSpeed = 600;    
 
   float P = 0;
   float D = 0;
@@ -59,7 +61,6 @@
   float dt;
 
 //Error
-  //const int sensorWeights[12] = {-465, -296, -178, -127, -76, -25, 25, 76, 127, 178, 296, 465};
   const int sensorWeights[12] = {-698, -444, -267, -190, -114, -38, 38, 114, 190, 267, 444, 698};
   int sensorValue[12];  
   long weightedSum = 0;
@@ -74,10 +75,6 @@
 
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
-
-// --- متغيرات نظام التحكم الهجين ---
-//enum RobotState { NORMAL_PD, SHARP_LEFT, SHARP_RIGHT };
-//RobotState currentState = NORMAL_PD;
 
 bool serviceStarted = false;
 
