@@ -23,10 +23,10 @@
   #define STBY 39   
 
 // ---  تعريف مفتاح التشغيل ودبابيس الاستراتيجيات  ---
-  #define LIMIT_SWITCH 17  
-  #define STRATEGY_1_PIN 18
-  #define STRATEGY_2_PIN 47
-  #define STRATEGY_3_PIN 48
+  #define limitSwitch 17  
+  #define switchPin1 18
+  #define switchPin2 47
+  #define switchPin3 48
 
 // --- تعريف دبابيس الحساسات الـ 12 ---
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
@@ -34,6 +34,9 @@
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 2500;
+  bool switch1 = false;
+  bool switch2 = false;
+  bool switch3 = false;
 
 
 //PD
