@@ -13,6 +13,11 @@ void calculateError() {
     currentError = (float)weightedSum / (float)sum;
     lineAvailable = true;
 
+    if (!lineWasFound) {
+      lastTime = micros();       
+      lastError = currentError;  
+    }
+
     if (currentError > 0){
       goRight = true;
       //goLeft = false;
@@ -24,4 +29,11 @@ void calculateError() {
   } else {
     lineAvailable = false; // الروبوت فقد الخط كلياً في المسار الطبيعي
   }
+  lineWasFound = lineAvailable;
 }
+
+
+
+
+
+
