@@ -8,7 +8,6 @@ void calculatePD() {
 
   if (dt <= 0.0) dt = 0.001;
 
-
   P = currentError;
   D = (currentError - lastError) / dt;
   lastError = currentError; 
