@@ -34,7 +34,7 @@
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
   static unsigned long lastPrintTime = 0;
   unsigned long lastButtonPress = 0;
-  const unsigned long debounceDelay = 300;
+  const unsigned long debounceDelay = 400;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
@@ -43,7 +43,12 @@
   int sensorBit = 0;
   byte rightSensor = 0;
   byte leftSensor = 0;
+  byte midSensor = 0; 
   byte allSensor = 0;
+  byte radar = 0;
+  byte rightRadar = 0;
+  byte leftRadar = 0;
+
 
 //PD
   bool isRunning = false;
@@ -92,8 +97,8 @@ void setup() {
 void loop() {
   loopSwitch();
   loopSensors();
-  loopStrategy();
   if (isRunning) {
+    loopStrategy();
     calculateError();
     loopMotor();
     } //else {  
