@@ -1,36 +1,62 @@
 void loopStrategy() {
   switch (strategy) {
+    case 0: // 000
+      if (midSensor >= 7) {  // السير في خط مستقيم لتجاوز التقاطع
+        caseMotor = 3;
+        lineWasFound = false;
+        lineAvailable = false;
+        loopMotor();
+        return;
+      }
+
+      // لازم افحص بت معين
+      if (leftRadar == 2) {
     
-    case 0: // الحالة 000
+      }
+    break;
+    case 1: // 001
+      // بس يخلص الخط الاسود لف
+      if (midSensor >= 7) {  // السير في خط مستقيم لتجاوز التقاطع
+        caseMotor = 3;
+        lineWasFound = false;
+        lineAvailable = false;
+        loopMotor();
+        return;
+      }
 
-      break;
+      // لازم افحص بت معين
+      if (leftRadar == 2) {
+    
+      }
+    break;
+    case 2: // 010
+      if (allSensor >= 11 || radar >= 3) {  // السير في خط مستقيم لتجاوز التقاطع
+        caseMotor = 3;
+        lineWasFound = false;
+        lineAvailable = false;
+        loopMotor();
+        return;
+      }
 
-    case 1: // الحالة 001
+      // لازم افحص بت معين
+      if (leftRadar == 2) {
+    
+      }
+    break;
+    case 3: // 011
 
-      break;
+    break;
+    case 4: // 100
 
-    case 2: // الحالة 010
-      // ضع قيمك هنا
-      break;
+    break;
+    case 5: // 101
 
-    case 3: // الحالة 011
-      // ضع قيمك هنا
-      break;
+    break;
+    case 6: // 110
 
-    case 4: // الحالة 100
-      // ضع قيمك هنا
-      break;
+    break;
+    case 7: // 111
 
-    case 5: // الحالة 101
-      // ضع قيمك هنا
-      break;
-
-    case 6: // الحالة 110
-      // ضع قيمك هنا
-      break;
-
-    case 7: // الحالة 111
-
-      break;
+    break;
   }
 }
