@@ -1,12 +1,12 @@
 void loopStrategy0() {
-  if (leftSensor){
+  if (leftRadar){
     leftRadarOn = true;
-    rightRadarTime = millis();
+    leftRadarTime = millis();
   } else { if (millis() - leftRadarTime > RadarTime) {
       leftRadarOn = false;
     }  
   } 
-  if (rightSensor){
+  if (rightRadar){
     rightRadarOn = true;
     rightRadarTime = millis();
   } else { if (millis() - rightRadarTime > RadarTime) {
@@ -14,15 +14,13 @@ void loopStrategy0() {
     }  
   } 
 
-  if (midSensor >= 7) {
-    calculateError();
-    return;
-  }
-
   if (midSensor) { 
     goLeft = false;
     goRight = false;
   }
+  
+  if (goLeft && leftRadar) calculateError();
+  if (goRight && rightRadar) calculateError();
 
   if (!allSensor) {
     if (leftRadarOn) {
@@ -35,10 +33,14 @@ void loopStrategy0() {
       goRight = true;
       return;
     }
-    if (goLeft || goRight) return;
-
-    calculateError();
-    return;
   }
+
+  if (radar && midSensor){
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  
   calculateError();
 }      
