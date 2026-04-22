@@ -1,7 +1,4 @@
 void calculateError() {
-  rightSensor = 0;
-  leftSensor = 0;
-  allSensor = 0;
   weightedSum = 0;
   sum = 0;
 
@@ -14,31 +11,20 @@ void calculateError() {
 
   if (sum > 0) {
     currentError = (float)weightedSum / (float)sum;
-    lineAvailable = true;
-    caseMotor = 0;
+    caseMotor = 0; // العودة للمسار الطبيعي
 
+    // --- حماية الـ PD عند استرجاع الخط ---
     if (!lineWasFound) {
       lastTime = micros();       
-      lastError = currentError;  
+      lastError = currentError;
+      lineWasFound = true; // تم الاستشفاء بنجاح
     }
 
-    if (currentError > 0){
-      goRight = true;
-    } else if (currentError < 0) {
-      goRight = false;
-    }
-  
+    calculatePD();
   } else {
-    lineAvailable = false; // الروبوت فقد الخط كلياً في المسار الطبيعي
-    if (goRight){ // الدوران لليمين
-      caseMotor = 2;
-    } else { // الدوران لليسار
-      caseMotor = 1;
-    }
+    // فقدنا الخط بالكامل (خط دفاع أخير إذا لم تتصرف الاستراتيجية)
+    lineWasFound = false;
   }
-  lineWasFound = lineAvailable;
-
-  if (lineAvailable) calculatePD();
 }
 
 
