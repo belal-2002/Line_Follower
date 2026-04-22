@@ -31,9 +31,9 @@ void calculateError() {
   } else {
     lineAvailable = false; // الروبوت فقد الخط كلياً في المسار الطبيعي
     if (goRight){ // الدوران لليمين
-      caseMotor = 1;
-    } else { // الدوران لليسار
       caseMotor = 2;
+    } else { // الدوران لليسار
+      caseMotor = 1;
     }
   }
   lineWasFound = lineAvailable;
