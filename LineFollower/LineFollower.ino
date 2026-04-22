@@ -108,11 +108,11 @@ void loop() {
   if (isRunning) {
     loopStrategy();
     loopMotor();
-    } //else {  
+    } else {  
     if (serviceStarted) {
       loopPrint();
     } else { 
       turnOnService();
     }
-  //}
+  }
 }
