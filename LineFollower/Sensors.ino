@@ -14,18 +14,24 @@ void loopSensors() {
     }
   }
 
+  // إزاحة البتات 6 خطوات لليمين لاستخراج بتات الحساسات اليسرى (من 6 إلى 11) وعدّها
+  leftSensor = __builtin_popcount((sensorBit >> 6) & 0x3F); 
+
   // استخراج أول 6 بتات (من 0 إلى 5) الخاصة بالحساسات اليمنى وعدّها بسرعة
   rightSensor = __builtin_popcount(sensorBit & 0x3F); // 0x3F تعادل 000000111111 ثنائياً
 
-  // إزاحة البتات 6 خطوات لليمين لاستخراج بتات الحساسات اليسرى (من 6 إلى 11) وعدّها
-  leftSensor = __builtin_popcount((sensorBit >> 6) & 0x3F); 
+  // حساسات المنتصف
   midSensor = __builtin_popcount((sensorBit >> 2) & 0xFF);
 
   // إجمالي الحساسات
   allSensor = __builtin_popcount(sensorBit & 0xFFF);
 
-  leftRadar = bitRead(sensorBit, 0) + bitRead(sensorBit, 1);
-  rightRadar = bitRead(sensorBit, 10) + bitRead(sensorBit, 11);
-  radar = leftRadar + rightRadar;  
+  // حساسات اليسار: إزاحة 10 خطوات لليمين لاقتناص بتات اليسار
+  leftRadar = __builtin_popcount((sensorBit >> 10) & 0x03);
+
+  // حساسات اليمين: 0x03 تعادل (11) ثنائياً لاقتناص أول بتين من اليمين
+  rightRadar = __builtin_popcount(sensorBit & 0x03);
+
+  radar = leftRadar + rightRadar;
 }
 
