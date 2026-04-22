@@ -31,7 +31,19 @@ void loopSensors() {
 
   // حساسات اليمين: 0x03 تعادل (11) ثنائياً لاقتناص أول بتين من اليمين
   rightRadar = __builtin_popcount(sensorBit & 0x03);
-
   radar = leftRadar + rightRadar;
+
+  if (leftRadar){
+    leftRadarOn = true;
+    leftRadarTime = millis();
+  } else { 
+    if (millis() - leftRadarTime > RadarTime) leftRadarOn = false;
+  } 
+  if (rightRadar){
+    rightRadarOn = true;
+    rightRadarTime = millis();
+  } else { 
+    if (millis() - rightRadarTime > RadarTime) rightRadarOn = false;
+  } 
 }
 
