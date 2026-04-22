@@ -12,17 +12,17 @@ void loopMotor() {
       ledcWrite(PWMB, rightMotorSpeed);
     break;
     case 1:
-      // الدوران لليمين
-      digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
-      digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
+      // الدوران لليسار
+      digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW); 
+      digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
     
       ledcWrite(PWMA, turnSpeed);
       ledcWrite(PWMB, turnSpeed);
     break;
     case 2:
-      // الدوران لليسار
-      digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW); 
-      digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
+      // الدوران لليمين
+      digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
+      digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
     
       ledcWrite(PWMA, turnSpeed);
       ledcWrite(PWMB, turnSpeed);
