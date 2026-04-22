@@ -33,8 +33,12 @@
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
   static unsigned long lastPrintTime = 0;
+  static unsigned long rightRadarTime = 0;
+  static unsigned long leftRadarTime = 0;
+  static unsigned long allRadarTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
+  const unsigned long RadarTime = 27;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
@@ -48,7 +52,11 @@
   byte radar = 0;
   byte rightRadar = 0;
   byte leftRadar = 0;
-
+  bool rightRadarOn = false;
+  bool leftRadarOn = false;
+  bool allRadarOn = false;
+  bool goRight = false;
+  bool goLeft = false;
 
 //PD
   bool isRunning = false;
@@ -76,7 +84,7 @@
   long sum = 0;
   bool lineAvailable = true;
   bool lineWasFound = true;
-  bool goRight = false;
+  
 
   int lineThreshold = 1333;
 
@@ -99,7 +107,6 @@ void loop() {
   loopSensors();
   if (isRunning) {
     loopStrategy();
-    calculateError();
     loopMotor();
     } //else {  
     if (serviceStarted) {
