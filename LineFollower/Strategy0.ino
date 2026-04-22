@@ -19,8 +19,9 @@ void loopStrategy0() {
     goRight = false;
   }
   
-  if (goLeft && leftRadar) calculateError();
-  if (goRight && rightRadar) calculateError();
+  if (goLeft && leftRadar) { calculateError(); return; }
+  if (goRight && rightRadar) { calculateError(); return; }
+  if (goLeft || goRight) return;
 
   if (!allSensor) {
     if (leftRadarOn) {
