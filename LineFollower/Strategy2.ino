@@ -1,15 +1,39 @@
-/*
-      // بس يخلص الخط الاسود لف
-      if (midSensor >= 7) {  // السير في خط مستقيم لتجاوز التقاطع
-        caseMotor = 3;
-        lineWasFound = false;
-        lineAvailable = false;
-        loopMotor();
-        return;
-      }
+void loopStrategy2() { 
+  if ((bitRead(sensorBit, 11)) && (midSensor >= 2) && (!rightRadar)) {
+    lineWasFound = false;
+    caseMotor = 1;
+    goLeft = true; 
+    return;   
+  }
 
-      // لازم افحص بت معين
-      if (leftRadar == 2) {
-    
-      }
-      */  
+  if (midSensor && (!leftRadar)) { 
+    goLeft = false;
+    goRight = false;
+  }
+  
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  
+  if (goLeft || goRight) return;
+
+  if (!allSensor) {
+    lineWasFound = false;
+    if (leftRadarOn) {
+      caseMotor = 1;
+      goLeft = true; 
+      return;
+    }
+    if (rightRadarOn) {
+      caseMotor = 2;
+      goRight = true;
+      return;
+    }
+  }
+
+  if (rightRadar && midSensor){
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+  }
+  
+  calculateError();
+}      
