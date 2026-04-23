@@ -3,8 +3,8 @@ void loopSensors() {
   for (int i = 0; i < 12; i++) {
     sensorValue[i] = analogRead(sensorPins[i]);
   }
-  sensorValue[1] -= 70;
-  sensorValue[10] -= 170;
+  sensorValue[1] -= 25;
+  sensorValue[10] -= 250;
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
@@ -31,7 +31,7 @@ void loopSensors() {
 
   // حساسات اليمين: 0x03 تعادل (11) ثنائياً لاقتناص أول بتين من اليمين
   rightRadar = __builtin_popcount(sensorBit & 0x03);
-  
+
   radar = leftRadar + rightRadar;
 
   if (leftRadar){
