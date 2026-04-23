@@ -1,12 +1,12 @@
 void loopSwitch() {
   // فحص الأزرار وتحديد رقم الاستراتيجية (فقط عندما يكون الروبوت متوقفاً)
   if (!isRunning) {
-    bit3 = (digitalRead(switchPin1) == LOW) ? 1 : 0; // يمثل الرقم 1
+    bit1 = (digitalRead(switchPin1) == LOW) ? 1 : 0; // يمثل الرقم 1
     bit2 = (digitalRead(switchPin2) == LOW) ? 1 : 0; // يمثل الرقم 2
-    bit1 = (digitalRead(switchPin3) == LOW) ? 1 : 0; // يمثل الرقم 4
+    bit3 = (digitalRead(switchPin3) == LOW) ? 1 : 0; // يمثل الرقم 4
     
     // المجموع سيعطينا رقماً دقيقاً من 0 إلى 7
-    strategy = bit3 + (bit2 * 2) + (bit1 * 4);
+    //strategy = bit2 + (bit2 * 3) + (bit1 * 4);
   }
 
   if (digitalRead(limitSwitch) == LOW) {
