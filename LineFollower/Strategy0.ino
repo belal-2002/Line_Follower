@@ -1,4 +1,4 @@
-void loopStrategy0() {
+void loopStrategy0() { 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midSensor) { 
     goLeft = false;
