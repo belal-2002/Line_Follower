@@ -1,48 +1,23 @@
-/*
-      if (allSensor >= 11 || radar >= 3) {  // السير في خط مستقيم لتجاوز التقاطع
-        caseMotor = 3;
-        lineWasFound = false;
-        lineAvailable = false;
-        loopMotor();
-        return;
-      }
+void loopStrategy3() { 
+  if ((bitRead(sensorBit, 0)) && (midSensor >= 2) && (!leftRadar)) {
+    lineWasFound = false;
+    caseMotor = 2;
+    goRight = true; 
+    return;   
+  }
 
-      // لازم افحص بت معين
-      if (leftRadar == 2) {
-    
-      }
-*/      
-/*
-
-
-
-void loopStrategy0() {
-  if (leftSensor){
-    leftRadarOn = true;
-    leftRadarTime = millis();
-  } else { if (millis() - leftRadarTime > RadarTime) {
-      leftRadarOn = false;
-    }  
-  } 
-  if (rightSensor){
-    rightRadarOn = true;
-    rightRadarTime = millis();
-  } else { if (millis() - rightRadarTime > RadarTime) {
-      rightRadarOn = false;
-    }  
-  } 
-
-  //if (midSensor >= 7) {
-  //  calculateError();
-  //  return;
-  //}
-
-  if (midSensor) { 
+  if (midSensor && (!rightRadar)) { 
     goLeft = false;
     goRight = false;
   }
+  
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  
+  if (goLeft || goRight) return;
 
   if (!allSensor) {
+    lineWasFound = false;
     if (leftRadarOn) {
       caseMotor = 1;
       goLeft = true; 
@@ -53,14 +28,18 @@ void loopStrategy0() {
       goRight = true;
       return;
     }
-    if (goLeft || goRight) return;
-
-    calculateError();
-    return;
   }
+
+  if (leftRadar && rightRadar && midSensor) {
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  else if (leftRadar && midSensor) {
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  
   calculateError();
-} 
-
-
-*/
-
+}      
