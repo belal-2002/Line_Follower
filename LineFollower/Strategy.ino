@@ -10,10 +10,10 @@ void loopStrategy() {
       loopStrategy2();
     break;
     case 3: // 011
-      //loopStrategy3();
+      loopStrategy3();
     break;
     case 4: // 100
-      //loopStrategy4();
+      loopStrategy4();
     break;
     case 5: // 101
       //loopStrategy5();
