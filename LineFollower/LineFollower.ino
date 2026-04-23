@@ -42,7 +42,7 @@
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
-  byte strategy = 0;
+  byte strategy = 3;
   byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
