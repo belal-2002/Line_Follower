@@ -4,10 +4,10 @@ void loopStrategy() {
       loopStrategy0();
     break;
     case 1: // 001
-      //loopStrategy1();  
+      loopStrategy1();  
     break;
     case 2: // 010
-      //loopStrategy2();
+      loopStrategy2();
     break;
     case 3: // 011
       //loopStrategy3();
