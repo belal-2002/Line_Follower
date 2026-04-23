@@ -1,35 +1,38 @@
-void loopStrategy3() { 
+void loopStrategy3() { //Right 
   if ((bitRead(sensorBit, 0)) && (midSensor >= 2) && (!leftRadar)) {
     lineWasFound = false;
     caseMotor = 2;
     goRight = true; 
     loopMotor();
-    delay(250);
+    delay(127);
     return;   
   }
 
-  if (midSensor && (!rightRadar)) { 
+  if ((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6)) && (!rightRadar)) { 
     goLeft = false;
     goRight = false;
   }
   
-  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
   
   if (goLeft || goRight) return;
 
   if (!allSensor) {
     lineWasFound = false;
-    if (leftRadarOn) {
-      caseMotor = 1;
-      goLeft = true; 
-      return;
-    }
     if (rightRadarOn) {
       caseMotor = 2;
       goRight = true;
+      turnStartTime = millis();
       return;
     }
+    if (leftRadarOn) {
+      caseMotor = 1;
+      goLeft = true;
+      turnStartTime = millis();
+      return;
+    }
+
   }
 
   if (leftRadar && rightRadar && midSensor) {
