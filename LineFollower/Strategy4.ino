@@ -1,4 +1,5 @@
 void loopStrategy4() { 
+  /*
   if ((midSensor >= 7) && (bitRead(sensorBit, 1)) && (bitRead(sensorBit, 10))){
     goLeft = false;
     goRight = false;
@@ -58,4 +59,5 @@ void loopStrategy4() {
   }
   
   calculateError();
+  */
 } 
