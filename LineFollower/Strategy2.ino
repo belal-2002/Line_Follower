@@ -3,6 +3,8 @@ void loopStrategy2() {
     lineWasFound = false;
     caseMotor = 1;
     goLeft = true; 
+    loopMotor();
+    delay(250);
     return;   
   }
 
