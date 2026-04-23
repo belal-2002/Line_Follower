@@ -11,7 +11,7 @@
 
   const char* ssid = "Galaxy S20+2db9";      
   const char* password = "55555555";
-  //10.245.67.71
+  //10.189.201.71
 
 // --- تعريف دبابيس المحركات ---
   #define PWMA 42   
@@ -87,7 +87,7 @@
   bool lineWasFound = true;
   
 
-  int lineThreshold = 1333;
+  int lineThreshold = 600;
 
 
 int leftMotorSpeed = 0;
