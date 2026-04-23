@@ -5,12 +5,12 @@
   #include <TelnetStream.h>
 
 // --- إعدادات شبكة الواي فاي ---
-  const char* ssid = "Zain_B530_A013";      
-  const char* password = "F8BLmiFRedB"; 
+  //const char* ssid = "Zain_B530_A013";      
+  //const char* password = "F8BLmiFRedB"; 
   //192.168.8.28
 
-  //const char* ssid = "Galaxy S20+2db9";      
-  //const char* password = "55555555";
+  const char* ssid = "Galaxy S20+2db9";      
+  const char* password = "55555555";
   //10.245.67.71
 
 // --- تعريف دبابيس المحركات ---
@@ -36,9 +36,10 @@
   static unsigned long rightRadarTime = 0;
   static unsigned long leftRadarTime = 0;
   static unsigned long allRadarTime = 0;
+  unsigned long turnStartTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
-  const unsigned long RadarTime = 27;
+  const unsigned long RadarTime = 50;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
@@ -108,11 +109,11 @@ void loop() {
   if (isRunning) {
     loopStrategy();
     loopMotor();
-    } else {  
+    } //else {  
     if (serviceStarted) {
       loopPrint();
     } else { 
       turnOnService();
     }
-  }
+  //}
 }
