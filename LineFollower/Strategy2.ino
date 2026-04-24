@@ -1,5 +1,5 @@
 void loopStrategy2() { //Left
-  if ((bitRead(sensorBit, 11)) && (midSensor >= 2) && (!rightRadar)) {
+  if (leftRadar && (midSensor >= 3) && (!rightRadar)) {
     lineWasFound = false;
     caseMotor = 1;
     goLeft = true; 
