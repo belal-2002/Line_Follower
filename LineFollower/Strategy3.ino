@@ -4,7 +4,7 @@ void loopStrategy3() { //Right
     caseMotor = 2;
     goRight = true; 
     loopMotor();
-    delay(127);
+    delay(100);
     return;   
   }
 
