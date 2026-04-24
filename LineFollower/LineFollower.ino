@@ -5,12 +5,12 @@
   #include <TelnetStream.h>
 
 // --- إعدادات شبكة الواي فاي ---
-  //const char* ssid = "Zain_B530_A013";      
-  //const char* password = "F8BLmiFRedB"; 
+  const char* ssid = "Zain_B530_A013";      
+  const char* password = "F8BLmiFRedB"; 
   //192.168.8.28
 
-  const char* ssid = "Galaxy S20+2db9";      
-  const char* password = "55555555";
+  //const char* ssid = "Galaxy S20+2db9";      
+  //const char* password = "55555555";
   //10.189.201.71
 
 // --- تعريف دبابيس المحركات ---
@@ -43,7 +43,7 @@
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
-  byte strategy = 3;
+  byte strategy = 2;
   byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
@@ -87,7 +87,7 @@
   bool lineWasFound = true;
   
 
-  int lineThreshold = 600;
+  int lineThreshold = 1333;
 
 
 int leftMotorSpeed = 0;
