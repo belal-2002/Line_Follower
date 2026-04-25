@@ -87,7 +87,7 @@
   bool lineWasFound = true;
   
 
-  int lineThreshold = 1333;
+  int lineThreshold = 1275;
 
 
 int leftMotorSpeed = 0;
