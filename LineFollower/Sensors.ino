@@ -3,8 +3,8 @@ void loopSensors() {
   for (int i = 0; i < 12; i++) {
     sensorValue[i] = analogRead(sensorPins[i]);
   }
-  //sensorValue[1] -= 25;
-  //sensorValue[10] -= 450;
+  sensorValue[1] = max(0, sensorValue[1] - 25);
+  sensorValue[10] = max(0, sensorValue[10] - 450);
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
