@@ -3,8 +3,13 @@ void loopSensors() {
   for (int i = 0; i < 12; i++) {
     sensorValue[i] = analogRead(sensorPins[i]);
   }
-  sensorValue[1] = max(0, sensorValue[1] - 25);
-  sensorValue[10] = max(0, sensorValue[10] - 450);
+// معايرة الحساس رقم 2
+  sensorValue[1] = map(sensorValue[1], 223, 3261, 171, 2378);
+  sensorValue[1] = constrain(sensorValue[1], 127, 4095); // حماية القراءة من النزول تحت الصفر
+
+  // معايرة الحساس رقم 11
+  sensorValue[10] = map(sensorValue[10], 240, 3546, 171, 2378);
+  sensorValue[10] = constrain(sensorValue[10], 127, 4095); // حماية القراءة من النزول تحت الصفر
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
