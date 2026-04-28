@@ -16,7 +16,7 @@ void loopStrategy() {
       loopStrategy4();
     break;
     case 5: // 101
-      //loopStrategy5();
+      loopStrategy5();
     break;
     case 6: // 110
       //loopStrategy6();
