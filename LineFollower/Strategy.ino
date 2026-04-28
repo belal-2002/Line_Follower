@@ -19,10 +19,10 @@ void loopStrategy() {
       loopStrategy5();
     break;
     case 6: // 110
-      //loopStrategy6();
+      loopStrategy6();
     break;
     case 7: // 111
-      //loopStrategy7();
+      loopStrategy7();
     break;
   }
 }
