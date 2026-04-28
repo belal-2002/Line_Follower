@@ -6,7 +6,7 @@ void loopSwitch() {
     bit3 = (digitalRead(switchPin3) == LOW) ? 1 : 0; // يمثل الرقم 4
     
     // المجموع سيعطينا رقماً دقيقاً من 0 إلى 7
-    //strategy = bit2 + (bit2 * 3) + (bit1 * 4);
+    strategy = (bit1 * 1) + (bit2 * 2) + (bit3 * 4);
   }
 
   if (digitalRead(limitSwitch) == LOW) {
