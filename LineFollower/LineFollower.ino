@@ -95,6 +95,20 @@ int rightMotorSpeed = 0;
 
 bool serviceStarted = false;
 
+
+
+
+
+// 0: جاهز للأبيض | 1: جاهز للأسود | 2: انتهت المعايرة (بانتظار إعادة الضبط)
+int calibState = 0; 
+
+// --- متغيرات الحساب ---
+float whiteAvg[12];
+float blackAvg[12];
+float overallWhiteAvg = 0;
+float overallBlackAvg = 0;
+
+
 void setup() {
   //Serial.begin(115200);
   setupMotors();
