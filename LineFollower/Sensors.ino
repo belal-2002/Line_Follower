@@ -4,30 +4,19 @@ void loopSensors() {
     sensorValue[i] = analogRead(sensorPins[i]);
   }
 
-
-  // 1. ضع هذه المتغيرات في ملف Sensors.ino (خارج الدوال أو داخل دالة loopSensors):
-  int S2_White = 220, S2_Black = 3258;
-  int S11_White = 258, S11_Black = 3617;
-  int target_White = 174, target_Black = 2588;
-  // 2. استبدل كود المعايرة القديم بهذا الكود:
-  // معايرة الحساس رقم 2
-  sensorValue[1] = map(sensorValue[1], S2_White, S2_Black, target_White, target_Black);
-  sensorValue[1] = constrain(sensorValue[1], 50, 4095);
-
-  // معايرة الحساس رقم 11
-  sensorValue[10] = map(sensorValue[10], S11_White, S11_Black, target_White, target_Black);
-  sensorValue[10] = constrain(sensorValue[10], 50, 4095);
+  for (int i = 0; i < 12; i++) {
+    // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
+    sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
+    
+    // حماية القيم (استخدام 50 كحد أدنى كما طلبت)
+    sensorValue[i] = constrain(sensorValue[i], 50, 4095);
+  }
 
 
-  /*
-  // معايرة الحساس رقم 2
-  sensorValue[1] = map(sensorValue[1], 223, 3261, 171, 2378);
-  sensorValue[1] = constrain(sensorValue[1], 127, 4095); // حماية القراءة من النزول تحت الصفر
 
-  // معايرة الحساس رقم 11
-  sensorValue[10] = map(sensorValue[10], 240, 3546, 171, 2378);
-  sensorValue[10] = constrain(sensorValue[10], 127, 4095); // حماية القراءة من النزول تحت الصفر
-  */
+
+
+
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
