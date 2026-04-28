@@ -19,6 +19,7 @@ void setupSwitch() {
   pinMode(switchPin1, INPUT_PULLUP);
   pinMode(switchPin2, INPUT_PULLUP);
   pinMode(switchPin3, INPUT_PULLUP);
+  pinMode(buzzerPin, OUTPUT);
 }
 
 void setupSensors() {
