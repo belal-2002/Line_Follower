@@ -1,22 +1,32 @@
 void loopStrategy2() { //Left
   if (leftRadar && (midSensor >= 3) && (!rightRadar)) {
-    lineWasFound = false;
     caseMotor = 1;
     goLeft = true; 
     loopMotor();
-    delay(100);
+    delay(75);
+    turnStartTime = millis();
+    lineWasFound = false;
     return;   
   }
 
-  if ((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6)) && (!leftRadar)) {
+  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!leftRadar)) {
+    //if (millis() - turnStartTime > 100) {
     goLeft = false;
     goRight = false;
+    //}
   }
 
   //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
   //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
 
-  if (goLeft || goRight) return;
+  if (goLeft || goRight) {
+  //if (millis() - turnStartTime > 100) { // أقصى وقت مسموح للدوران الأعمى
+      goLeft = false; 
+      goRight = false;
+      caseMotor = 0; // العودة للوضع الطبيعي
+  //}
+  return;
+}
 
   if (!allSensor) {
     lineWasFound = false;
