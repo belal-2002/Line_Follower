@@ -1,7 +1,13 @@
 void loopSensors() {
-  // 1. قراءة جميع الحساسات
+// 1. قراءة جميع الحساسات باستخدام فلتر (متوسط 3 قراءات)
   for (int i = 0; i < 12; i++) {
-    sensorValue[i] = analogRead(sensorPins[i]);
+    long tempSum = 0; // متغير مؤقت لتخزين مجموع القراءات
+    // أخذ 3 قراءات متتالية لنفس الحساس
+    for (int j = 0; j < 3; j++) {
+      tempSum += analogRead(sensorPins[i]);
+    }
+    // حساب المتوسط وتخزينه كقراءة نهائية للحساس
+    sensorValue[i] = tempSum / 3;
   }
 
   for (int i = 0; i < 12; i++) {
@@ -11,12 +17,6 @@ void loopSensors() {
     // حماية القيم (استخدام 50 كحد أدنى كما طلبت)
     sensorValue[i] = constrain(sensorValue[i], 50, 4095);
   }
-
-
-
-
-
-
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
