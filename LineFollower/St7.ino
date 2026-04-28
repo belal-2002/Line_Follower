@@ -9,7 +9,6 @@ static float overallWhiteAvg = 0;
 static float overallBlackAvg = 0;
 
 void loopStrategy7() {
-  caseMotor = 4;
   bool currentButtonState = (digitalRead(limitSwitch) == LOW);
 
   // اكتشاف لحظة الضغط على الزر
@@ -20,6 +19,13 @@ void loopStrategy7() {
       if (calibState == 0) {
         TelnetStream.println("\n=== بدء معايرة الخط الأبيض ===");
         runCalibrationPhase(false); 
+        
+        // --- نغمة انتهاء الأبيض (سريعة ومتقطعة) ---
+        for(int b=0; b<3; b++){
+          buzzerOn(); delay(100);
+          buzzerOff(); delay(100);
+        }
+
         calibState = 1;
         TelnetStream.println("\n--> الروبوت متوقف. ضعه على الأسود واضغط الزر...");
       } 
@@ -27,11 +33,21 @@ void loopStrategy7() {
         TelnetStream.println("\n=== بدء معايرة الخط الأسود ===");
         runCalibrationPhase(true);  
         finalizeCalibration();      
+        
+        // --- نغمة انتهاء الأسود والمعايرة (طويلة ثم حادة) ---
+        buzzerOn(); delay(600);    // نغمة طويلة
+        buzzerOff(); delay(150);
+        // نغير التردد لنغمة مختلفة (استدعاء الدالة الأصلية في الأردوينو مؤقتاً)
+        tone(buzzerPin, 3000, 400); // نغمة حادة جداً لتأكيد النهاية
+        delay(400);
+
         calibState = 2;
         TelnetStream.println("\n--- تمت المعايرة. لتكرارها اضغط الزر، أو غير الاستراتيجية للانطلاق ---");
       } 
       else if (calibState == 2) {
         TelnetStream.println("\n--- إعادة تعيين النظام. ضع الروبوت على الأبيض واضغط الزر ---");
+        // نغمة التصفير
+        buzzerOn(); delay(100); buzzerOff();
         calibState = 0;
       }
     }
@@ -52,7 +68,6 @@ void runCalibrationPhase(bool isBlack) {
       int val = analogRead(sensorPins[s]);
       sums[s] += val;
       
-      // طباعة عينة واحدة كل 10 تكرارات
       if (i % 10 == 0) {
         TelnetStream.print(val);
         TelnetStream.print("\t");
@@ -60,7 +75,7 @@ void runCalibrationPhase(bool isBlack) {
     }
     
     if (i % 10 == 0) {
-      TelnetStream.println(); // سطر جديد بعد طباعة عينة كاملة من 12 حساس
+      TelnetStream.println(); 
     }
     
     delay(10); 
@@ -78,14 +93,9 @@ void runCalibrationPhase(bool isBlack) {
       whiteAvg[s] = avg;
     }
     
-    //TelnetStream.print("S"); 
-    //TelnetStream.print(s+1); 
-    //TelnetStream.print(":"); 
-    //TelnetStream.print(avg, 1); 
-    TelnetStream.print(avg);
-    TelnetStream.print("\t");
+    TelnetStream.print("S"); TelnetStream.print(s+1); TelnetStream.print(":"); TelnetStream.print(avg, 1); TelnetStream.print("\t");
     
-    if (s != 1 && s != 10) { // استثناء S2 و S11
+    if (s != 1 && s != 10) { 
       overallSum += avg;
     }
   }
@@ -102,7 +112,6 @@ void runCalibrationPhase(bool isBlack) {
 void finalizeCalibration() {
   int calculatedThreshold = round((overallWhiteAvg + overallBlackAvg) / 2.0);
   
-  // تحديث المتغيرات العامة في الذاكرة
   target_White = round(overallWhiteAvg);
   target_Black = round(overallBlackAvg);
   lineThreshold = calculatedThreshold;
@@ -112,7 +121,6 @@ void finalizeCalibration() {
     S_Black[i] = round(blackAvg[i]);
   }
 
-  // طباعة الكود الجاهز للنسخ بالشكل المطلوب
   TelnetStream.println("\n=======================================================");
   TelnetStream.println("🎉 اكتملت المعايرة بنجاح! تم تحديث الذاكرة.");
   TelnetStream.println("يمكنك نسخ الكود التالي ولصقه في ملف LineFollower.ino:");
