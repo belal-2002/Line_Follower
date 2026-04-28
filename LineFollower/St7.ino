@@ -1,4 +1,5 @@
 void loopStrategy7() {
+  caseMotor = 4;
   // فحص الكبسة
   if (digitalRead(limitSwitch) == LOW) {
     if (millis() - lastButtonPress > debounceDelay) {
