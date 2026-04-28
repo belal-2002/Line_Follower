@@ -66,7 +66,8 @@
   float Kd = 15.0;
   int maximumSpeed = 625;  //1023;   
   int baseSpeed = 275;  //800;  
-  int turnSpeed = 600;    
+  int turnSpeed = 675;  
+  int innerTurnSpeed = turnSpeed*2;  
 
   float P = 0;
   float D = 0;
@@ -96,12 +97,11 @@ bool serviceStarted = false;
 
 
 
-int S_White[12] = {174, 220, 174, 174, 174, 174, 174, 174, 174, 174, 258, 174};
-int S_Black[12] = {2588, 3258, 2588, 2588, 2588, 2588, 2588, 2588, 2588, 2588, 3617, 2588};
+int S_White[12] = {181.00, 224.00, 163.00, 158.00, 182.00, 163.00, 169.00, 153.00, 155.00, 192.00, 251.00, 190.00};
+int S_Black[12] = {2222.00, 3269.00, 2203.00, 2097.00, 2825.00, 2715.00, 2315.00, 2091.00, 2041.00, 2878.00, 3622.00, 2742.00};
 
-int target_White = 174;
-int target_Black = 2588;
-int lineThreshold = 1381;
+int target_White = 171, target_Black = 2413
+int lineThreshold = 1292;
 
 // 0: جاهز للأبيض | 1: جاهز للأسود | 2: انتهت المعايرة (بانتظار إعادة الضبط)
 int calibState = 0; 
