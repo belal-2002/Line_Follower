@@ -3,16 +3,15 @@ void loopStrategy7() {
   if (digitalRead(limitSwitch) == LOW) {
     if (millis() - lastButtonPress > debounceDelay) {
       isRunning = !isRunning;
-      
       if (isRunning) {
         if (calibState == 0) {
           runCalibration(false); // معايرة الأبيض
-          isRunning = false;     // إطفاء الروبوت برمجياً لانتظار الأسود
+          isRunning = false; // إطفاء الروبوت برمجياً لانتظار الأسود
           calibState = 1;
         } 
         else if (calibState == 1) {
-          runCalibration(true);  // معايرة الأسود
-          generateFinalCode();   // طباعة الكود النهائي لجميع الحساسات
+          runCalibration(true); // معايرة الأسود
+          generateFinalCode(); // تخزين القيم تلقائياً وطباعة الملخص
           isRunning = false;
           calibState = 2;
         } 
@@ -33,7 +32,6 @@ void loopStrategy7() {
 // دالة مدمجة لعمل المعايرة
 void runCalibration(bool isBlack) {
   long sums[12] = {0};
-  
   if (isBlack) {
     TelnetStream.println("\n=== بدء معايرة الخط الأسود ===");
   } else {
@@ -41,7 +39,6 @@ void runCalibration(bool isBlack) {
   }
   
   TelnetStream.println("طباعة 10 عينات من أصل 100:");
-  
   for (int i = 0; i < 100; i++) {
     for (int s = 0; s < 12; s++) {
       sensorValue[s] = analogRead(sensorPins[s]);
@@ -50,7 +47,7 @@ void runCalibration(bool isBlack) {
     
     if (i % 10 == 0) {
       for (int s = 0; s < 12; s++) {
-        TelnetStream.print(sensorValue[s]); 
+        TelnetStream.print(sensorValue[s]);
         TelnetStream.print("\t");
       }
       TelnetStream.println();
@@ -63,14 +60,14 @@ void runCalibration(bool isBlack) {
   
   for (int s = 0; s < 12; s++) {
     float avg = (float)sums[s] / 100.0;
-    
     if (isBlack) {
       blackAvg[s] = avg;
     } else {
       whiteAvg[s] = avg;
     }
     
-    TelnetStream.print("S"); TelnetStream.print(s+1); 
+    TelnetStream.print("S");
+    TelnetStream.print(s+1); 
     TelnetStream.print(":"); TelnetStream.print(avg, 1); TelnetStream.print(" \t");
     
     // حساب المجموع الكلي مع استثناء الحساسين (الرابع عشر والثاني عشر) للحفاظ على المرجع الأساسي المستقر
@@ -98,44 +95,41 @@ void generateFinalCode() {
   int target_W = round(overallWhiteAvg);
   int target_B = round(overallBlackAvg);
 
+  // 1. تحديث المتغيرات العامة (Global Variables) تلقائياً في ذاكرة الروبوت
+  target_White = target_W;
+  target_Black = target_B;
+  lineThreshold = calculatedThreshold;
+  
+  for (int i = 0; i < 12; i++) {
+    S_White[i] = round(whiteAvg[i]);
+    S_Black[i] = round(blackAvg[i]);
+  }
+
+  // 2. طباعة ملخص للتأكيد فقط
   TelnetStream.println("\n=======================================================");
-  TelnetStream.println("🎉 اكتملت المعايرة الشاملة بنجاح! انسخ الكود التالي:");
+  TelnetStream.println("🎉 اكتملت المعايرة الشاملة بنجاح!");
+  TelnetStream.println("✅ تم تحديث قيم الحساسات وقيمة lineThreshold تلقائياً في ذاكرة الروبوت وهو جاهز للانطلاق!");
   TelnetStream.println("=======================================================\n");
   
-  TelnetStream.println("// 1. ضع هذه المصفوفات في ملف Sensors.ino (خارج الدوال بالبداية، أو داخل دالة loopSensors):");
+  TelnetStream.println("القيم التي تم تخزينها واعتمادها حالياً:");
   
   // طباعة مصفوفة الأبيض
-  TelnetStream.print("int S_White[12] = {");
+  TelnetStream.print("S_White[12] = {");
   for (int i = 0; i < 12; i++) {
-    TelnetStream.print(round(whiteAvg[i]));
+    TelnetStream.print(S_White[i]);
     if (i < 11) TelnetStream.print(", ");
   }
   TelnetStream.println("};");
 
   // طباعة مصفوفة الأسود
-  TelnetStream.print("int S_Black[12] = {");
+  TelnetStream.print("S_Black[12] = {");
   for (int i = 0; i < 12; i++) {
-    TelnetStream.print(round(blackAvg[i]));
+    TelnetStream.print(S_Black[i]);
     if (i < 11) TelnetStream.print(", ");
   }
   TelnetStream.println("};");
 
-  TelnetStream.printf("int target_White = %d, target_Black = %d;\n\n", target_W, target_B);
-  
-  TelnetStream.println("// 2. استبدل كود القراءة والمعايرة في دالة loopSensors بالكامل بهذا الكود:");
-  TelnetStream.println("  for (int i = 0; i < 12; i++) {");
-  TelnetStream.println("    // أخذ القراءة الخام");
-  TelnetStream.println("    sensorValue[i] = analogRead(sensorPins[i]);");
-  TelnetStream.println("    ");
-  TelnetStream.println("    // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي");
-  TelnetStream.println("    sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);");
-  TelnetStream.println("    ");
-  TelnetStream.println("    // حماية القيم (استخدام 50 كحد أدنى حسب طلبك)");
-  TelnetStream.println("    sensorValue[i] = constrain(sensorValue[i], 50, 4095);");
-  TelnetStream.println("  }");
-
-  TelnetStream.println("\n-------------------------------------------------------");
-  TelnetStream.println("// 3. القيمة المثالية لمتغير lineThreshold في ملف LineFollower.ino هي:");
-  TelnetStream.printf("int lineThreshold = %d;\n", calculatedThreshold);
+  TelnetStream.printf("target_White = %d, target_Black = %d\n", target_White, target_Black);
+  TelnetStream.printf("lineThreshold = %d\n", lineThreshold);
   TelnetStream.println("=======================================================");
 }
