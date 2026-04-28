@@ -1,36 +1,15 @@
 void loopMotor() {
   switch (caseMotor) {
     case 0:
-      // 1. حساب السرعة مع السماح بالقيم السالبة (للدوران العكسي) وتقييدها بالسرعة القصوى
-      leftMotorSpeed  = constrain(baseSpeed + PD_Value, -maximumSpeed, maximumSpeed);
-      rightMotorSpeed = constrain(baseSpeed - PD_Value, -maximumSpeed, maximumSpeed);
+      // إرجاع المحركات للاتجاه الأمامي الطبيعي
+      digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
+      digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
+      // تقييد السرعة وإرسالها للمحركات (10-bit)
+      leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, maximumSpeed);
+      rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, maximumSpeed);
 
-      // 2. التحكم في المحرك الأيسر (اتجاه وسرعة)
-      if (leftMotorSpeed >= 0) {
-        // الاتجاه للأمام
-        digitalWrite(AIN1, LOW);
-        digitalWrite(AIN2, HIGH);
-      } else {
-        // الاتجاه للخلف (تفعيل الدوران العكسي)
-        digitalWrite(AIN1, HIGH);
-        digitalWrite(AIN2, LOW);
-      }
-      // إرسال السرعة كقيمة موجبة دائماً (القيمة المطلقة)
-      ledcWrite(PWMA, abs(leftMotorSpeed));
-
-
-      // 3. التحكم في المحرك الأيمن (اتجاه وسرعة)
-      if (rightMotorSpeed >= 0) {
-        // الاتجاه للأمام
-        digitalWrite(BIN1, HIGH); 
-        digitalWrite(BIN2, LOW);
-      } else {
-        // الاتجاه للخلف (تفعيل الدوران العكسي)
-        digitalWrite(BIN1, LOW); 
-        digitalWrite(BIN2, HIGH);
-      }
-      // إرسال السرعة كقيمة موجبة دائماً (القيمة المطلقة)
-      ledcWrite(PWMB, abs(rightMotorSpeed));
+      ledcWrite(PWMA, leftMotorSpeed);
+      ledcWrite(PWMB, rightMotorSpeed);
     break;
     case 1:
       // الدوران لليسار
