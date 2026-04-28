@@ -1,5 +1,6 @@
 void loopPrint() {
-  if (millis() - lastPrintTime > 2000) {
+  if (!(strategy == 7)){
+  if (millis() - lastPrintTime > 1500) {
 
     for (int i = 0; i < 12; i++) {
       TelnetStream.print(sensorValue[i]);  
@@ -48,5 +49,12 @@ void loopPrint() {
     if (turnSpeed < 0) turnSpeed = 0;
     if (maximumSpeed < 0) maximumSpeed = 0;
     if (strategy < 0) strategy = 0;
+  }
+  } else {
+    if (millis() - lastPrintTime > 3500) {
+      TelnetStream.printf("strategy:%d", strategy);
+      lastPrintTime = millis();
+      //TelnetStream.println();
+    }
   }
 }
