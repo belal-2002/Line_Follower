@@ -1,3 +1,3 @@
-void loopStrategy7() {
-  
+void loopStrategy6() {
+
 }
