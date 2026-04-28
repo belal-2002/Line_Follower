@@ -27,6 +27,7 @@
   #define switchPin1 47
   #define switchPin2 48
   #define switchPin3 18
+  #define buzzerPin 1
 
 // --- تعريف دبابيس الحساسات الـ 12 ---
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
@@ -44,6 +45,7 @@
   bool bit2 = false;
   bool bit3 = false;
   byte strategy = 0;
+  byte buzzer = 0;
   byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
@@ -102,14 +104,6 @@ int target_White = 174;
 int target_Black = 2588;
 int lineThreshold = 1292;
 
-// 0: جاهز للأبيض | 1: جاهز للأسود | 2: انتهت المعايرة (بانتظار إعادة الضبط)
-//int calibState = 0; 
-
-// --- متغيرات الحساب ---
-//float whiteAvg[12];
-//float blackAvg[12];
-//float overallWhiteAvg = 0;
-//float overallBlackAvg = 0;
 
 
 void setup() {
