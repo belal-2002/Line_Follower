@@ -24,9 +24,9 @@
 
 // ---  تعريف مفتاح التشغيل ودبابيس الاستراتيجيات  ---
   #define limitSwitch 17  
-  #define switchPin1 18
-  #define switchPin2 47
-  #define switchPin3 48
+  #define switchPin1 47
+  #define switchPin2 48
+  #define switchPin3 18
 
 // --- تعريف دبابيس الحساسات الـ 12 ---
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
@@ -43,7 +43,7 @@
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
-  byte strategy = 2;
+  byte strategy = 0;
   byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
@@ -87,7 +87,7 @@
   bool lineWasFound = true;
   
 
-  int lineThreshold = 1275;
+  int lineThreshold = 1381;
 
 
 int leftMotorSpeed = 0;
