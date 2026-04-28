@@ -43,6 +43,7 @@ void loopMotor() {
       ledcWrite(PWMB, turnSpeed);
     break;
     case 4:
+        // توقف تام
         digitalWrite(STBY, LOW);  
         digitalWrite(AIN1, LOW);  digitalWrite(AIN2, LOW); 
         digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
