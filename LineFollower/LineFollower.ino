@@ -87,8 +87,6 @@
   bool lineWasFound = true;
   
 
-  int lineThreshold = 1381;
-
 
 int leftMotorSpeed = 0;
 int rightMotorSpeed = 0;
@@ -98,6 +96,12 @@ bool serviceStarted = false;
 
 
 
+int S_White[12] = {174, 220, 174, 174, 174, 174, 174, 174, 174, 174, 258, 174};
+int S_Black[12] = {2588, 3258, 2588, 2588, 2588, 2588, 2588, 2588, 2588, 2588, 3617, 2588};
+
+int target_White = 174;
+int target_Black = 2588;
+int lineThreshold = 1381;
 
 // 0: جاهز للأبيض | 1: جاهز للأسود | 2: انتهت المعايرة (بانتظار إعادة الضبط)
 int calibState = 0; 
