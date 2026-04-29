@@ -46,13 +46,13 @@ void loopSensors() {
 
   radar = leftRadar + rightRadar;
 
-  if (leftRadar){
+  if (leftRadar == 2){
     leftRadarOn = true;
     leftRadarTime = millis();
   } else { 
     if (millis() - leftRadarTime > RadarTime) leftRadarOn = false;
   } 
-  if (rightRadar){
+  if (rightRadar == 2){
     rightRadarOn = true;
     rightRadarTime = millis();
   } else { 
