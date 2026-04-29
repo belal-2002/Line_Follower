@@ -4,7 +4,7 @@ void loopStrategy0() {
     goLeft = false;
     goRight = false;
   }
-  
+
   // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
   if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
   if (goRight && rightRadar) { goRight = false; calculateError(); return; }
