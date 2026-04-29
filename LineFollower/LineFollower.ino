@@ -64,12 +64,12 @@
 //PD
   bool isRunning = false;
 
-  float Kp = 1.15;
-  float Kd = 15.0;
+  float Kp = 0.85;
+  float Kd = 18.0;
   int maximumSpeed = 625;  //1023;   
   int baseSpeed = 275;  //800;  
   int turnSpeed = 675;  
-  int innerTurnSpeed = turnSpeed*2;  
+  int innerTurnSpeed = turnSpeed / 2;  
 
   float P = 0;
   float D = 0;
