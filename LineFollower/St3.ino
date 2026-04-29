@@ -1,5 +1,5 @@
 void loopStrategy3() { //Right 
-  if (rightRadar && (midSensor >= 3) && (!leftRadar)) {
+  if ((rightRadar == 2) && (midSensor >= 3) && (!leftRadar)) {
     caseMotor = 2;
     goRight = true; 
     loopMotor();
@@ -10,21 +10,21 @@ void loopStrategy3() { //Right
   }
 
   if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!rightRadar)) { 
-    if (millis() - turnStartTime > 100) {
+    //if (millis() - turnStartTime > 100) {
     goLeft = false;
     goRight = false;
-    }
+    //}
   }
   
   //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
   //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
   
   if (goLeft || goRight) {
-  if (millis() - turnStartTime > 100) { // أقصى وقت مسموح للدوران الأعمى
+  //if (millis() - turnStartTime > 100) { // أقصى وقت مسموح للدوران الأعمى
       goLeft = false; 
       goRight = false;
       caseMotor = 0; // العودة للوضع الطبيعي
-  }
+ // }
   return;
 }
 
