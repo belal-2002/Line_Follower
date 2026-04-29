@@ -1,5 +1,5 @@
 void loopStrategy2() { //Left
-  if (leftRadar && (midSensor >= 3) && (!rightRadar)) {
+  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
     caseMotor = 1;
     goLeft = true; 
     loopMotor();
