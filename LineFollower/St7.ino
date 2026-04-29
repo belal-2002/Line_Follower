@@ -9,9 +9,10 @@ static float overallWhiteAvg = 0;
 static float overallBlackAvg = 0;
 
 void loopStrategy7() {
+    caseMotor = 4;
   bool currentButtonState = (digitalRead(limitSwitch) == LOW);
 
-  // اكتشاف لحظة الضغط على الزر
+  // اكتشاف لحظة الضغط على الزر (انتقال من غير مضغوط إلى مضغوط)
   if (currentButtonState && !wasButtonPressed) {
     delay(50); // Debounce
     
@@ -20,11 +21,8 @@ void loopStrategy7() {
         TelnetStream.println("\n=== بدء معايرة الخط الأبيض ===");
         runCalibrationPhase(false); 
         
-        // --- نغمة انتهاء الأبيض (سريعة ومتقطعة) ---
-        for(int b=0; b<3; b++){
-          buzzerOn(); delay(100);
-          buzzerOff(); delay(100);
-        }
+        // --- تشغيل نغمة انتهاء الأبيض ---
+        playToneWhiteDone();
 
         calibState = 1;
         TelnetStream.println("\n--> الروبوت متوقف. ضعه على الأسود واضغط الزر...");
@@ -34,20 +32,18 @@ void loopStrategy7() {
         runCalibrationPhase(true);  
         finalizeCalibration();      
         
-        // --- نغمة انتهاء الأسود والمعايرة (طويلة ثم حادة) ---
-        buzzerOn(); delay(600);    // نغمة طويلة
-        buzzerOff(); delay(150);
-        // نغير التردد لنغمة مختلفة (استدعاء الدالة الأصلية في الأردوينو مؤقتاً)
-        tone(buzzerPin, 3000, 400); // نغمة حادة جداً لتأكيد النهاية
-        delay(400);
+        // --- تشغيل نغمة انتهاء المعايرة بالكامل ---
+        playToneCalibrationComplete();
 
         calibState = 2;
         TelnetStream.println("\n--- تمت المعايرة. لتكرارها اضغط الزر، أو غير الاستراتيجية للانطلاق ---");
       } 
       else if (calibState == 2) {
         TelnetStream.println("\n--- إعادة تعيين النظام. ضع الروبوت على الأبيض واضغط الزر ---");
-        // نغمة التصفير
-        buzzerOn(); delay(100); buzzerOff();
+        
+        // --- تشغيل نغمة التصفير ---
+        playToneReset();
+        
         calibState = 0;
       }
     }
@@ -55,6 +51,7 @@ void loopStrategy7() {
   
   wasButtonPressed = currentButtonState;
 
+  // إبقاء الاتصال نشطاً
   if (TelnetStream.available()) { TelnetStream.read(); }
 }
 
@@ -68,6 +65,7 @@ void runCalibrationPhase(bool isBlack) {
       int val = analogRead(sensorPins[s]);
       sums[s] += val;
       
+      // طباعة عينة واحدة كل 10 تكرارات
       if (i % 10 == 0) {
         TelnetStream.print(val);
         TelnetStream.print("\t");
@@ -93,8 +91,14 @@ void runCalibrationPhase(bool isBlack) {
       whiteAvg[s] = avg;
     }
     
-    TelnetStream.print("S"); TelnetStream.print(s+1); TelnetStream.print(":"); TelnetStream.print(avg, 1); TelnetStream.print("\t");
+    //TelnetStream.print("S"); 
+    //TelnetStream.print(s+1); 
+    //TelnetStream.print(":"); 
+    //TelnetStream.print(avg, 1); 
+    TelnetStream.print(avg, 0);
+    TelnetStream.print("\t");
     
+    // استثناء S2 و S11
     if (s != 1 && s != 10) { 
       overallSum += avg;
     }
@@ -112,6 +116,7 @@ void runCalibrationPhase(bool isBlack) {
 void finalizeCalibration() {
   int calculatedThreshold = round((overallWhiteAvg + overallBlackAvg) / 2.0);
   
+  // تحديث المتغيرات العامة
   target_White = round(overallWhiteAvg);
   target_Black = round(overallBlackAvg);
   lineThreshold = calculatedThreshold;
