@@ -40,7 +40,7 @@
   unsigned long turnStartTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
-  const unsigned long RadarTime = 50;
+  const unsigned long RadarTime = 33;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
