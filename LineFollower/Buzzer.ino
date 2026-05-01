@@ -16,9 +16,9 @@ void buzzerOff() {
 void playToneWhiteDone() {
   for (int i = 0; i < 3; i++) {
     buzzerOn();
-    delay(80);
+    delay(100);
     buzzerOff();
-    delay(80);
+    delay(100);
   }
 }
 
