@@ -46,7 +46,6 @@
   bool bit3 = false;
   byte strategy = 1;
   byte buzzer = 0;
-  //byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
   byte leftSensor = 0;
@@ -60,6 +59,8 @@
   bool allRadarOn = false;
   bool goRight = false;
   bool goLeft = false;
+  bool turnLeft = false;
+  bool turnRight = false;
 
 //PD
   bool isRunning = false;
