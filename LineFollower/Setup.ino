@@ -44,6 +44,7 @@ void turnOnService() {
     // بدء الخدمات بعد ضبط الحماية
     ArduinoOTA.begin();
     TelnetStream.begin();
+    playToneWiFiConnected(); // --> إطلاق نغمة النجاح الجديدة هنا <--
     serviceStarted = true; 
   }
 }
