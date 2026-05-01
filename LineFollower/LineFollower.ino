@@ -46,7 +46,7 @@
   bool bit3 = false;
   byte strategy = 0;
   byte buzzer = 0;
-  byte caseMotor = 0;
+  //byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
   byte leftSensor = 0;
@@ -119,7 +119,6 @@ void loop() {
   loopSensors();
   if (isRunning) {
     loopStrategy();
-    loopMotor();
     } //else {  
     if (serviceStarted) {
       loopPrint();
