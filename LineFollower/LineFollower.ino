@@ -98,11 +98,11 @@ int rightMotorSpeed = 0;
 bool serviceStarted = false;
 
 
-int S_White[12] = {182, 224, 157, 152, 176, 178, 160, 146, 149, 179, 245, 184};
-int S_Black[12] = {2581, 3341, 2289, 2206, 2855, 2533, 2564, 2034, 1815, 2864, 3535, 2650};
-int target_White = 166;
-int target_Black = 2389;
-int lineThreshold = 1278;
+int S_White[12] = {216, 240, 164, 157, 185, 164, 172, 154, 158, 199, 260, 211};
+int S_Black[12] = {3375, 3540, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700, 3146};
+int target_White = 178;
+int target_Black = 2671;
+int lineThreshold = 1425;
 
 
 
