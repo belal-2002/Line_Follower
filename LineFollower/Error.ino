@@ -23,6 +23,7 @@ void calculateError() {
   } else {
     // فقدنا الخط بالكامل (خط دفاع أخير إذا لم تتصرف الاستراتيجية)
     lineWasFound = false;
+    forwardMotor();
   }
 }
 
