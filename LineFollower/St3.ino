@@ -38,7 +38,7 @@ void loopStrategy3() { //Left
   if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
     turnLeft = true; 
     leftMotor();
-    delay(65);
+    delay(85);
     turnStartTime = millis();
     lineWasFound = false;
     return;   
