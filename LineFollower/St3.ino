@@ -1,25 +1,24 @@
 void loopStrategy3() { //Left
-  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
-    goLeft = true; 
-    leftMotor();
-    delay(75);
-    turnStartTime = millis();
-    lineWasFound = false;
-    return;   
+  // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+  if (midSensor) { 
+    goLeft = false;
+    goRight = false;
   }
+
+  // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
 
   if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!leftRadar)) {
     //if (millis() - turnStartTime > 100) {
-    goLeft = false;
-    goRight = false;
+    turnLeft = false;
     //}
   }
+  
+  // الاستمرار في الدوران إذا بدأناه
+  if (turnLeft || goLeft || goRight) return;
 
-  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
-
-  if (goLeft || goRight) return;
-
+  // الدخول في حالة الفقدان الكلي للخط
   if (!allSensor) {
     lineWasFound = false;
     if (leftRadarOn) {
@@ -32,7 +31,17 @@ void loopStrategy3() { //Left
       rightMotor();      
       return;
     }
+    forwardMotor();
     return;
+  }
+
+  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
+    turnLeft = true; 
+    leftMotor();
+    delay(65);
+    turnStartTime = millis();
+    lineWasFound = false;
+    return;   
   }
 
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
