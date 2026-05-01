@@ -110,6 +110,7 @@ void setup() {
   //Serial.begin(115200);
   setupMotors();
   setupSwitch();
+  setupBuzzer();
   setupSensors();
   setupNetwork();
 }
