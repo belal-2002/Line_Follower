@@ -4,10 +4,10 @@ void loopStrategy1() {
     goLeft = false;
     goRight = false;
   }
-  
+
   // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
-  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
   if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
   
   // الاستمرار في الدوران إذا بدأناه
   if (goLeft || goRight) return;
@@ -15,14 +15,14 @@ void loopStrategy1() {
   // الدخول في حالة الفقدان الكلي للخط
   if (!allSensor) {
     lineWasFound = false;
-    if (rightRadarOn) {
-      goRight = true;
-      rightMotor();
-      return;
-    }
     if (leftRadarOn) {
       goLeft = true; 
       leftMotor();
+      return;
+    }
+    if (rightRadarOn) {
+      goRight = true;
+      rightMotor();      
       return;
     }
   }
