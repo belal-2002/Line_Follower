@@ -1,4 +1,5 @@
 void loopPrint() {
+  ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
   if (!(strategy == 7)){
   if (millis() - lastPrintTime > 1500) {
 
@@ -24,7 +25,6 @@ void loopPrint() {
     lastPrintTime = millis();
   }
 
-  ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
   // معالجة أوامر الكيبورد لتعديل PID
   if (TelnetStream.available()) {
     char c = TelnetStream.read();
@@ -36,8 +36,8 @@ void loopPrint() {
     if (c == 'd') maximumSpeed -= 25;
     if (c == 'r') baseSpeed += 25;
     if (c == 'f') baseSpeed -= 25;
-    if (c == 't') turnSpeed += 25;
-    if (c == 'g') turnSpeed -= 25;
+    if (c == 't') {turnSpeed += 25; innerTurnSpeed = turnSpeed / 2;}
+    if (c == 'g') {turnSpeed -= 25; innerTurnSpeed = turnSpeed / 2;}
     if (c == '0') strategy = 0;
     if (c == '1') strategy = 1;
     if (c == '2') strategy = 2;
