@@ -11,8 +11,7 @@ void loopStrategy4() { //Right
 
   if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!rightRadar)) { 
     //if (millis() - turnStartTime > 100) {
-    goLeft = false;
-    goRight = false;
+    turnRight = false;
     //}
   }
   
@@ -39,7 +38,7 @@ void loopStrategy4() { //Right
   if ((rightRadar == 2) && (midSensor >= 3) && (!leftRadar)) {
     turnRight = true; 
     rightMotor();
-    delay(65);
+    delay(85);
     turnStartTime = millis();
     lineWasFound = false;
     return;   
