@@ -18,7 +18,7 @@ void loopStrategy0() {
         calibState = 0;
         lastIsRunning = isRunning; // مزامنة الحالة الحالية لتجاهل الـ false عند التشغيل
         TelnetStream.println("\n=========================================");
-        TelnetStream.println("⚙️ تم تفعيل وضع المعايرة (الاستراتيجية 7)");
+        TelnetStream.println("⚙️ تم تفعيل وضع المعايرة (الاستراتيجية 0)");
         TelnetStream.println("1. ضع الروبوت على [الخط الأبيض].");
         TelnetStream.println("2. اضغط زر التشغيل (سيصبح isRunning = True).");
         TelnetStream.println("=========================================\n");
