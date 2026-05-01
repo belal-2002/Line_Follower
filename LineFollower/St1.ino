@@ -1,4 +1,4 @@
-void loopStrategy1() { 
+void loopStrategy1() { // للأمام ثم لليسار
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midSensor) { 
     goLeft = false;
@@ -25,6 +25,8 @@ void loopStrategy1() {
       rightMotor();      
       return;
     }
+    forwardMotor();
+    return;
   }
 
   // تجاوز التقاطعات العرضية بأمان
