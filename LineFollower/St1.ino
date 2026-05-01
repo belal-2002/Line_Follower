@@ -16,13 +16,13 @@ void loopStrategy1() {
   if (!allSensor) {
     lineWasFound = false;
     if (rightRadarOn) {
-      caseMotor = 2;
       goRight = true;
+      rightMotor();
       return;
     }
     if (leftRadarOn) {
-      caseMotor = 1;
       goLeft = true; 
+      leftMotor();
       return;
     }
   }
