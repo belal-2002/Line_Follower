@@ -15,7 +15,11 @@ void setupSwitch() {
   pinMode(switchPin1, INPUT_PULLUP);
   pinMode(switchPin2, INPUT_PULLUP);
   pinMode(switchPin3, INPUT_PULLUP);
+}
+
+void setupBuzzer() {
   pinMode(buzzerPin, OUTPUT);
+  digitalWrite(buzzerPin, LOW); // التأكد من إطفائه في البداية
 }
 
 void setupSensors() {
