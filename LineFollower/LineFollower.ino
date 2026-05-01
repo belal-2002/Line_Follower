@@ -117,7 +117,7 @@ void setup() {
 void loop() {
   loopSwitch();
   loopSensors();
-  if (isRunning) {
+  if (isRunning || strategy == 7) {
     loopStrategy();
     } //else {  
     if (serviceStarted) {
