@@ -9,7 +9,7 @@ static float overallWhiteAvg = 0;
 static float overallBlackAvg = 0;
 
 void loopStrategy7() {
-    caseMotor = 4;
+  stopMotor();
   bool currentButtonState = (digitalRead(limitSwitch) == LOW);
 
   // اكتشاف لحظة الضغط على الزر (انتقال من غير مضغوط إلى مضغوط)
