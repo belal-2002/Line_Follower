@@ -7,11 +7,7 @@ void setupMotors() {
   ledcAttach(PWMA, 10000, 10); 
   ledcAttach(PWMB, 10000, 10);
 
-  digitalWrite(STBY, LOW); // الإيقاف التام في البداية
-  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, LOW); 
-  digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
-  ledcWrite(PWMA, 0);
-  ledcWrite(PWMB, 0);
+  stopMotor(); // الإيقاف التام في البداية
 }
 
 void setupSwitch() {
