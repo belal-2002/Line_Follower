@@ -1,0 +1,918 @@
+﻿==== Buzzer.ino ====
+// ==========================================
+// دوال النغمات المخصصة للمعايرة والتنبيهات
+// ==========================================
+
+// 1. نغمة "تم الأبيض" (3 صفارات قصيرة وسريعة بتردد متوسط)
+void playToneWhiteDone() {
+  for (int i = 0; i < 3; i++) {
+    tone(buzzerPin, 2500, 80); // تشغيل نغمة لمدة 80 ملي ثانية
+    delay(160); // الانتظار لضمان وضوح التقطيع (80 للتشغيل + 80 صمت)
+  }
+}
+
+// 2. نغمة "تم الأسود / اكتملت المعايرة" (صفارة طويلة ثم نغمة حادة)
+void playToneCalibrationComplete() {
+  tone(buzzerPin, 2000, 600); // صفارة طويلة بتردد 2000
+  delay(750); // انتظار 600 للتشغيل + 150 صمت
+  
+  // نغمة حادة للتأكيد (تردد 3000 هرتز لمدة 400 مللي ثانية)
+  tone(buzzerPin, 3000, 400);
+  delay(400); // انتظار انتهاء النغمة
+}
+
+// 3. دالة نغمة الواي فاي (التي اتفقنا عليها مسبقاً)
+void playToneWiFiConnected() {
+  tone(buzzerPin, 1500, 150);
+  delay(200);
+  tone(buzzerPin, 2500, 200);
+  delay(250);
+}
+
+==== Error.ino ====
+void calculateError() {
+  weightedSum = 0;
+  sum = 0;
+
+  for (int i = 0; i < 12; i++) {
+    if (bitRead(sensorBit, 11 - i)) {
+      weightedSum += (long)sensorValue[i] * sensorWeights[i];
+      sum += sensorValue[i];
+    }
+  }
+
+  if (sum > 0) {
+    currentError = (float)weightedSum / (float)sum;
+
+    // --- حماية الـ PD عند استرجاع الخط ---
+    if (!lineWasFound) {
+      lastTime = micros();       
+      lastError = currentError;
+      lineWasFound = true; // تم الاستشفاء بنجاح
+    }
+
+    calculatePD();
+  } else {
+    // فقدنا الخط بالكامل (خط دفاع أخير إذا لم تتصرف الاستراتيجية)
+    lineWasFound = false;
+  }
+}
+
+
+
+==== LineFollower.ino ====
+#include <WiFi.h>
+  #include <ESPmDNS.h>
+  #include <WiFiUdp.h>
+  #include <ArduinoOTA.h>
+  #include <TelnetStream.h>
+
+// --- إعدادات شبكة الواي فاي ---
+  const char* ssid = "Zain_B530_A013";      
+  const char* password = "F8BLmiFRedB"; 
+  //192.168.8.28
+
+  //const char* ssid = "Galaxy S20+2db9";      
+  //const char* password = "55555555";
+  //10.189.201.71
+
+// --- تعريف دبابيس المحركات ---
+  #define PWMA 42   
+  #define AIN1 41   
+  #define AIN2 40   
+  #define PWMB 19   
+  #define BIN1 21   
+  #define BIN2 20   
+  #define STBY 39   
+
+// ---  تعريف مفتاح التشغيل ودبابيس الاستراتيجيات  ---
+  #define limitSwitch 17  
+  #define switchPin1 47
+  #define switchPin2 48
+  #define switchPin3 18
+  #define buzzerPin 1
+
+// --- تعريف دبابيس الحساسات الـ 12 ---
+  const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
+
+// --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
+  static unsigned long lastPrintTime = 0;
+  static unsigned long rightRadarTime = 0;
+  static unsigned long leftRadarTime = 0;
+  static unsigned long allRadarTime = 0;
+  unsigned long turnStartTime = 0;
+  unsigned long lastButtonPress = 0;
+  const unsigned long debounceDelay = 400;
+  const unsigned long RadarTime = 33;
+  bool bit1 = false;
+  bool bit2 = false;
+  bool bit3 = false;
+  byte strategy = 1;
+  byte buzzer = 0;
+  //byte caseMotor = 0;
+  int sensorBit = 0;
+  byte rightSensor = 0;
+  byte leftSensor = 0;
+  byte midSensor = 0; 
+  byte allSensor = 0;
+  byte radar = 0;
+  byte rightRadar = 0;
+  byte leftRadar = 0;
+  bool rightRadarOn = false;
+  bool leftRadarOn = false;
+  bool allRadarOn = false;
+  bool goRight = false;
+  bool goLeft = false;
+
+//PD
+  bool isRunning = false;
+
+  float Kp = 0.85;
+  float Kd = 18.0;
+  int maximumSpeed = 625;  //1023;   
+  int baseSpeed = 275;  //800;  
+  int turnSpeed = 675;  
+  int innerTurnSpeed = turnSpeed / 2;  
+
+  float P = 0;
+  float D = 0;
+  float PD_Value =0;
+  float lastError = 0;
+  float currentError = 0;
+
+  unsigned long currentTime = 0;
+  static unsigned long lastTime = 0;
+  float dt;
+
+//Error
+  const int sensorWeights[12] = {-698, -444, -267, -190, -114, -38, 38, 114, 190, 267, 444, 698};
+  int sensorValue[12]; 
+  long weightedSum = 0;
+  long sum = 0;
+  bool lineAvailable = true;
+  bool lineWasFound = true;
+  
+
+
+int leftMotorSpeed = 0;
+int rightMotorSpeed = 0;
+
+bool serviceStarted = false;
+
+
+int S_White[12] = {182, 224, 157, 152, 176, 178, 160, 146, 149, 179, 245, 184};
+int S_Black[12] = {2581, 3341, 2289, 2206, 2855, 2533, 2564, 2034, 1815, 2864, 3535, 2650};
+int target_White = 166;
+int target_Black = 2389;
+int lineThreshold = 1278;
+
+
+
+void setup() {
+  //Serial.begin(115200);
+  setupMotors();
+  setupSwitch();
+  setupBuzzer();
+  setupSensors();
+  setupNetwork();
+}
+
+void loop() {
+  loopSwitch();
+  loopSensors();
+  if (isRunning || strategy == 0) {
+    loopStrategy();
+    } //else {  
+    if (serviceStarted) {
+      loopPrint();
+    } else { 
+      turnOnService();
+    }
+  //}
+}
+
+==== Motors.ino ====
+void moveMotor() {
+  // إرجاع المحركات للاتجاه الأمامي الطبيعي
+  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
+  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
+      
+  // تقييد السرعة وإرسالها للمحركات (10-bit)
+  leftMotorSpeed  = constrain(baseSpeed + PD_Value, 0, maximumSpeed);
+  rightMotorSpeed = constrain(baseSpeed - PD_Value, 0, maximumSpeed);
+
+  ledcWrite(PWMA, leftMotorSpeed);
+  ledcWrite(PWMB, rightMotorSpeed);
+}
+
+void leftMotor() {
+  // الدوران لليسار (Left Turn)
+ // 1. المحرك الأيسر (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
+  digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW);
+  ledcWrite(PWMA, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
+      
+  // 2. المحرك الأيمن (الخارجي) يستمر بالدفع للأمام بالسرعة العالية المحددة
+  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
+  ledcWrite(PWMB, turnSpeed);      // 600
+}
+
+void rightMotor() {
+  // الدوران لليمين (Right Turn)
+  // 1. المحرك الأيسر (الخارجي) يستمر بالدفع للأمام بالسرعة العالية المحددة
+  digitalWrite(AIN1, LOW); digitalWrite(AIN2, HIGH); 
+  ledcWrite(PWMA, turnSpeed);      // 600
+      
+  // 2. المحرك الأيمن (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
+  digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
+  ledcWrite(PWMB, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
+}
+
+void stopMotor() {
+  // توقف تام
+  digitalWrite(STBY, LOW);  
+  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, LOW); 
+  digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
+  ledcWrite(PWMA, 0);
+  ledcWrite(PWMB, 0);
+}
+
+void forwardMotor() {
+  // السير في خط مستقيم
+  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
+  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
+
+  ledcWrite(PWMA, turnSpeed);
+  ledcWrite(PWMB, turnSpeed);
+}
+
+
+
+
+
+
+
+==== PD.ino ====
+void calculatePD() {
+  P = 0;
+  D = 0;
+  currentTime = micros();
+
+  dt = (float) (currentTime - lastTime) / 1000000.0;
+  lastTime = currentTime;
+
+  if (dt <= 0.0) dt = 0.001;
+
+  P = currentError;
+  D = (currentError - lastError) / dt;
+  lastError = currentError; 
+  PD_Value = (Kp * P) + (Kd * D);
+
+  moveMotor();
+}
+
+==== Print.ino ====
+void loopPrint() {
+  ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
+  if (!(strategy == 0)){
+  if (millis() - lastPrintTime > 1500) {
+
+    for (int i = 0; i < 12; i++) {
+      TelnetStream.print(sensorValue[i]);  
+      TelnetStream.print("\t");               
+    }
+    TelnetStream.println();
+
+  String output = "";
+  for (int i = 0; i < 12; i++) {
+    output += bitRead(sensorBit, 11 - i);
+    output += "\t";
+  }
+  TelnetStream.print(output);
+
+      TelnetStream.print("\t");
+      TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  strategy:%d", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, strategy);
+      TelnetStream.print("\t");
+      //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
+
+      TelnetStream.println();
+    lastPrintTime = millis();
+  }
+
+  // معالجة أوامر الكيبورد لتعديل PID
+  if (TelnetStream.available()) {
+    char c = TelnetStream.read();
+    if (c == 'q') Kp += 0.1;
+    if (c == 'a') Kp -= 0.1;
+    if (c == 'w') Kd += 1;
+    if (c == 's') Kd -= 1;
+    if (c == 'e') maximumSpeed += 25;
+    if (c == 'd') maximumSpeed -= 25;
+    if (c == 'r') baseSpeed += 25;
+    if (c == 'f') baseSpeed -= 25;
+    if (c == 't') {turnSpeed += 25; innerTurnSpeed = turnSpeed / 2;}
+    if (c == 'g') {turnSpeed -= 25; innerTurnSpeed = turnSpeed / 2;}
+    if (c == '0') strategy = 0;
+    if (c == '1') strategy = 1;
+    if (c == '2') strategy = 2;
+    if (c == '3') strategy = 3;
+
+    if (Kp < 0) Kp = 0;
+    if (Kd < 0) Kd = 0;
+    if (baseSpeed < 0) baseSpeed = 0;
+    if (turnSpeed < 0) turnSpeed = 0;
+    if (maximumSpeed < 0) maximumSpeed = 0;
+    if (strategy < 0) strategy = 0;
+  }
+  } else {
+    if (millis() - lastPrintTime > 3500) {
+      TelnetStream.printf("strategy:%d", strategy);
+      lastPrintTime = millis();
+      //TelnetStream.println();
+    }
+  }
+}
+
+==== Sensors.ino ====
+void loopSensors() {
+// 1. قراءة جميع الحساسات باستخدام فلتر (متوسط 3 قراءات)
+  for (int i = 0; i < 12; i++) {
+    long tempSum = 0; // متغير مؤقت لتخزين مجموع القراءات
+    // أخذ 3 قراءات متتالية لنفس الحساس
+    for (int j = 0; j < 3; j++) {
+      tempSum += analogRead(sensorPins[i]);
+    }
+    // حساب المتوسط وتخزينه كقراءة نهائية للحساس
+    sensorValue[i] = tempSum / 3;
+  }
+
+  for (int i = 0; i < 12; i++) {
+    // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
+    sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
+    
+    // حماية القيم (استخدام 50 كحد أدنى كما طلبت)
+    sensorValue[i] = constrain(sensorValue[i], 50, 4095);
+  }
+
+  for (int i = 0; i < 12; i++) {
+    if (sensorValue[i] > lineThreshold) {
+      bitSet(sensorBit, 11 - i);
+    } else {
+      bitClear(sensorBit, 11 - i);
+    }
+  }
+
+  // إزاحة البتات 6 خطوات لليمين لاستخراج بتات الحساسات اليسرى (من 6 إلى 11) وعدّها
+  leftSensor = __builtin_popcount((sensorBit >> 6) & 0x3F); 
+
+  // استخراج أول 6 بتات (من 0 إلى 5) الخاصة بالحساسات اليمنى وعدّها بسرعة
+  rightSensor = __builtin_popcount(sensorBit & 0x3F); // 0x3F تعادل 000000111111 ثنائياً
+
+  // حساسات المنتصف
+  midSensor = __builtin_popcount((sensorBit >> 2) & 0xFF);
+
+  // إجمالي الحساسات
+  allSensor = __builtin_popcount(sensorBit & 0xFFF);
+
+  // حساسات اليسار: إزاحة 10 خطوات لليمين لاقتناص بتات اليسار
+  leftRadar = __builtin_popcount((sensorBit >> 10) & 0x03);
+
+  // حساسات اليمين: 0x03 تعادل (11) ثنائياً لاقتناص أول بتين من اليمين
+  rightRadar = __builtin_popcount(sensorBit & 0x03);
+
+  radar = leftRadar + rightRadar;
+
+  if (leftRadar == 2){
+    leftRadarOn = true;
+    leftRadarTime = millis();
+  } else { 
+    if (millis() - leftRadarTime > RadarTime) leftRadarOn = false;
+  } 
+  if (rightRadar == 2){
+    rightRadarOn = true;
+    rightRadarTime = millis();
+  } else { 
+    if (millis() - rightRadarTime > RadarTime) rightRadarOn = false;
+  } 
+}
+
+
+==== Setup.ino ====
+void setupMotors() {
+  pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
+  pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
+  pinMode(STBY, OUTPUT);
+
+  // --- التعديل الاحترافي للتردد والدقة ---
+  ledcAttach(PWMA, 10000, 10); 
+  ledcAttach(PWMB, 10000, 10);
+
+  stopMotor(); // الإيقاف التام في البداية
+}
+
+void setupSwitch() {
+  pinMode(limitSwitch, INPUT_PULLUP);
+  pinMode(switchPin1, INPUT_PULLUP);
+  pinMode(switchPin2, INPUT_PULLUP);
+  pinMode(switchPin3, INPUT_PULLUP);
+}
+
+void setupBuzzer() {
+  pinMode(buzzerPin, OUTPUT);
+  digitalWrite(buzzerPin, LOW); // التأكد من إطفائه في البداية
+}
+
+void setupSensors() {
+  for (int i = 0; i < 12; i++) {
+    pinMode(sensorPins[i], INPUT);
+  }
+}
+
+void setupNetwork() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  //ArduinoOTA.begin();
+  //TelnetStream.begin();
+}
+
+void turnOnService() {
+  if (WiFi.status() == WL_CONNECTED) {
+    ArduinoOTA.setHostname("Belal_Line_Follower");     // اسم الروبوت على الشبكة
+    ArduinoOTA.setPassword("789");      // كلمة المرور السرية
+
+    // بدء الخدمات بعد ضبط الحماية
+    ArduinoOTA.begin();
+    TelnetStream.begin();
+    playToneWiFiConnected(); // --> إطلاق نغمة النجاح الجديدة هنا <--
+    serviceStarted = true; 
+  }
+}
+
+==== St0.ino ====
+// تعريف المتغيرات محلياً (static) لتحتفظ بقيمتها
+static int calibState = 0;
+static bool lastIsRunning = false;
+static byte lastStrategyForCalib = 255;
+
+// متغيرات التخزين المؤقت للمعايرة
+static float whiteAvg[12];
+static float blackAvg[12];
+static float overallWhiteAvg = 0;
+static float overallBlackAvg = 0;
+
+void loopStrategy0() {
+    // 1. إجبار المحركات على التوقف التام دائماً أثناء وضع المعايرة للأمان
+    stopMotor();
+
+    // 2. اكتشاف الدخول الجديد للاستراتيجية 7 لتصفير المتغيرات (يحميك عند تغيير الاستراتيجيات والعودة)
+    if (strategy != lastStrategyForCalib) {
+        calibState = 0;
+        lastIsRunning = isRunning; // مزامنة الحالة الحالية لتجاهل الـ false عند التشغيل
+        TelnetStream.println("\n=========================================");
+        TelnetStream.println("⚙️ تم تفعيل وضع المعايرة (الاستراتيجية 0)");
+        TelnetStream.println("1. ضع الروبوت على [الخط الأبيض].");
+        TelnetStream.println("2. اضغط زر التشغيل (سيصبح isRunning = True).");
+        TelnetStream.println("=========================================\n");
+        lastStrategyForCalib = strategy;
+    }
+
+    // 3. قراءة الحالة الحالية للتشغيل (التي يتم التحكم بها بشكل آمن من Switch.ino)
+    bool currentIsRunning = isRunning;
+
+    // 4. آلة الحالة (State Machine) للمعايرة حسب طلبك المخصص
+    if (calibState == 0) {
+        // انتظار التحول من إيقاف (false) إلى تشغيل (true) -> معايرة الأبيض
+        if (currentIsRunning == true && lastIsRunning == false) {
+            TelnetStream.println("\n=== بدء معايرة الخط الأبيض ===");
+            runCalibrationPhase(false);
+            playToneWhiteDone();
+            calibState = 1; // الانتقال لانتظار الأسود
+            TelnetStream.println("\n✅ تمت معايرة الأبيض.");
+            TelnetStream.println("--> الروبوت الآن في وضع التشغيل (الآن انقله للون الأسود).");
+            TelnetStream.println("--> اضغط الزر مرة أخرى للإيقاف (سيصبح isRunning = False) لتبدأ معايرة الأسود...");
+        }
+    }
+    else if (calibState == 1) {
+        // انتظار التحول من تشغيل (true) إلى إيقاف (false) -> معايرة الأسود
+        if (currentIsRunning == false && lastIsRunning == true) {
+            TelnetStream.println("\n=== بدء معايرة الخط الأسود ===");
+            runCalibrationPhase(true);
+            finalizeCalibration();
+            playToneCalibrationComplete();
+            calibState = 0; // تصفير الحالة للتمكن من الإعادة فوراً دون الحاجة لترسيت
+            TelnetStream.println("\n🎉 تمت المعايرة بالكامل! النظام جاهز.");
+            TelnetStream.println("يمكنك تغيير الاستراتيجية للانطلاق، أو تكرار العملية بوضع الروبوت على الأبيض والضغط مجدداً.");
+        }
+    }
+
+    // تحديث الحالة السابقة للمقارنة في الدورة القادمة
+    lastIsRunning = currentIsRunning;
+
+    // إبقاء الاتصال نشطاً وتفريغ البفر
+    if (TelnetStream.available()) { TelnetStream.read(); }
+}
+
+void runCalibrationPhase(bool isBlack) {
+    long sums[12] = {0};
+    TelnetStream.println("جاري أخذ 100 قراءة لضمان الدقة...");
+
+    for (int i = 0; i < 100; i++) {
+        for (int s = 0; s < 12; s++) {
+            int val = analogRead(sensorPins[s]);
+            sums[s] += val;
+        }
+        delay(10); // تأخير زمني بسيط لضمان استقرار القراءات التناظرية
+    }
+
+    TelnetStream.println("--- متوسط الحساسات الـ 12 ---");
+    float overallSum = 0;
+
+    for (int s = 0; s < 12; s++) {
+        float avg = (float)sums[s] / 100.0;
+        if (isBlack) {
+            blackAvg[s] = avg;
+        } else {
+            whiteAvg[s] = avg;
+        }
+
+        TelnetStream.print(avg, 0);
+        TelnetStream.print("\t");
+
+        // استثناء S2 و S11 من المتوسط العام (كما في الكود الأصلي)
+        if (s != 1 && s != 10) {
+            overallSum += avg;
+        }
+    }
+    TelnetStream.println();
+
+    // قسمة على 10 لأننا استثنينا حساسين
+    float overall = overallSum / 10.0; 
+    
+    if (isBlack) {
+        overallBlackAvg = overall;
+    } else {
+        overallWhiteAvg = overall;
+    }
+}
+
+void finalizeCalibration() {
+    int calculatedThreshold = round((overallWhiteAvg + overallBlackAvg) / 2.0);
+
+    // تحديث المتغيرات العامة الحية
+    target_White = round(overallWhiteAvg);
+    target_Black = round(overallBlackAvg);
+    lineThreshold = calculatedThreshold;
+
+    for (int i = 0; i < 12; i++) {
+        S_White[i] = round(whiteAvg[i]);
+        S_Black[i] = round(blackAvg[i]);
+    }
+
+    TelnetStream.println("\n=======================================================");
+    TelnetStream.println("🎉 اكتملت المعايرة بنجاح! تم تحديث الذاكرة الحية.");
+    TelnetStream.println("يمكنك نسخ الكود التالي ولصقه في ملف LineFollower.ino:");
+    TelnetStream.println("=======================================================\n");
+
+    TelnetStream.print("int S_White[12] = {");
+    for (int i = 0; i < 12; i++) {
+        TelnetStream.print(S_White[i]);
+        if (i < 11) TelnetStream.print(", ");
+    }
+    TelnetStream.println("};");
+
+    TelnetStream.print("int S_Black[12] = {");
+    for (int i = 0; i < 12; i++) {
+        TelnetStream.print(S_Black[i]);
+        if (i < 11) TelnetStream.print(", ");
+    }
+    TelnetStream.println("};");
+
+    TelnetStream.print("int target_White = "); TelnetStream.print(target_White); TelnetStream.println(";");
+    TelnetStream.print("int target_Black = "); TelnetStream.print(target_Black); TelnetStream.println(";");
+    TelnetStream.print("int lineThreshold = "); TelnetStream.print(lineThreshold); TelnetStream.println(";");
+    TelnetStream.println("\n=======================================================");
+}
+
+==== St1.ino ====
+void loopStrategy1() { 
+  // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+  if (midSensor) { 
+    goLeft = false;
+    goRight = false;
+  }
+
+  // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  
+  // الاستمرار في الدوران إذا بدأناه
+  if (goLeft || goRight) return;
+
+  // الدخول في حالة الفقدان الكلي للخط
+  if (!allSensor) {
+    lineWasFound = false;
+    if (leftRadarOn) {
+      goLeft = true; 
+      leftMotor();
+      return;
+    }
+    if (rightRadarOn) {
+      goRight = true;
+      rightMotor();      
+      return;
+    }
+  }
+
+  // تجاوز التقاطعات العرضية بأمان
+  if (radar && midSensor){
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  
+  calculateError();
+}      
+
+==== St2.ino ====
+void loopStrategy2() { 
+  // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+  if (midSensor) { 
+    goLeft = false;
+    goRight = false;
+  }
+  
+  // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  
+  // الاستمرار في الدوران إذا بدأناه
+  if (goLeft || goRight) return;
+
+  // الدخول في حالة الفقدان الكلي للخط
+  if (!allSensor) {
+    lineWasFound = false;
+    if (rightRadarOn) {
+      goRight = true;
+      rightMotor();
+      return;
+    }
+    if (leftRadarOn) {
+      goLeft = true; 
+      leftMotor();
+      return;
+    }
+  }
+
+  // تجاوز التقاطعات العرضية بأمان
+  if (radar && midSensor){
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  
+  calculateError();
+}      
+
+==== St3.ino ====
+void loopStrategy3() { //Left
+  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
+    goLeft = true; 
+    leftMotor();
+    delay(75);
+    turnStartTime = millis();
+    lineWasFound = false;
+    return;   
+  }
+
+  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!leftRadar)) {
+    //if (millis() - turnStartTime > 100) {
+    goLeft = false;
+    goRight = false;
+    //}
+  }
+
+  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+
+  if (goLeft || goRight) return;
+
+  if (!allSensor) {
+    lineWasFound = false;
+    if (leftRadarOn) {
+      goLeft = true; 
+      leftMotor();
+      return;
+    }
+    if (rightRadarOn) {
+      goRight = true;
+      rightMotor();      
+      return;
+    }
+    return;
+  }
+
+  // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
+  if (leftRadar && rightRadar && midSensor) {
+    // إعماء الرادارين معاً ليمر الروبوت بناءً على حساسات المنتصف فقط
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  // 2. تجاهل الفخاخ اليمنى (حرف T المتجه لليمين)
+  else if (rightRadar && midSensor) {
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+  }
+  
+  calculateError();
+}      
+
+==== St4.ino ====
+void loopStrategy4() { //Right 
+  if ((rightRadar == 2) && (midSensor >= 3) && (!leftRadar)) {
+    goRight = true; 
+    rightMotor();
+    delay(75);
+    turnStartTime = millis();
+    lineWasFound = false;
+    return;   
+  }
+
+  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!rightRadar)) { 
+    //if (millis() - turnStartTime > 100) {
+    goLeft = false;
+    goRight = false;
+    //}
+  }
+  
+  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  
+  if (goLeft || goRight) return;
+
+  if (!allSensor) {
+    lineWasFound = false;
+    if (rightRadarOn) {
+      goRight = true;
+      rightMotor();
+      return;
+    }
+    if (leftRadarOn) {
+      goLeft = true; 
+      leftMotor();
+      return;
+    }
+    return;
+  }
+
+  if (leftRadar && rightRadar && midSensor) {
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  else if (leftRadar && midSensor) {
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  
+  calculateError();
+}      
+
+==== St5.ino ====
+void loopStrategy5() { 
+  /*
+  if ((midSensor >= 7) && (bitRead(sensorBit, 1)) && (bitRead(sensorBit, 10))){
+    goLeft = false;
+    goRight = false;
+    calculateError();
+    return;
+  }
+  
+
+  if ((bitRead(sensorBit, 11)) && (midSensor >= 2) && (!rightRadar)) 
+
+
+
+
+  if ((bitRead(sensorBit, 11)) && (midSensor >= 2) && (!rightRadar)) {
+    lineWasFound = false;
+    caseMotor = 1;
+    goLeft = true; 
+    return;   
+  }
+
+  if (midSensor && (!leftRadar)) { 
+    goLeft = false;
+    goRight = false;
+  }
+  
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  
+  if (goLeft || goRight) return;
+
+  if (!allSensor) {
+    lineWasFound = false;
+    if (leftRadarOn) {
+      caseMotor = 1;
+      goLeft = true; 
+      return;
+    }
+    if (rightRadarOn) {
+      caseMotor = 2;
+      goRight = true;
+      return;
+    }
+  }
+
+  // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
+  if (leftRadar && rightRadar && midSensor) {
+    // إعماء الرادارين معاً ليمر الروبوت بناءً على حساسات المنتصف فقط
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+    bitClear(sensorBit, 10);
+    bitClear(sensorBit, 11);
+  }
+  // 2. تجاهل الفخاخ اليمنى (حرف T المتجه لليمين)
+  else if (rightRadar && midSensor) {
+    bitClear(sensorBit, 0);
+    bitClear(sensorBit, 1);
+  }
+  
+  calculateError();
+  */
+} 
+
+==== St6.ino ====
+void loopStrategy6() {
+  forwardMotor();
+}
+
+==== St7.ino ====
+void loopStrategy7() {
+  forwardMotor();
+}   
+
+==== Strategy.ino ====
+void loopStrategy() {
+  switch (strategy) {
+    case 0: // 000
+      loopStrategy0();
+    break;
+    case 1: // 001
+      loopStrategy1();  
+    break;
+    case 2: // 010
+      loopStrategy2();
+    break;
+    case 3: // 011
+      loopStrategy3();
+    break;
+    case 4: // 100
+      loopStrategy4();
+    break;
+    case 5: // 101
+      loopStrategy5();
+    break;
+    case 6: // 110
+      loopStrategy6();
+    break;
+    case 7: // 111
+      loopStrategy7();
+    break;
+  }
+}
+
+==== Switch.ino ====
+void loopSwitch() {
+  // فحص الأزرار وتحديد رقم الاستراتيجية (فقط عندما يكون الروبوت متوقفاً)
+  if (!isRunning) {
+    bit1 = (digitalRead(switchPin1) == LOW) ? 1 : 0; // يمثل الرقم 1
+    bit2 = (digitalRead(switchPin2) == LOW) ? 1 : 0; // يمثل الرقم 2
+    bit3 = (digitalRead(switchPin3) == LOW) ? 1 : 0; // يمثل الرقم 4
+    
+    // المجموع سيعطينا رقماً دقيقاً من 0 إلى 7
+    strategy = (bit1 * 1) + (bit2 * 2) + (bit3 * 4);
+  }
+
+  if (digitalRead(limitSwitch) == LOW) {
+    
+    if (millis() - lastButtonPress > debounceDelay) {
+      
+      isRunning = !isRunning; 
+      
+      if (isRunning) {
+        digitalWrite(STBY, HIGH);
+      } else {
+        stopMotor();  
+      }
+      
+      lastButtonPress = millis();
+    }
+  }
+}
+
