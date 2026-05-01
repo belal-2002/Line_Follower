@@ -1,6 +1,6 @@
 void loopPrint() {
   ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
-  if (!(strategy == 7)){
+  if (!(strategy == 0)){
   if (millis() - lastPrintTime > 1500) {
 
     for (int i = 0; i < 12; i++) {
