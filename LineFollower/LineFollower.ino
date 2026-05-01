@@ -44,7 +44,7 @@
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
-  byte strategy = 0;
+  byte strategy = 1;
   byte buzzer = 0;
   //byte caseMotor = 0;
   int sensorBit = 0;
@@ -118,7 +118,7 @@ void setup() {
 void loop() {
   loopSwitch();
   loopSensors();
-  if (isRunning || strategy == 7) {
+  if (isRunning || strategy == 0) {
     loopStrategy();
     } //else {  
     if (serviceStarted) {
