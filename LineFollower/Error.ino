@@ -11,7 +11,6 @@ void calculateError() {
 
   if (sum > 0) {
     currentError = (float)weightedSum / (float)sum;
-    caseMotor = 0; // العودة للمسار الطبيعي
 
     // --- حماية الـ PD عند استرجاع الخط ---
     if (!lineWasFound) {
