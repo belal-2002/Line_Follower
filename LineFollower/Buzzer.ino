@@ -1,9 +1,3 @@
-// إعداد الطنان
-void setupBuzzer() {
-  pinMode(buzzerPin, OUTPUT);
-  digitalWrite(buzzerPin, LOW); // التأكد من إطفائه في البداية
-}
-
 // دالة لتشغيل الطنان بشكل مستمر (مفيدة للأخطاء)
 void buzzerOn() {
   digitalWrite(buzzerPin, HIGH);
