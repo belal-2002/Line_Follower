@@ -1,52 +1,38 @@
-void loopStrategy2() { //Left
-  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
-    goLeft = true; 
-    leftMotor();
-    delay(75);
-    turnStartTime = millis();
-    lineWasFound = false;
-    return;   
-  }
-
-  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!leftRadar)) {
-    //if (millis() - turnStartTime > 100) {
+void loopStrategy2() { 
+  // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+  if (midSensor) { 
     goLeft = false;
     goRight = false;
-    //}
   }
-
-  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
-
+  
+  // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  
+  // الاستمرار في الدوران إذا بدأناه
   if (goLeft || goRight) return;
 
+  // الدخول في حالة الفقدان الكلي للخط
   if (!allSensor) {
     lineWasFound = false;
+    if (rightRadarOn) {
+      goRight = true;
+      rightMotor();
+      return;
+    }
     if (leftRadarOn) {
       goLeft = true; 
       leftMotor();
       return;
     }
-    if (rightRadarOn) {
-      goRight = true;
-      rightMotor();      
-      return;
-    }
-    return;
   }
 
-  // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
-  if (leftRadar && rightRadar && midSensor) {
-    // إعماء الرادارين معاً ليمر الروبوت بناءً على حساسات المنتصف فقط
+  // تجاوز التقاطعات العرضية بأمان
+  if (radar && midSensor){
     bitClear(sensorBit, 0);
     bitClear(sensorBit, 1);
     bitClear(sensorBit, 10);
     bitClear(sensorBit, 11);
-  }
-  // 2. تجاهل الفخاخ اليمنى (حرف T المتجه لليمين)
-  else if (rightRadar && midSensor) {
-    bitClear(sensorBit, 0);
-    bitClear(sensorBit, 1);
   }
   
   calculateError();
