@@ -14,8 +14,8 @@ void loopSensors() {
     // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
     
-    // حماية القيم (استخدام 50 كحد أدنى كما طلبت)
-    sensorValue[i] = constrain(sensorValue[i], 50, 4095);
+    // حماية القيم
+    sensorValue[i] = constrain(sensorValue[i], 0, 4095);
   }
 
   for (int i = 0; i < 12; i++) {
