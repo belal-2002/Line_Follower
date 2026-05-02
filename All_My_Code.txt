@@ -55,6 +55,7 @@ void calculateError() {
   } else {
     // فقدنا الخط بالكامل (خط دفاع أخير إذا لم تتصرف الاستراتيجية)
     lineWasFound = false;
+    forwardMotor();
   }
 }
 
@@ -66,6 +67,11 @@ void calculateError() {
   #include <WiFiUdp.h>
   #include <ArduinoOTA.h>
   #include <TelnetStream.h>
+  #include <Wire.h>
+  const int MPU_ADDR = 0x68;
+  float currentAngleZ = 0.0;
+  unsigned long lastMpuTime = 0;
+  float gyroZ_offset = 0.0;
 
 // --- إعدادات شبكة الواي فاي ---
   const char* ssid = "Zain_B530_A013";      
@@ -109,7 +115,6 @@ void calculateError() {
   bool bit3 = false;
   byte strategy = 1;
   byte buzzer = 0;
-  //byte caseMotor = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
   byte leftSensor = 0;
@@ -123,6 +128,8 @@ void calculateError() {
   bool allRadarOn = false;
   bool goRight = false;
   bool goLeft = false;
+  bool turnLeft = false;
+  bool turnRight = false;
 
 //PD
   bool isRunning = false;
@@ -160,11 +167,11 @@ int rightMotorSpeed = 0;
 bool serviceStarted = false;
 
 
-int S_White[12] = {182, 224, 157, 152, 176, 178, 160, 146, 149, 179, 245, 184};
-int S_Black[12] = {2581, 3341, 2289, 2206, 2855, 2533, 2564, 2034, 1815, 2864, 3535, 2650};
-int target_White = 166;
-int target_Black = 2389;
-int lineThreshold = 1278;
+int S_White[12] = {216, 240, 164, 157, 185, 164, 172, 154, 158, 199, 260, 211};
+int S_Black[12] = {3375, 3540, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700, 3146};
+int target_White = 178;
+int target_Black = 2671;
+int lineThreshold = 1425;
 
 
 
@@ -175,10 +182,12 @@ void setup() {
   setupBuzzer();
   setupSensors();
   setupNetwork();
+  setupMPU();
 }
 
 void loop() {
   loopSwitch();
+  updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
     loopStrategy();
@@ -250,6 +259,27 @@ void forwardMotor() {
 
 
 
+
+==== MPU.ino ====
+void updateMPU() {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x47);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 2, true);
+  int16_t gyroZ_raw = Wire.read() << 8 | Wire.read();
+
+  unsigned long currentTime = micros();
+  float dt = (currentTime - lastMpuTime) / 1000000.0;
+  lastMpuTime = currentTime;
+
+  // تحويل القراءة الخام إلى درجات/ثانية
+  float gyroZ_rate = (gyroZ_raw - gyroZ_offset) / 131.0;
+
+  // فلتر بسيط لتجاهل التشويش (Deadband)
+  if(abs(gyroZ_rate) > 1.0) {
+    currentAngleZ += gyroZ_rate * dt;
+  }
+}
 
 ==== PD.ino ====
 void calculatePD() {
@@ -349,8 +379,8 @@ void loopSensors() {
     // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
     
-    // حماية القيم (استخدام 50 كحد أدنى كما طلبت)
-    sensorValue[i] = constrain(sensorValue[i], 50, 4095);
+    // حماية القيم
+    sensorValue[i] = constrain(sensorValue[i], 0, 4095);
   }
 
   for (int i = 0; i < 12; i++) {
@@ -446,6 +476,27 @@ void turnOnService() {
     playToneWiFiConnected(); // --> إطلاق نغمة النجاح الجديدة هنا <--
     serviceStarted = true; 
   }
+}
+
+void setupMPU() {
+  Wire.begin();
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x6B); // سجل إدارة الطاقة
+  Wire.write(0);    // إيقاظ الحساس
+  Wire.endTransmission(true);
+
+  // حساب الـ Offset لمعايرة الحساس عند بدء التشغيل (يجب أن يكون الروبوت ثابتاً)
+  long sumZ = 0;
+  for(int i=0; i<200; i++){
+    Wire.beginTransmission(MPU_ADDR);
+    Wire.write(0x47); // مسجل Gyro Z
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_ADDR, 2, true);
+    sumZ += (Wire.read() << 8 | Wire.read());
+    delay(3);
+  }
+  gyroZ_offset = sumZ / 200.0;
+  lastMpuTime = micros();
 }
 
 ==== St0.ino ====
@@ -594,7 +645,7 @@ void finalizeCalibration() {
 }
 
 ==== St1.ino ====
-void loopStrategy1() { 
+void loopStrategy1() { // للأمام ثم لليسار
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midSensor) { 
     goLeft = false;
@@ -621,6 +672,8 @@ void loopStrategy1() {
       rightMotor();      
       return;
     }
+    forwardMotor();
+    return;
   }
 
   // تجاوز التقاطعات العرضية بأمان
@@ -635,7 +688,7 @@ void loopStrategy1() {
 }      
 
 ==== St2.ino ====
-void loopStrategy2() { 
+void loopStrategy2() { // للأمام ثم لليمين
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midSensor) { 
     goLeft = false;
@@ -662,6 +715,8 @@ void loopStrategy2() {
       leftMotor();
       return;
     }
+    forwardMotor();
+    return;
   }
 
   // تجاوز التقاطعات العرضية بأمان
@@ -677,27 +732,31 @@ void loopStrategy2() {
 
 ==== St3.ino ====
 void loopStrategy3() { //Left
-  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
-    goLeft = true; 
-    leftMotor();
-    delay(75);
-    turnStartTime = millis();
-    lineWasFound = false;
-    return;   
-  }
-
-  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!leftRadar)) {
-    //if (millis() - turnStartTime > 100) {
+  // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+  if (midSensor) { 
     goLeft = false;
     goRight = false;
-    //}
   }
 
-  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  // الاستشفاء المبكر
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
 
-  if (goLeft || goRight) return;
+  // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
+  if (turnLeft) {
+    // ننهي الدوران الإجباري في إحدى الحالتين:
+    // 1. الروبوت دار 60 درجة بالكامل بناءً على الحساس.
+    // 2. الروبوت تجاوز 40 درجة (كحد أمان أولي) والتقطت حساسات المنتصف الخط مجدداً.
+    if ((abs(currentAngleZ) >= 60.0) || 
+        (abs(currentAngleZ) >= 40.0 && (bitRead(sensorBit, 5) || bitRead(sensorBit, 6)))) {
+      turnLeft = false;
+    }
+  }
+  
+  // الاستمرار في الدوران إذا بدأناه
+  if (turnLeft || goLeft || goRight) return;
 
+  // الدخول في حالة الفقدان الكلي للخط
   if (!allSensor) {
     lineWasFound = false;
     if (leftRadarOn) {
@@ -710,12 +769,23 @@ void loopStrategy3() { //Left
       rightMotor();      
       return;
     }
+    forwardMotor();
     return;
+  }
+
+  // --- نقطة تفعيل الدوران ---
+  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
+    turnLeft = true; 
+    leftMotor();
+    // تصفير الزاوية ليبدأ الحساب الدقيق من لحظة اتخاذ قرار الدوران
+    currentAngleZ = 0.0; 
+    // تمت إزالة delay(85) والاعتماد على الوقت هنا
+    lineWasFound = false;
+    return;   
   }
 
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
   if (leftRadar && rightRadar && midSensor) {
-    // إعماء الرادارين معاً ليمر الروبوت بناءً على حساسات المنتصف فقط
     bitClear(sensorBit, 0);
     bitClear(sensorBit, 1);
     bitClear(sensorBit, 10);
@@ -728,31 +798,32 @@ void loopStrategy3() { //Left
   }
   
   calculateError();
-}      
+}
 
 ==== St4.ino ====
 void loopStrategy4() { //Right 
-  if ((rightRadar == 2) && (midSensor >= 3) && (!leftRadar)) {
-    goRight = true; 
-    rightMotor();
-    delay(75);
-    turnStartTime = millis();
-    lineWasFound = false;
-    return;   
-  }
-
-  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!rightRadar)) { 
-    //if (millis() - turnStartTime > 100) {
+  // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+  if (midSensor) { 
     goLeft = false;
     goRight = false;
-    //}
   }
   
-  //if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  //if (goRight && rightRadar) { goRight = false; calculateError(); return; }
-  
-  if (goLeft || goRight) return;
+  // الاستشفاء المبكر
+  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
 
+  // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
+  if (turnRight) {
+    if ((abs(currentAngleZ) >= 60.0) || 
+        (abs(currentAngleZ) >= 40.0 && (bitRead(sensorBit, 5) || bitRead(sensorBit, 6)))) {
+      turnRight = false;
+    }
+  }
+  
+  // الاستمرار في الدوران إذا بدأناه
+  if (turnRight || goLeft || goRight) return;
+
+  // الدخول في حالة الفقدان الكلي للخط
   if (!allSensor) {
     lineWasFound = false;
     if (rightRadarOn) {
@@ -765,7 +836,21 @@ void loopStrategy4() { //Right
       leftMotor();
       return;
     }
+    forwardMotor();
     return;
+  }
+
+  // --- نقطة تفعيل الدوران ---
+  if ((rightRadar == 2) && (midSensor >= 3) && (!leftRadar)) {
+    turnRight = true; 
+    rightMotor();
+    
+    // تصفير الزاوية لحساب الـ 60 درجة بشكل دقيق
+    currentAngleZ = 0.0; 
+    // تمت إزالة delay(85) والاعتماد على الوقت هنا
+    
+    lineWasFound = false;
+    return;   
   }
 
   if (leftRadar && rightRadar && midSensor) {
@@ -780,11 +865,21 @@ void loopStrategy4() { //Right
   }
   
   calculateError();
-}      
+}
 
 ==== St5.ino ====
 void loopStrategy5() { 
-  /*
+  calculateError();
+} 
+
+==== St6.ino ====
+void loopStrategy6() {
+  forwardMotor();
+}
+
+==== St7.ino ====
+void loopStrategy7() {
+    /*
   if ((midSensor >= 7) && (bitRead(sensorBit, 1)) && (bitRead(sensorBit, 10))){
     goLeft = false;
     goRight = false;
@@ -845,16 +940,6 @@ void loopStrategy5() {
   
   calculateError();
   */
-} 
-
-==== St6.ino ====
-void loopStrategy6() {
-  forwardMotor();
-}
-
-==== St7.ino ====
-void loopStrategy7() {
-  forwardMotor();
 }   
 
 ==== Strategy.ino ====
