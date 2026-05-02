@@ -5,14 +5,19 @@ void loopStrategy3() { //Left
     goRight = false;
   }
 
-  // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
+  // الاستشفاء المبكر
   if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
   if (goRight && rightRadar) { goRight = false; calculateError(); return; }
 
-  if (((bitRead(sensorBit, 5)) || (bitRead(sensorBit, 6))) && (!leftRadar)) {
-    //if (millis() - turnStartTime > 100) {
-    turnLeft = false;
-    //}
+  // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
+  if (turnLeft) {
+    // ننهي الدوران الإجباري في إحدى الحالتين:
+    // 1. الروبوت دار 60 درجة بالكامل بناءً على الحساس.
+    // 2. الروبوت تجاوز 40 درجة (كحد أمان أولي) والتقطت حساسات المنتصف الخط مجدداً.
+    if ((abs(currentAngleZ) >= 70.0) || 
+        (abs(currentAngleZ) >= 50.0 && (bitRead(sensorBit, 5) || bitRead(sensorBit, 6)))) {
+      turnLeft = false;
+    }
   }
   
   // الاستمرار في الدوران إذا بدأناه
@@ -35,18 +40,22 @@ void loopStrategy3() { //Left
     return;
   }
 
-  if ((leftRadar == 2) && (midSensor >= 3) && (!rightRadar)) {
+  // --- نقطة تفعيل الدوران ---
+  if ((leftRadar) && (midSensor >= 2) && (!rightRadar)) {
     turnLeft = true; 
+    //goLeft = true;
     leftMotor();
-    delay(85);
-    turnStartTime = millis();
+    // تصفير الزاوية ليبدأ الحساب الدقيق من لحظة اتخاذ قرار الدوران
+    currentAngleZ = 0.0; 
+    // تمت إزالة delay(85) والاعتماد على الوقت هنا
     lineWasFound = false;
     return;   
   }
 
+
+  /*
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
   if (leftRadar && rightRadar && midSensor) {
-    // إعماء الرادارين معاً ليمر الروبوت بناءً على حساسات المنتصف فقط
     bitClear(sensorBit, 0);
     bitClear(sensorBit, 1);
     bitClear(sensorBit, 10);
@@ -57,6 +66,6 @@ void loopStrategy3() { //Left
     bitClear(sensorBit, 0);
     bitClear(sensorBit, 1);
   }
-  
+  */
   calculateError();
-}      
+}
