@@ -29,6 +29,7 @@ void loopStrategy2() { // للأمام ثم لليمين
     return;
   }
 
+  /*
   // تجاوز التقاطعات العرضية بأمان
   if (radar && midSensor){
     bitClear(sensorBit, 0);
@@ -36,6 +37,6 @@ void loopStrategy2() { // للأمام ثم لليمين
     bitClear(sensorBit, 10);
     bitClear(sensorBit, 11);
   }
-  
+  */
   calculateError();
 }      
