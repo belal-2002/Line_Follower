@@ -3,6 +3,13 @@
   #include <WiFiUdp.h>
   #include <ArduinoOTA.h>
   #include <TelnetStream.h>
+  #include <Wire.h>
+  const int MPU_ADDR = 0x68;
+  #define SDA_PIN 15  // إضافة رقم الدبوس
+  #define SCL_PIN 16  // إضافة رقم الدبوس
+  float currentAngleZ = 0.0;
+  unsigned long lastMpuTime = 0;
+  float gyroZ_offset = 0.0;
 
 // --- إعدادات شبكة الواي فاي ---
   const char* ssid = "Zain_B530_A013";      
@@ -40,7 +47,7 @@
   unsigned long turnStartTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
-  const unsigned long RadarTime = 33;
+  const unsigned long RadarTime = 37;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
@@ -113,10 +120,12 @@ void setup() {
   setupBuzzer();
   setupSensors();
   setupNetwork();
+  setupMPU();
 }
 
 void loop() {
   loopSwitch();
+  updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
     loopStrategy();
