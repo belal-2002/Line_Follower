@@ -59,10 +59,14 @@
   byte midSensor = 0; 
   byte allSensor = 0;
   byte radar = 0;
-  byte rightRadar = 0;
   byte leftRadar = 0;
-  bool rightRadarOn = false;
+  byte rightRadar = 0;
+  byte leftMidRadar = 0;
+  byte rightMidRadar = 0;
   bool leftRadarOn = false;
+  bool rightRadarOn = false;
+  bool leftMidRadarOn = false;
+  bool rightMidRadarOn = false;
   bool allRadarOn = false;
   bool goRight = false;
   bool goLeft = false;
