@@ -9,7 +9,7 @@ void loopSensors() {
     // حساب المتوسط وتخزينه كقراءة نهائية للحساس
     sensorValue[i] = tempSum / 3;
   }
-
+  /*
   for (int i = 0; i < 12; i++) {
     // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
@@ -17,6 +17,7 @@ void loopSensors() {
     // حماية القيم
     sensorValue[i] = constrain(sensorValue[i], 0, 4095);
   }
+  */
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
@@ -46,6 +47,9 @@ void loopSensors() {
 
   radar = leftRadar + rightRadar;
 
+  leftMidRadar = bitRead(sensorBit, 2);
+  rightMidRadar = bitRead(sensorBit, 9);
+
   if (leftRadar){
     leftRadarOn = true;
     leftRadarTime = millis();
@@ -57,6 +61,23 @@ void loopSensors() {
     rightRadarTime = millis();
   } else { 
     if (millis() - rightRadarTime > RadarTime) rightRadarOn = false;
+  }
+
+  /*
+  if (leftMidRadar){
+    leftMidRadarOn = true;
+    leftMidRadarTime = millis();
+  } else { 
+    if (millis() - leftMidRadarTime > RadarTime) leftMidRadarOn = false;
   } 
+  if (rightMidRadar){
+    rightMidRadarOn = true;
+    rightMidRadarTime = millis();
+  } else { 
+    if (millis() - rightMidRadarTime > RadarTime) rightMidRadarOn = false;
+  } 
+  */
+
 }
+
 
