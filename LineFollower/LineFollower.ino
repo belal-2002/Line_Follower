@@ -40,14 +40,21 @@
   const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
+// --- متغيرات حساب المسافة الافتراضية للرادار ---
+  float RadarDistanceThreshold = 5.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
+  float currentTravelledDistance = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
+  float leftRadarStartDistance = 0.0;   // المسافة المسجلة لحظة التقاط رادار اليسار
+  float rightRadarStartDistance = 0.0;  // المسافة المسجلة لحظة التقاط رادار اليمين
+  float pwmToCmFactor = 0.21;           // معامل تحويل سرعة المحرك (PWM) إلى مسافة (يحتاج لمعايرة بسيطة)
+  unsigned long lastDistTime = 0;       // لحساب فرق الوقت dt الخاص بالمسافة حصراً
+  int leftSpeed = 0;
+  int rightSpeed = 0; 
+
   static unsigned long lastPrintTime = 0;
-  static unsigned long rightRadarTime = 0;
-  static unsigned long leftRadarTime = 0;
-  static unsigned long allRadarTime = 0;
   unsigned long turnStartTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
-  const unsigned long RadarTime = 37;
+  //const unsigned long RadarTime = 37;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
@@ -75,6 +82,7 @@
 
 //PD
   bool isRunning = false;
+  bool serviceStarted = false;
 
   float Kp = 0.85;
   float Kd = 18.0;
@@ -82,6 +90,8 @@
   int baseSpeed = 275;  //800;  
   int turnSpeed = 675;  
   int innerTurnSpeed = turnSpeed / 2;  
+  int leftMotorSpeed = 0;
+  int rightMotorSpeed = 0;
 
   float P = 0;
   float D = 0;
@@ -102,11 +112,6 @@
   bool lineWasFound = true;
   
 
-
-int leftMotorSpeed = 0;
-int rightMotorSpeed = 0;
-
-bool serviceStarted = false;
 
 
 int S_White[12] = {216, 240, 164, 157, 185, 164, 172, 154, 158, 199, 260, 211};
