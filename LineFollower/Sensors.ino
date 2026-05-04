@@ -50,17 +50,23 @@ void loopSensors() {
   leftMidRadar = bitRead(sensorBit, 2);
   rightMidRadar = bitRead(sensorBit, 9);
 
-  if (leftRadar){
+if (leftRadar){
     leftRadarOn = true;
-    leftRadarTime = millis();
+    leftRadarStartDistance = currentTravelledDistance; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
-    if (millis() - leftRadarTime > RadarTime) leftRadarOn = false;
+    // إذا اختفى الخط عن الرادار، نتحقق مما إذا كان الروبوت قد قطع المسافة المحددة (5 سم)
+    if ((currentTravelledDistance - leftRadarStartDistance) > RadarDistanceThreshold) {
+        leftRadarOn = false;
+    }
   } 
+  
   if (rightRadar){
     rightRadarOn = true;
-    rightRadarTime = millis();
+    rightRadarStartDistance = currentTravelledDistance; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
-    if (millis() - rightRadarTime > RadarTime) rightRadarOn = false;
+    if ((currentTravelledDistance - rightRadarStartDistance) > RadarDistanceThreshold) {
+        rightRadarOn = false;
+    }
   }
 
   /*
