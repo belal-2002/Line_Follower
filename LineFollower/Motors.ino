@@ -9,6 +9,10 @@ void moveMotor() {
 
   ledcWrite(PWMA, leftMotorSpeed);
   ledcWrite(PWMB, rightMotorSpeed);
+
+  leftSpeed = leftMotorSpeed;
+  rightSpeed = rightMotorSpeed; 
+  updateDistance();
 }
 
 void leftMotor() {
@@ -40,6 +44,8 @@ void stopMotor() {
   digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
   ledcWrite(PWMA, 0);
   ledcWrite(PWMB, 0);
+
+  updateDistance();
 }
 
 void forwardMotor() {
@@ -49,6 +55,29 @@ void forwardMotor() {
 
   ledcWrite(PWMA, baseSpeed);
   ledcWrite(PWMB, baseSpeed);
+
+  leftSpeed = leftMotorSpeed;
+  rightSpeed = rightMotorSpeed; 
+  updateDistance();
+}
+
+void updateDistance() {
+  unsigned long currentMicros = micros();
+  // حساب فرق الزمن بالثواني
+  float dist_dt = (currentMicros - lastDistTime) / 1000000.0;
+  lastDistTime = currentMicros;
+
+  // حماية من القيم الشاذة عند بداية التشغيل
+  if (dist_dt > 0.1) dist_dt = 0.001; 
+
+  // حساب متوسط السرعة الحالية للمحركين (كقيمة مطلقة لأننا نهتم بالمسافة بغض النظر عن الاتجاه)
+  float avgSpeedPWM = (abs(leftSpeed) + abs(rightSpeed)) / 2.0;
+
+  // تحويل PWM إلى سرعة (سم/ثانية) ثم حساب المسافة المقطوعة (المسافة = السرعة × الزمن)
+  float speedCmPerSec = avgSpeedPWM * pwmToCmFactor;
+  float distanceMoved = speedCmPerSec * dist_dt;
+
+  currentTravelledDistance += distanceMoved; // إضافة المسافة الجديدة للمسافة الإجمالية
 }
 
 
