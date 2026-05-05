@@ -1,14 +1,14 @@
 void loopStrategy5() { //Left
-/*
+
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
-  if (midSensor) { 
+  if (midMidSensor) { 
     goLeft = false;
     goRight = false;
   }
 
   // الاستشفاء المبكر
-  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightMidRadar) { goRight = false; calculateError(); return; }
 
   // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
   if (turnLeft) {
@@ -25,14 +25,14 @@ void loopStrategy5() { //Left
   if (turnLeft || goLeft || goRight) return;
 
   // الدخول في حالة الفقدان الكلي للخط
-  if (!allSensor) {
+  if (!midSensor) {
     lineWasFound = false;
-    if (leftRadarOn) {
+    if (leftMidRadarOn) {
       goLeft = true; 
       leftMotor();
       return;
     }
-    if (rightRadarOn) {
+    if (rightMidRadarOn) {
       goRight = true;
       rightMotor();      
       return;
@@ -42,7 +42,7 @@ void loopStrategy5() { //Left
   }
 
   // --- نقطة تفعيل الدوران ---
-  if ((leftRadar) && (midSensor >= 2) && (!rightRadar)) {
+  if ((leftMidRadar) && (midMidSensor >= 2) && (!rightMidRadar)) {
     turnLeft = true; 
     //goLeft = true;
     leftMotor();
@@ -53,7 +53,11 @@ void loopStrategy5() { //Left
     return;   
   }
 
+  bitClear(sensorBit, 0);
+  bitClear(sensorBit, 1);
+  bitClear(sensorBit, 10);
+  bitClear(sensorBit, 11);
 
   calculateError();
-  */
+  
 }
