@@ -3,27 +3,30 @@ void loopPrint() {
   if (!(strategy == 0)){
   if (millis() - lastPrintTime > 1500) {
 
-    for (int i = 0; i < 12; i++) {
-      TelnetStream.print(sensorValue[i]);  
-      TelnetStream.print("\t");               
-    }
-    TelnetStream.println();
-/*
   String output = "";
   for (int i = 0; i < 12; i++) {
     output += bitRead(sensorBit, 11 - i);
     output += "\t";
   }
   TelnetStream.print(output);
-  */
 
-      TelnetStream.print("\t");
-      TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  strategy:%d", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, strategy);
-      TelnetStream.print("\t");
-      //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
+  TelnetStream.println();    
 
-      TelnetStream.println();
-    lastPrintTime = millis();
+  for (int i = 0; i < 12; i++) {
+    TelnetStream.print(sensorValue[i]);  
+    TelnetStream.print("\t");               
+  }
+
+   
+
+
+  TelnetStream.print("\t");
+  TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  strategy:%d", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, strategy);
+  TelnetStream.print("\t");
+  //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
+
+  TelnetStream.println();
+  lastPrintTime = millis();
   }
 
   // معالجة أوامر الكيبورد لتعديل PID
