@@ -24,6 +24,10 @@ void leftMotor() {
   // 2. المحرك الأيمن (الخارجي) يستمر بالدفع للأمام بالسرعة العالية المحددة
   digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
   ledcWrite(PWMB, turnSpeed);      // 600
+
+  leftSpeed = 0;
+  rightSpeed = 0; 
+  updateDistance();
 }
 
 void rightMotor() {
@@ -35,6 +39,10 @@ void rightMotor() {
   // 2. المحرك الأيمن (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
   digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
   ledcWrite(PWMB, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
+
+  leftSpeed = 0;
+  rightSpeed = 0; 
+  updateDistance();
 }
 
 void stopMotor() {
@@ -45,6 +53,8 @@ void stopMotor() {
   ledcWrite(PWMA, 0);
   ledcWrite(PWMB, 0);
 
+  leftSpeed = 0;
+  rightSpeed = 0; 
   updateDistance();
 }
 
@@ -77,7 +87,7 @@ void updateDistance() {
   float speedCmPerSec = avgSpeedPWM * pwmToCmFactor;
   float distanceMoved = speedCmPerSec * dist_dt;
 
-  currentTravelledDistance += distanceMoved; // إضافة المسافة الجديدة للمسافة الإجمالية
+  distanceNow += distanceMoved; // إضافة المسافة الجديدة للمسافة الإجمالية
 }
 
 
