@@ -9,7 +9,7 @@ void loopSensors() {
     // حساب المتوسط وتخزينه كقراءة نهائية للحساس
     sensorValue[i] = tempSum / 3;
   }
-  /*
+  
   for (int i = 0; i < 12; i++) {
     // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
@@ -17,7 +17,7 @@ void loopSensors() {
     // حماية القيم
     sensorValue[i] = constrain(sensorValue[i], 0, 4095);
   }
-  */
+  
 
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
@@ -36,6 +36,9 @@ void loopSensors() {
   // حساسات المنتصف
   midSensor = __builtin_popcount((sensorBit >> 2) & 0xFF);
 
+  // حساسات المنتصف
+  midMidSensor = __builtin_popcount((sensorBit >> 3) & 0x3F);
+
   // إجمالي الحساسات
   allSensor = __builtin_popcount(sensorBit & 0xFFF);
 
@@ -52,37 +55,40 @@ void loopSensors() {
 
 if (leftRadar){
     leftRadarOn = true;
-    leftRadarStartDistance = currentTravelledDistance; // تسجيل المسافة الحالية كنقطة بداية
+    leftRadarStartDistance = distanceNow; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
     // إذا اختفى الخط عن الرادار، نتحقق مما إذا كان الروبوت قد قطع المسافة المحددة (5 سم)
-    if ((currentTravelledDistance - leftRadarStartDistance) > RadarDistanceThreshold) {
+    if ((distanceNow - leftRadarStartDistance) > RadarDistanceThreshold) {
         leftRadarOn = false;
     }
   } 
   
   if (rightRadar){
     rightRadarOn = true;
-    rightRadarStartDistance = currentTravelledDistance; // تسجيل المسافة الحالية كنقطة بداية
+    rightRadarStartDistance = distanceNow; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
-    if ((currentTravelledDistance - rightRadarStartDistance) > RadarDistanceThreshold) {
+    if ((distanceNow - rightRadarStartDistance) > RadarDistanceThreshold) {
         rightRadarOn = false;
     }
   }
 
-  /*
   if (leftMidRadar){
     leftMidRadarOn = true;
-    leftMidRadarTime = millis();
+    leftMidRadarStartDistance = distanceNow;
   } else { 
-    if (millis() - leftMidRadarTime > RadarTime) leftMidRadarOn = false;
+    if ((distanceNow - leftMidRadarStartDistance) > RadarDistanceThreshold) {
+        leftMidRadarOn = false;
+    }
   } 
+  
   if (rightMidRadar){
     rightMidRadarOn = true;
-    rightMidRadarTime = millis();
+    rightMidRadarStartDistance = distanceNow;
   } else { 
-    if (millis() - rightMidRadarTime > RadarTime) rightMidRadarOn = false;
-  } 
-  */
+    if ((distanceNow - rightMidRadarStartDistance) > RadarDistanceThreshold) {
+        rightMidRadarOn = false;
+    }
+  }
 
 }
 
