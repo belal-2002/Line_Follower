@@ -42,9 +42,11 @@
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
 // --- متغيرات حساب المسافة الافتراضية للرادار ---
   float RadarDistanceThreshold = 5.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
-  float currentTravelledDistance = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
+  float distanceNow = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
   float leftRadarStartDistance = 0.0;   // المسافة المسجلة لحظة التقاط رادار اليسار
   float rightRadarStartDistance = 0.0;  // المسافة المسجلة لحظة التقاط رادار اليمين
+  float leftMidRadarStartDistance = 0.0;   
+  float rightMidRadarStartDistance = 0.0;  
   float pwmToCmFactor = 0.21;           // معامل تحويل سرعة المحرك (PWM) إلى مسافة (يحتاج لمعايرة بسيطة)
   unsigned long lastDistTime = 0;       // لحساب فرق الوقت dt الخاص بالمسافة حصراً
   int leftSpeed = 0;
@@ -54,7 +56,6 @@
   unsigned long turnStartTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
-  //const unsigned long RadarTime = 37;
   bool bit1 = false;
   bool bit2 = false;
   bool bit3 = false;
@@ -64,6 +65,7 @@
   byte rightSensor = 0;
   byte leftSensor = 0;
   byte midSensor = 0; 
+  byte midMidSensor = 0;
   byte allSensor = 0;
   byte radar = 0;
   byte leftRadar = 0;
@@ -115,7 +117,7 @@
 
 
 int S_White[12] = {216, 240, 164, 157, 185, 164, 172, 154, 158, 199, 260, 211};
-int S_Black[12] = {3375, 3540, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700, 3146};
+int S_Black[12] = {3375, 1555, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700, 3146};
 int target_White = 178;
 int target_Black = 2671;
 int lineThreshold = 1425;
