@@ -50,8 +50,8 @@ void loopSensors() {
 
   radar = leftRadar + rightRadar;
 
-  leftMidRadar = bitRead(sensorBit, 2);
-  rightMidRadar = bitRead(sensorBit, 9);
+  leftMidRadar = bitRead(sensorBit, 9);
+  rightMidRadar = bitRead(sensorBit, 2);
 
 if (leftRadar){
     leftRadarOn = true;
