@@ -52,7 +52,6 @@ void loopPrint() {
     if (baseSpeed < 0) baseSpeed = 0;
     if (turnSpeed < 0) turnSpeed = 0;
     if (maximumSpeed < 0) maximumSpeed = 0;
-    if (strategy < 0) strategy = 0;
   }
   } else {
     if (millis() - lastPrintTime > 3500) {
