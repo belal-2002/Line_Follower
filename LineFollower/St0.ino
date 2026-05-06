@@ -140,4 +140,5 @@ void finalizeCalibration() {
     TelnetStream.print("int target_Black = "); TelnetStream.print(target_Black); TelnetStream.println(";");
     TelnetStream.print("int lineThreshold = "); TelnetStream.print(lineThreshold); TelnetStream.println(";");
     TelnetStream.println("\n=======================================================");
+    lastMpuTime = micros();
 }
