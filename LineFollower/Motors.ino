@@ -12,14 +12,13 @@ void moveMotor() {
 
   leftSpeed = leftMotorSpeed;
   rightSpeed = rightMotorSpeed; 
-  updateDistance();
 }
 
 void leftMotor() {
   // الدوران لليسار (Left Turn)
  // 1. المحرك الأيسر (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
   digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW);
-  ledcWrite(PWMA, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
+  ledcWrite(PWMA, turnSpeed); // <-- تم التعديل للسرعة التفاضلية
       
   // 2. المحرك الأيمن (الخارجي) يستمر بالدفع للأمام بالسرعة العالية المحددة
   digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
@@ -27,7 +26,6 @@ void leftMotor() {
 
   leftSpeed = 0;
   rightSpeed = 0; 
-  updateDistance();
 }
 
 void rightMotor() {
@@ -38,11 +36,10 @@ void rightMotor() {
       
   // 2. المحرك الأيمن (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
   digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
-  ledcWrite(PWMB, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
+  ledcWrite(PWMB, turnSpeed); // <-- تم التعديل للسرعة التفاضلية
 
   leftSpeed = 0;
   rightSpeed = 0; 
-  updateDistance();
 }
 
 void stopMotor() {
@@ -55,7 +52,6 @@ void stopMotor() {
 
   leftSpeed = 0;
   rightSpeed = 0; 
-  updateDistance();
 }
 
 void forwardMotor() {
@@ -66,9 +62,8 @@ void forwardMotor() {
   ledcWrite(PWMA, baseSpeed);
   ledcWrite(PWMB, baseSpeed);
 
-  leftSpeed = leftMotorSpeed;
-  rightSpeed = rightMotorSpeed; 
-  updateDistance();
+  leftSpeed = baseSpeed;
+  rightSpeed = baseSpeed; 
 }
 
 void updateDistance() {
