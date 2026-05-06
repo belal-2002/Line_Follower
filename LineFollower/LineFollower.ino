@@ -90,7 +90,7 @@
   float Kd = 18.0;
   int maximumSpeed = 625;  //1023;   
   int baseSpeed = 275;  //800;  
-  int turnSpeed = 675;  
+  int turnSpeed = 400;  
   int innerTurnSpeed = turnSpeed / 2;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
@@ -136,6 +136,7 @@ void setup() {
 
 void loop() {
   loopSwitch();
+  updateDistance();
   updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
