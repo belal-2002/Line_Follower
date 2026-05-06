@@ -2,6 +2,12 @@ void loopStrategy5() { //Left
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midMidSensor) { 
+    if (goLeft || goRight){
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+    }
     goLeft = false;
     goRight = false;
   }
@@ -12,11 +18,16 @@ void loopStrategy5() { //Left
 
   // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
   if (turnLeft) {
-    // ننهي الدوران الإجباري في إحدى الحالتين:
-    // 1. الروبوت دار 60 درجة بالكامل بناءً على الحساس.
-    // 2. الروبوت تجاوز 40 درجة (كحد أمان أولي) والتقطت حساسات المنتصف الخط مجدداً.
+    /*
+    if (midMidSensor) { 
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+    }
+    */
     if ((abs(currentAngleZ) >= 70.0) || 
-        (abs(currentAngleZ) >= 50.0 && (bitRead(sensorBit, 5) || bitRead(sensorBit, 6)))) {
+        (abs(currentAngleZ) >= 50.0 && (midSensor))) {
       turnLeft = false;
     }
   }
