@@ -4,15 +4,15 @@ void loopPrint() {
   if (millis() - lastPrintTime > 1500) {
 
   String output = "";
-  for (int i = 0; i < 12; i++) {
-    output += bitRead(sensorBit, 11 - i);
+  for (int i = 0; i < 10; i++) {
+    output += bitRead(sensorBit, 9 - i);
     output += "\t";
   }
   TelnetStream.print(output);
 
   TelnetStream.println();    
 
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 10; i++) {
     TelnetStream.print(sensorValue[i]);  
     TelnetStream.print("\t");               
   }
