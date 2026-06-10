@@ -10,7 +10,7 @@ void loopSensors() {
     sensorValue[i] = tempSum / 3;
   }
   
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 10; i++) {
     // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
     
