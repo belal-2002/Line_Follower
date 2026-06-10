@@ -1,6 +1,6 @@
 void loopSensors() {
 // 1. قراءة جميع الحساسات باستخدام فلتر (متوسط 3 قراءات)
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 10; i++) {
     long tempSum = 0; // متغير مؤقت لتخزين مجموع القراءات
     // أخذ 3 قراءات متتالية لنفس الحساس
     for (int j = 0; j < 3; j++) {
@@ -19,39 +19,35 @@ void loopSensors() {
   }
   
 
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 10; i++) {
     if (sensorValue[i] > lineThreshold) {
-      bitSet(sensorBit, 11 - i);
+      bitSet(sensorBit, 9 - i);
     } else {
-      bitClear(sensorBit, 11 - i);
+      bitClear(sensorBit, 9 - i);
     }
   }
 
   // إزاحة البتات 6 خطوات لليمين لاستخراج بتات الحساسات اليسرى (من 6 إلى 11) وعدّها
-  leftSensor = __builtin_popcount((sensorBit >> 6) & 0x3F); 
+  leftSensor = __builtin_popcount((sensorBit >> 5) & 0x1F); 
 
   // استخراج أول 6 بتات (من 0 إلى 5) الخاصة بالحساسات اليمنى وعدّها بسرعة
-  rightSensor = __builtin_popcount(sensorBit & 0x3F); // 0x3F تعادل 000000111111 ثنائياً
+  rightSensor = __builtin_popcount(sensorBit & 0x1F); // 0x3F تعادل 000000111111 ثنائياً
 
   // حساسات المنتصف
-  midSensor = __builtin_popcount((sensorBit >> 2) & 0xFF);
+  midSensor = __builtin_popcount((sensorBit >> 1) & 0xFF);
 
   // حساسات المنتصف
-  midMidSensor = __builtin_popcount((sensorBit >> 3) & 0x3F);
+  midMidSensor = __builtin_popcount((sensorBit >> 2) & 0x3F);
 
   // إجمالي الحساسات
-  allSensor = __builtin_popcount(sensorBit & 0xFFF);
+  allSensor = __builtin_popcount(sensorBit & 0x3FF);
 
-  // حساسات اليسار: إزاحة 10 خطوات لليمين لاقتناص بتات اليسار
-  leftRadar = __builtin_popcount((sensorBit >> 10) & 0x03);
-
-  // حساسات اليمين: 0x03 تعادل (11) ثنائياً لاقتناص أول بتين من اليمين
-  rightRadar = __builtin_popcount(sensorBit & 0x03);
-
+  leftRadar = bitRead(sensorBit, 9);
+  rightRadar = bitRead(sensorBit, 0);
   radar = leftRadar + rightRadar;
 
-  leftMidRadar = bitRead(sensorBit, 9);
-  rightMidRadar = bitRead(sensorBit, 2);
+  leftMidRadar = bitRead(sensorBit, 8);
+  rightMidRadar = bitRead(sensorBit, 1);
 
 if (leftRadar){
     leftRadarOn = true;
