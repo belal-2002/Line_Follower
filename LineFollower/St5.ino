@@ -65,9 +65,8 @@ void loopStrategy5() { //Left
   }
 
   bitClear(sensorBit, 0);
-  bitClear(sensorBit, 1);
-  bitClear(sensorBit, 10);
-  bitClear(sensorBit, 11);
+  bitClear(sensorBit, 9);
+
 
   calculateError();
   
