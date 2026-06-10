@@ -9,9 +9,6 @@ void moveMotor() {
 
   ledcWrite(PWMA, leftMotorSpeed);
   ledcWrite(PWMB, rightMotorSpeed);
-
-  leftSpeed = leftMotorSpeed;
-  rightSpeed = rightMotorSpeed; 
 }
 
 void leftMotor() {
@@ -23,9 +20,6 @@ void leftMotor() {
   // 2. المحرك الأيمن (الخارجي) يستمر بالدفع للأمام بالسرعة العالية المحددة
   digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW); 
   ledcWrite(PWMB, turnSpeed);      // 600
-
-  leftSpeed = 0;
-  rightSpeed = 0; 
 }
 
 void rightMotor() {
@@ -37,9 +31,6 @@ void rightMotor() {
   // 2. المحرك الأيمن (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
   digitalWrite(BIN1, LOW); digitalWrite(BIN2, HIGH); 
   ledcWrite(PWMB, turnSpeed); // <-- تم التعديل للسرعة التفاضلية
-
-  leftSpeed = 0;
-  rightSpeed = 0; 
 }
 
 void stopMotor() {
@@ -49,9 +40,6 @@ void stopMotor() {
   digitalWrite(BIN1, LOW);  digitalWrite(BIN2, LOW);  
   ledcWrite(PWMA, 0);
   ledcWrite(PWMB, 0);
-
-  leftSpeed = 0;
-  rightSpeed = 0; 
 }
 
 void forwardMotor() {
@@ -61,28 +49,31 @@ void forwardMotor() {
 
   ledcWrite(PWMA, baseSpeed);
   ledcWrite(PWMB, baseSpeed);
-
-  leftSpeed = baseSpeed;
-  rightSpeed = baseSpeed; 
 }
 
 void updateDistance() {
-  unsigned long currentMicros = micros();
-  // حساب فرق الزمن بالثواني
-  float dist_dt = (currentMicros - lastDistTime) / 1000000.0;
-  lastDistTime = currentMicros;
+  // 1. إيقاف المقاطعات لحظياً لنسخ القيم بأمان
+  noInterrupts();
+  long currentLeftTicks = leftTicks;
+  long currentRightTicks = rightTicks;
+  interrupts();
 
-  // حماية من القيم الشاذة عند بداية التشغيل
-  if (dist_dt > 0.1) dist_dt = 0.001; 
+  // 2. حساب المسافة المقطوعة لكل عجل بالسنتيمتر
+  float distanceLeft = currentLeftTicks * distancePerTick;
+  float distanceRight = currentRightTicks * distancePerTick;
 
-  // حساب متوسط السرعة الحالية للمحركين (كقيمة مطلقة لأننا نهتم بالمسافة بغض النظر عن الاتجاه)
-  float avgSpeedPWM = (abs(leftSpeed) + abs(rightSpeed)) / 2.0;
+  // 3. المسافة الإجمالية لمركز الروبوت (لحسابات الرادار)
+  distanceNow = (distanceLeft + distanceRight) / 2.0;
 
-  // تحويل PWM إلى سرعة (سم/ثانية) ثم حساب المسافة المقطوعة (المسافة = السرعة × الزمن)
-  float speedCmPerSec = avgSpeedPWM * pwmToCmFactor;
-  float distanceMoved = speedCmPerSec * dist_dt;
-
-  distanceNow += distanceMoved; // إضافة المسافة الجديدة للمسافة الإجمالية
+  /* * ملاحظة هندسية حول "الاتجاه":
+   * يمكننا حساب زاوية دوران الروبوت من العجلات (Odometry) كالتالي:
+   * float encoderAngleRad = (distanceRight - distanceLeft) / wheelBase;
+   * float encoderAngleDeg = encoderAngleRad * (180.0 / PI);
+   * * ولكن! الانزلاق في الحلبة سيجعل هذا الرقم يفقد دقته بسرعة.
+   * أنت تمتلك MPU6050 والذي يعتبر المعيار الذهبي لقياس زاوية الدوران (currentAngleZ).
+   * لذلك، يفضل الاعتماد على الـ Encoders لمعرفة المسافة الخطية (متى تقطع التقاطع)،
+   * والاعتماد على MPU6050 لمعرفة زاوية الانعطاف (متى تتوقف عن الدوران).
+   */
 }
 
 
