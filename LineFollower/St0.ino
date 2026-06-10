@@ -4,8 +4,8 @@ static bool lastIsRunning = false;
 static byte lastStrategyForCalib = 255;
 
 // متغيرات التخزين المؤقت للمعايرة
-static float whiteAvg[12];
-static float blackAvg[12];
+static float whiteAvg[10];
+static float blackAvg[10];
 static float overallWhiteAvg = 0;
 static float overallBlackAvg = 0;
 
@@ -62,21 +62,21 @@ void loopStrategy0() {
 }
 
 void runCalibrationPhase(bool isBlack) {
-    long sums[12] = {0};
+    long sums[10] = {0};
     TelnetStream.println("جاري أخذ 100 قراءة لضمان الدقة...");
 
     for (int i = 0; i < 100; i++) {
-        for (int s = 0; s < 12; s++) {
+        for (int s = 0; s < 10; s++) {
             int val = analogRead(sensorPins[s]);
             sums[s] += val;
         }
         delay(10); // تأخير زمني بسيط لضمان استقرار القراءات التناظرية
     }
 
-    TelnetStream.println("--- متوسط الحساسات الـ 12 ---");
+    TelnetStream.println("--- متوسط الحساسات الـ 10 ---");
     float overallSum = 0;
 
-    for (int s = 0; s < 12; s++) {
+    for (int s = 0; s < 10; s++) {
         float avg = (float)sums[s] / 100.0;
         if (isBlack) {
             blackAvg[s] = avg;
@@ -87,8 +87,8 @@ void runCalibrationPhase(bool isBlack) {
         TelnetStream.print(avg, 0);
         TelnetStream.print("\t");
 
-        // استثناء S2 و S11 من المتوسط العام (كما في الكود الأصلي)
-        if (s != 1 && s != 10) {
+        // استثناء S1 و S10 من المتوسط العام (كما في الكود الأصلي)
+        if (s != 0 && s != 9) {
             overallSum += avg;
         }
     }
@@ -112,7 +112,7 @@ void finalizeCalibration() {
     target_Black = round(overallBlackAvg);
     lineThreshold = calculatedThreshold;
 
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 10; i++) {
         S_White[i] = round(whiteAvg[i]);
         S_Black[i] = round(blackAvg[i]);
     }
@@ -122,17 +122,17 @@ void finalizeCalibration() {
     TelnetStream.println("يمكنك نسخ الكود التالي ولصقه في ملف LineFollower.ino:");
     TelnetStream.println("=======================================================\n");
 
-    TelnetStream.print("int S_White[12] = {");
-    for (int i = 0; i < 12; i++) {
+    TelnetStream.print("int S_White[10] = {");
+    for (int i = 0; i < 10; i++) {
         TelnetStream.print(S_White[i]);
-        if (i < 11) TelnetStream.print(", ");
+        if (i < 9) TelnetStream.print(", ");
     }
     TelnetStream.println("};");
 
-    TelnetStream.print("int S_Black[12] = {");
-    for (int i = 0; i < 12; i++) {
+    TelnetStream.print("int S_Black[10] = {");
+    for (int i = 0; i < 10; i++) {
         TelnetStream.print(S_Black[i]);
-        if (i < 11) TelnetStream.print(", ");
+        if (i < 9) TelnetStream.print(", ");
     }
     TelnetStream.println("};");
 
