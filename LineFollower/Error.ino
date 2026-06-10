@@ -2,8 +2,8 @@ void calculateError() {
   weightedSum = 0;
   sum = 0;
 
-  for (int i = 0; i < 12; i++) {
-    if (bitRead(sensorBit, 11 - i)) {
+  for (int i = 0; i < 10; i++) {
+    if (bitRead(sensorBit, 9 - i)) { 
       weightedSum += (long)sensorValue[i] * sensorWeights[i];
       sum += sensorValue[i];
     }
