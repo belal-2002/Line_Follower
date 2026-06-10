@@ -20,6 +20,10 @@
   //const char* password = "55555555";
   //10.189.201.71
 
+// --- تعريف دبابيس حساسات السرعة (Encoders) ---
+  #define LEFT_ENCODER 14  
+  #define RIGHT_ENCODER 11
+
 // --- تعريف دبابيس المحركات ---
   #define PWMA 42   
   #define AIN1 41   
@@ -47,10 +51,6 @@
   float rightRadarStartDistance = 0.0;  // المسافة المسجلة لحظة التقاط رادار اليمين
   float leftMidRadarStartDistance = 0.0;   
   float rightMidRadarStartDistance = 0.0;  
-  float pwmToCmFactor = 0.21;           // معامل تحويل سرعة المحرك (PWM) إلى مسافة (يحتاج لمعايرة بسيطة)
-  unsigned long lastDistTime = 0;       // لحساب فرق الوقت dt الخاص بالمسافة حصراً
-  int leftSpeed = 0;
-  int rightSpeed = 0; 
 
   static unsigned long lastPrintTime = 0;
   unsigned long turnStartTime = 0;
@@ -105,6 +105,16 @@
   static unsigned long lastTime = 0;
   float dt;
 
+
+// --- متغيرات الـ Odometry ---
+  // استخدام volatile ضروري جداً للمتغيرات التي يتم تعديلها داخل المقاطعات (Interrupts)
+  volatile long leftTicks = 0;
+  volatile long rightTicks = 0;
+
+  const float distancePerTick = 0.8639; // المسافة لكل نبضة بالسنتيمتر
+  const float wheelBase = 7.0;          // المسافة بين العجلتين الخلفيتين بالسنتيمتر
+
+
 //Error
   const int sensorWeights[10] = {-444, -267, -190, -114, -38, 38, 114, 190, 267, 444};
   int sensorValue[10]; 
@@ -132,6 +142,7 @@ void setup() {
   setupSensors();
   setupNetwork();
   setupMPU();
+  setupEncoder();
 }
 
 void loop() {
