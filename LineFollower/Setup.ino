@@ -69,3 +69,46 @@ void setupMPU() {
   gyroZ_offset = sumZ / 200.0;
   lastMpuTime = micros();
 }
+
+// دالة مقاطعة العجل الأيسر
+void IRAM_ATTR leftEncoderISR() {
+  // نقرأ دبابيس المحرك لمعرفة الاتجاه
+  // المحرك الأيسر: AIN1=LOW و AIN2=HIGH تعني للأمام
+  if (digitalRead(AIN1) == LOW && digitalRead(AIN2) == HIGH) {
+    leftTicks++;
+  } 
+  // AIN1=HIGH و AIN2=LOW تعني للخلف
+  else if (digitalRead(AIN1) == HIGH && digitalRead(AIN2) == LOW) {
+    leftTicks--;
+  } 
+  // في حالة الفرملة أو الانزلاق الحر (الافتراضي نزيد المسافة)
+  else {
+    leftTicks++; 
+  }
+}
+
+// دالة مقاطعة العجل الأيمن
+void IRAM_ATTR rightEncoderISR() {
+  // المحرك الأيمن: BIN1=HIGH و BIN2=LOW تعني للأمام
+  if (digitalRead(BIN1) == HIGH && digitalRead(BIN2) == LOW) {
+    rightTicks++;
+  } 
+  // BIN1=LOW و BIN2=HIGH تعني للخلف
+  else if (digitalRead(BIN1) == LOW && digitalRead(BIN2) == HIGH) {
+    rightTicks--;
+  } 
+  else {
+    rightTicks++;
+  }
+}
+
+void setupEncoder() {
+  // إعداد دبابيس حساسات السرعة
+  pinMode(LEFT_ENCODER, INPUT_PULLUP);
+  pinMode(RIGHT_ENCODER, INPUT_PULLUP);
+
+  // ربط المقاطعات - تعمل فور استشعار ثقب في القرص
+  attachInterrupt(digitalPinToInterrupt(LEFT_ENCODER), leftEncoderISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_ENCODER), rightEncoderISR, RISING);
+}
+
