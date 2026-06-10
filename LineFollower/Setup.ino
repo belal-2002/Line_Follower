@@ -63,7 +63,7 @@ void setupMPU() {
     Wire.write(0x47); // مسجل Gyro Z
     Wire.endTransmission(false);
     Wire.requestFrom(MPU_ADDR, 2, true);
-    sumZ += (Wire.read() << 8 | Wire.read());
+    sumZ += (int16_t)(Wire.read() << 8 | Wire.read());
     delay(3);
   }
   gyroZ_offset = sumZ / 200.0;
