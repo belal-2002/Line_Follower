@@ -27,17 +27,17 @@
   #define PWMB 19   
   #define BIN1 21   
   #define BIN2 20   
-  #define STBY 39   
+  #define STBY 48   
 
 // ---  تعريف مفتاح التشغيل ودبابيس الاستراتيجيات  ---
   #define limitSwitch 17  
   #define switchPin1 47
-  #define switchPin2 48
+  #define switchPin2 39
   #define switchPin3 18
   #define buzzerPin 1
 
 // --- تعريف دبابيس الحساسات الـ 12 ---
-  const int sensorPins[12] = {14, 13, 10, 9, 8, 7, 6, 5, 4, 2, 12, 11};
+  const int sensorPins[10] = {13, 10, 9, 8, 7, 6, 5, 4, 2, 12};
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
 // --- متغيرات حساب المسافة الافتراضية للرادار ---
@@ -106,8 +106,8 @@
   float dt;
 
 //Error
-  const int sensorWeights[12] = {-698, -444, -267, -190, -114, -38, 38, 114, 190, 267, 444, 698};
-  int sensorValue[12]; 
+  const int sensorWeights[10] = {-444, -267, -190, -114, -38, 38, 114, 190, 267, 444};
+  int sensorValue[10]; 
   long weightedSum = 0;
   long sum = 0;
   bool lineAvailable = true;
@@ -116,8 +116,8 @@
 
 
 
-int S_White[12] = {216, 240, 164, 157, 185, 164, 172, 154, 158, 199, 260, 211};
-int S_Black[12] = {3375, 1555, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700, 3146};
+int S_White[10] = {240, 164, 157, 185, 164, 172, 154, 158, 199, 260};
+int S_Black[10] = {1555, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700};
 int target_White = 178;
 int target_Black = 2671;
 int lineThreshold = 1425;
