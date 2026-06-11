@@ -26,8 +26,8 @@ void loopStrategy5() { //Left
       rightMidRadarOn = false;
     }
     */
-    if ((abs(currentAngleZ) >= 70.0) || 
-        (abs(currentAngleZ) >= 50.0 && (midSensor))) {
+    if ((abs(currentAngleZ) >= 50.0) || 
+        (abs(currentAngleZ) >= 40.0 && (midSensor))) {
       turnLeft = false;
     }
   }
@@ -53,12 +53,12 @@ void loopStrategy5() { //Left
   }
 
   // --- نقطة تفعيل الدوران ---
-  if ((leftMidRadar) && (midMidSensor >= 2) && (!rightMidRadar)) {
+  if ((leftMidRadar) && (midMidSensor >= 4) && (!rightMidRadar)) {
     turnLeft = true; 
     //goLeft = true;
     leftMotor();
     // تصفير الزاوية ليبدأ الحساب الدقيق من لحظة اتخاذ قرار الدوران
-    currentAngleZ = 0.0; 
+    resetAngleZ(); 
     // تمت إزالة delay(85) والاعتماد على الوقت هنا
     lineWasFound = false;
     return;   
