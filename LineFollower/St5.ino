@@ -74,7 +74,7 @@ void loopStrategy5() { //Left
   }
   if (millis() - LineNotFoundTime >= 10) {
     recoveryTurn180 = false; // إنهاء حالة البحث
-    LineNotFoundStartDistance = distanceNow;
+    lostLineDistance = distanceNow;
   }
 
   // --- نقطة تفعيل الدوران ---
