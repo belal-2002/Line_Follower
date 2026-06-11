@@ -88,10 +88,10 @@
 
   float Kp = 0.85;
   float Kd = 18.0;
-  int maximumSpeed = 625;     
-  int baseSpeed = 275;    
-  int turnSpeed = 200;  
-  int innerTurnSpeed = turnSpeed / 2;  
+  int maximumSpeed = 400;     
+  int baseSpeed = 200;    
+  int turnSpeed = 250;  
+  int innerTurnSpeed = turnSpeed / 5*4;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
@@ -112,7 +112,8 @@
   volatile long rightTicks = 0;
 
   const float distancePerTick = 0.8639; // المسافة لكل نبضة بالسنتيمتر
-  const float wheelBase = 7.0;          // المسافة بين العجلتين الخلفيتين بالسنتيمتر
+  const float trackWidth = 8.75; // المسافة بين العجلتين بالسنتيمتر
+  float angleOffset = 0.0;       // لحفظ نقطة الصفر عند كل دوران
 
 
 //Error
@@ -151,7 +152,7 @@ void setup() {
 void loop() {
   loopSwitch();
   updateDistance();
-  updateMPU();
+  //updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
     loopStrategy();
