@@ -86,8 +86,8 @@
   bool isRunning = false;
   bool serviceStarted = false;
 
-  float Kp = 0.85;
-  float Kd = 18.0;
+  float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
+  float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
   int maximumSpeed = 400;     
   int baseSpeed = 200;    
   int turnSpeed = 250;  
@@ -101,9 +101,7 @@
   float lastError = 0;
   float currentError = 0;
 
-  unsigned long currentTime = 0;
-  static unsigned long lastTime = 0;
-  float dt;
+
 
 
 // --- متغيرات الـ Odometry ---
@@ -133,7 +131,6 @@ int S_Black[10] = {2468, 2804, 2721, 3377, 3118, 3720, 3020, 2962, 3801, 3942};
 int target_White = 152;
 int target_Black = 2552;
 int lineThreshold = 1352;
-
 
 
 
