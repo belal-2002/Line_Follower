@@ -46,7 +46,7 @@ void loopStrategy3() { //Left
     //goLeft = true;
     leftMotor();
     // تصفير الزاوية ليبدأ الحساب الدقيق من لحظة اتخاذ قرار الدوران
-    currentAngleZ = 0.0; 
+    resetAngleZ(); 
     // تمت إزالة delay(85) والاعتماد على الوقت هنا
     lineWasFound = false;
     return;   
