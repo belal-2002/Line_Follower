@@ -33,6 +33,19 @@ void rightMotor() {
   ledcWrite(PWMB, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
 }
 
+void spinTurn180() {
+  // الدوران الموضعي لليسار في أضيق مساحة ممكنة (Zero Radius)
+  // 1. المحرك الأيسر للخلف بسرعة الدوران
+  digitalWrite(AIN1, HIGH);
+  digitalWrite(AIN2, LOW);
+  ledcWrite(PWMA, turnSpeed); 
+
+  // 2. المحرك الأيمن للأمام بنفس سرعة الدوران
+  digitalWrite(BIN1, HIGH);
+  digitalWrite(BIN2, LOW); 
+  ledcWrite(PWMB, turnSpeed);
+}
+
 void stopMotor() {
   // توقف تام
   digitalWrite(STBY, LOW);  
