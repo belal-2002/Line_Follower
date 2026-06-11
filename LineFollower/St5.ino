@@ -27,7 +27,8 @@ void loopStrategy5() { //Left
     }
     */
     if ((abs(currentAngleZ) >= 50.0) || 
-        (abs(currentAngleZ) >= 40.0 && (midSensor))) {
+        (abs(currentAngleZ) >= 40.0 && (midSensor)) ||
+        (millis() - turnStartTime >= 400)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
       turnLeft = false;
     }
   }
@@ -60,6 +61,7 @@ void loopStrategy5() { //Left
     // تصفير الزاوية ليبدأ الحساب الدقيق من لحظة اتخاذ قرار الدوران
     resetAngleZ(); 
     // تمت إزالة delay(85) والاعتماد على الوقت هنا
+    turnStartTime = millis();
     lineWasFound = false;
     return;   
   }
