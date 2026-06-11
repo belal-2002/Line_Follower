@@ -3,7 +3,7 @@ void calculateError() {
   sum = 0;
 
   for (int i = 0; i < 10; i++) {
-    if (bitRead(sensorBit, 9 - i)) { 
+    if (sensorValue[i] > lineThreshold) { 
       weightedSum += (long)sensorValue[i] * sensorWeights[i];
       sum += sensorValue[i];
     }
@@ -13,8 +13,7 @@ void calculateError() {
     currentError = (float)weightedSum / (float)sum;
 
     // --- حماية الـ PD عند استرجاع الخط ---
-    if (!lineWasFound) {
-      lastTime = micros();       
+    if (!lineWasFound) {      
       lastError = currentError;
       lineWasFound = true; // تم الاستشفاء بنجاح
     }
