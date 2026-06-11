@@ -13,7 +13,7 @@ void moveMotor() {
 
 void leftMotor() {
   // الدوران لليسار (Left Turn)
- // 1. المحرك الأيسر (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
+  // 1. المحرك الأيسر (الداخلي) يعمل كمرساة ويدور للخلف بسرعة منخفضة
   digitalWrite(AIN1, HIGH); digitalWrite(AIN2, LOW);
   ledcWrite(PWMA, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
       
@@ -62,19 +62,33 @@ void updateDistance() {
   float distanceLeft = currentLeftTicks * distancePerTick;
   float distanceRight = currentRightTicks * distancePerTick;
 
-  // 3. المسافة الإجمالية لمركز الروبوت (لحسابات الرادار)
+  // 3. المسافة الإجمالية لمركز الروبوت (للرادار)
   distanceNow = (distanceLeft + distanceRight) / 2.0;
 
-  /* * ملاحظة هندسية حول "الاتجاه":
-   * يمكننا حساب زاوية دوران الروبوت من العجلات (Odometry) كالتالي:
-   * float encoderAngleRad = (distanceRight - distanceLeft) / wheelBase;
-   * float encoderAngleDeg = encoderAngleRad * (180.0 / PI);
-   * * ولكن! الانزلاق في الحلبة سيجعل هذا الرقم يفقد دقته بسرعة.
-   * أنت تمتلك MPU6050 والذي يعتبر المعيار الذهبي لقياس زاوية الدوران (currentAngleZ).
-   * لذلك، يفضل الاعتماد على الـ Encoders لمعرفة المسافة الخطية (متى تقطع التقاطع)،
-   * والاعتماد على MPU6050 لمعرفة زاوية الانعطاف (متى تتوقف عن الدوران).
-   */
+  // 4. حساب زاوية الدوران المطلقة بالراديان ثم تحويلها لدرجات
+  // الدوران لليسار سينتج زاوية موجبة، ولليمين زاوية سالبة (مطابق لنظام MPU)
+  float absoluteAngle = ((distanceRight - distanceLeft) / trackWidth) * (180.0 / PI);
+  
+  // 5. تحديث الزاوية الحالية بناءً على نقطة التصفير
+  currentAngleZ = absoluteAngle - angleOffset;
 }
+
+// دالة نستخدمها بدلاً من (currentAngleZ = 0.0) لتصفير الزاوية دون فقدان المسافة
+void resetAngleZ() {
+  noInterrupts();
+  long currentLeftTicks = leftTicks;
+  long currentRightTicks = rightTicks;
+  interrupts();
+
+  float distanceLeft = currentLeftTicks * distancePerTick;
+  float distanceRight = currentRightTicks * distancePerTick;
+
+  // نجعل الإزاحة تساوي الزاوية المطلقة الحالية، فتصبح currentAngleZ صفر
+  angleOffset = ((distanceRight - distanceLeft) / trackWidth) * (180.0 / PI);
+  currentAngleZ = 0.0;
+}
+
+
 
 
 
