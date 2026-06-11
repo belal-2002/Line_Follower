@@ -44,7 +44,7 @@ void loopStrategy4() { //Right
     rightMotor();
     
     // تصفير الزاوية لحساب الـ 60 درجة بشكل دقيق
-    currentAngleZ = 0.0; 
+    resetAngleZ(); 
     // تمت إزالة delay(85) والاعتماد على الوقت هنا
     
     lineWasFound = false;
