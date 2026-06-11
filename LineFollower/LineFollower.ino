@@ -46,13 +46,14 @@
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
 // --- متغيرات حساب المسافة الافتراضية للرادار ---
   float RadarDistanceThreshold = 5.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
-  float DistanceForward = 5.0;
+  float gapDistance = 5.0;   // مسافة تخطي الفجوات بالسنتيمتر
   float distanceNow = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
   float leftRadarStartDistance = 0.0;   // المسافة المسجلة لحظة التقاط رادار اليسار
   float rightRadarStartDistance = 0.0;  // المسافة المسجلة لحظة التقاط رادار اليمين
   float leftMidRadarStartDistance = 0.0;   
   float rightMidRadarStartDistance = 0.0; 
-  float LineNotFoundStartDistance = 0.0;
+  float lostLineDistance = 0.0;
+  bool sweep180Done = false; // يمنع الروبوت من الدوران 180 درجة مرتين متتاليتين
 
   static unsigned long lastPrintTime = 0;
   unsigned long turnStartTime = 0;
