@@ -88,9 +88,9 @@
 
   float Kp = 0.85;
   float Kd = 18.0;
-  int maximumSpeed = 625;  //1023;   
-  int baseSpeed = 275;  //800;  
-  int turnSpeed = 400;  
+  int maximumSpeed = 625;     
+  int baseSpeed = 275;    
+  int turnSpeed = 200;  
   int innerTurnSpeed = turnSpeed / 2;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
@@ -126,11 +126,14 @@
 
 
 
-int S_White[10] = {240, 164, 157, 185, 164, 172, 154, 158, 199, 260};
-int S_Black[10] = {1555, 2431, 2106, 2963, 2611, 2639, 2236, 2071, 3135, 3700};
-int target_White = 178;
-int target_Black = 2671;
-int lineThreshold = 1425;
+
+int S_White[10] = {173, 178, 172, 215, 182, 197, 169, 175, 233, 906};
+int S_Black[10] = {2468, 2804, 2721, 3377, 3118, 3720, 3020, 2962, 3801, 3942};
+int target_White = 152;
+int target_Black = 2552;
+int lineThreshold = 1352;
+
+
 
 
 
