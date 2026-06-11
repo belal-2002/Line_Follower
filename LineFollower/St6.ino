@@ -2,6 +2,12 @@ void loopStrategy6() { //Right
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midMidSensor) { 
+    if (goLeft || goRight){
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+    }
     goLeft = false;
     goRight = false;
   }
@@ -59,5 +65,4 @@ void loopStrategy6() { //Right
 
 
   calculateError();
-  
 }
