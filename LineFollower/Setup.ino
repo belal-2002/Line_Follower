@@ -23,7 +23,7 @@ void setupBuzzer() {
 }
 
 void setupSensors() {
-  for (int i = 0; i < 12; i++) {
+  for (int i = 0; i < 10; i++) {
     pinMode(sensorPins[i], INPUT);
   }
 }
