@@ -49,8 +49,33 @@ void loopStrategy5() { //Left
       rightMotor();      
       return;
     }
-    forwardMotor();
-    return;
+    LineNotFoundTime = millis();
+    if ((distanceNow - LineNotFoundStartDistance) > DistanceForward) {
+      if (!recoveryTurn180) {  // الاستشفاء عبر الدوران الموضعي 180 درجة (الملاذ الأخير)
+        recoveryTurn180 = true;  // إذا لم نكن في حالة الدوران، نبدأها الآن
+        resetAngleZ(); // تصفير الزاوية لبدء حساب 180 درجة
+        spinTurn180(); // بدء الدوران الموضعي
+        return;
+      } else {        
+        if (abs(currentAngleZ) >= 180.0) {  // نحن الآن في منتصف عملية الدوران، نتحقق من الزاوية
+            // اكتملت الـ 180 درجة ولم يجد الخط
+            resetAngleZ(); // تصفير الزاوية لتنظيف التراكمات
+            forwardMotor(); // الاتجاه للأمام كما طلبت
+            return;
+        } else {
+            // لم يكمل 180 درجة بعد، استمر بالدوران حول نفسه
+            spinTurn180();
+            return;
+          }
+        }
+    } else { 
+      forwardMotor();
+      return;  
+    }
+  }
+  if (millis() - turnStartTime >= 10) {
+    recoveryTurn180 = false; // إنهاء حالة البحث
+    LineNotFoundStartDistance = distanceNow;
   }
 
   // --- نقطة تفعيل الدوران ---
