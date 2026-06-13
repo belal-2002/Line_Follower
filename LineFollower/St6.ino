@@ -42,20 +42,22 @@ void loopStrategy6() { //Right
       return;
     }
     LineNotFoundTime = millis();
-    if ((distanceNow - lostLineDistance) > gapDistance) {
-      if (!recoveryTurn180) {  // الاستشفاء عبر الدوران الموضعي 180 درجة (الملاذ الأخير)
-        recoveryTurn180 = true;  // إذا لم نكن في حالة الدوران، نبدأها الآن
+    if ((absDistanceNow - lostLineDistance) > gapDistance) {
+      if (!Turn180now) {  // الاستشفاء عبر الدوران الموضعي 180 درجة (الملاذ الأخير)
+        Turn180now = true;  // إذا لم نكن في حالة الدوران، نبدأها الآن
+        sweep180Done = false;
         resetAngleZ(); // تصفير الزاوية لبدء حساب 180 درجة
-        spinTurn180(); // بدء الدوران الموضعي
+        sweepSearchTurn(); // بدء الدوران 
         return;
-      } else {        
-        if (abs(currentAngleZ) >= 180.0) {  // نحن الآن في منتصف عملية الدوران، نتحقق من الزاوية
+      } else {  
+        if (sweep180Done) {  // نحن الآن في منتصف عملية الدوران، نتحقق من الزاوية
+        //if (abs(currentAngleZ) >= 180.0) {  // نحن الآن في منتصف عملية الدوران، نتحقق من الزاوية
             // اكتملت الـ 180 درجة ولم يجد الخط
             forwardMotor(); // الاتجاه للأمام كما طلبت
             return;
         } else {
             // لم يكمل 180 درجة بعد، استمر بالدوران حول نفسه
-            spinTurn180();
+            sweepSearchTurn();
             return;
           }
         }
@@ -65,8 +67,9 @@ void loopStrategy6() { //Right
     }
   }
   if (millis() - LineNotFoundTime >= 10) {
-    recoveryTurn180 = false; // إنهاء حالة البحث
-    lostLineDistance = distanceNow;
+    Turn180now = false; // إنهاء حالة البحث
+    sweep180Done = false;
+    lostLineDistance = absDistanceNow;
   }
 
   // --- نقطة تفعيل الدوران ---
