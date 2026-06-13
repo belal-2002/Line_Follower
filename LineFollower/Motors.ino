@@ -33,19 +33,6 @@ void rightMotor() {
   ledcWrite(PWMB, innerTurnSpeed); // <-- تم التعديل للسرعة التفاضلية
 }
 
-void spinTurn180() {
-  // الدوران الموضعي لليسار في أضيق مساحة ممكنة (Zero Radius)
-  // 1. المحرك الأيسر للخلف بسرعة الدوران
-  digitalWrite(AIN1, HIGH);
-  digitalWrite(AIN2, LOW);
-  ledcWrite(PWMA, turnSpeed); 
-
-  // 2. المحرك الأيمن للأمام بنفس سرعة الدوران
-  digitalWrite(BIN1, HIGH);
-  digitalWrite(BIN2, LOW); 
-  ledcWrite(PWMB, turnSpeed);
-}
-
 void stopMotor() {
   // توقف تام
   digitalWrite(STBY, LOW);  
@@ -64,6 +51,28 @@ void forwardMotor() {
   ledcWrite(PWMB, baseSpeed);
 }
 
+void sweepSearchTurn() {
+  if (abs(currentAngleZ) < 180.0) { 
+  // المحرك الأيسر للخلف بسرعة الدوران
+  digitalWrite(AIN1, HIGH);  digitalWrite(AIN2, LOW);
+  ledcWrite(PWMA, turnSpeed); 
+  // المحرك الأيمن للأمام بنفس سرعة الدوران
+  digitalWrite(BIN1, HIGH);  digitalWrite(BIN2, LOW); 
+  ledcWrite(PWMB, turnSpeed);
+  } else { 
+    if (abs(currentAngleZ) < 750.0) {
+      // المحرك الأيسر للخلف بسرعة الدوران
+      digitalWrite(AIN1, HIGH);  digitalWrite(AIN2, LOW);
+      ledcWrite(PWMA, (turnSpeed * 2)); 
+      // المحرك الأيمن للأمام بنفس سرعة الدوران
+      digitalWrite(BIN1, HIGH);  digitalWrite(BIN2, LOW); 
+      ledcWrite(PWMB, turnSpeed);
+    } else { 
+      sweep180Done = true;
+    }
+  }
+}
+
 void updateDistance() {
   // 1. إيقاف المقاطعات لحظياً لنسخ القيم بأمان
   noInterrupts();
@@ -77,6 +86,7 @@ void updateDistance() {
 
   // 3. المسافة الإجمالية لمركز الروبوت (للرادار)
   distanceNow = (distanceLeft + distanceRight) / 2.0;
+  absDistanceNow = (abs(distanceLeft) + abs(distanceRight)) / 2.0;
 
   // 4. حساب زاوية الدوران المطلقة بالراديان ثم تحويلها لدرجات
   // الدوران لليسار سينتج زاوية موجبة، ولليمين زاوية سالبة (مطابق لنظام MPU)
