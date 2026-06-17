@@ -54,18 +54,18 @@ void forwardMotor() {
 void sweepSearchTurn() {
   if (abs(currentAngleZ) < 180.0) { 
   // المحرك الأيسر للخلف بسرعة الدوران
-  digitalWrite(AIN1, HIGH);  digitalWrite(AIN2, LOW);
+  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH);
   ledcWrite(PWMA, turnSpeed); 
   // المحرك الأيمن للأمام بنفس سرعة الدوران
-  digitalWrite(BIN1, HIGH);  digitalWrite(BIN2, LOW); 
+  digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
   ledcWrite(PWMB, turnSpeed);
   } else { 
     if (abs(currentAngleZ) < 750.0) {
       // المحرك الأيسر للخلف بسرعة الدوران
-      digitalWrite(AIN1, HIGH);  digitalWrite(AIN2, LOW);
+      digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH);
       ledcWrite(PWMA, (turnSpeed * 2)); 
       // المحرك الأيمن للأمام بنفس سرعة الدوران
-      digitalWrite(BIN1, HIGH);  digitalWrite(BIN2, LOW); 
+      digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
       ledcWrite(PWMB, turnSpeed);
     } else { 
       sweep180Done = true;
