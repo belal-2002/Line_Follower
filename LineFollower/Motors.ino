@@ -55,18 +55,18 @@ void sweepSearchTurn() {
   if (abs(currentAngleZ) < 180.0) { 
   // المحرك الأيسر للخلف بسرعة الدوران
   digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH);
-  ledcWrite(PWMA, turnSpeed); 
+  ledcWrite(PWMA, (turnSpeed / 4*3)); 
   // المحرك الأيمن للأمام بنفس سرعة الدوران
   digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
-  ledcWrite(PWMB, turnSpeed);
+  ledcWrite(PWMB, (turnSpeed / 4*3));
   } else { 
-    if (abs(currentAngleZ) < 750.0) {
+    if (abs(currentAngleZ) < 675.0) {
       // المحرك الأيسر للخلف بسرعة الدوران
       digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH);
-      ledcWrite(PWMA, (turnSpeed * 2)); 
+      ledcWrite(PWMA, turnSpeed); 
       // المحرك الأيمن للأمام بنفس سرعة الدوران
       digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
-      ledcWrite(PWMB, turnSpeed);
+      ledcWrite(PWMB, (turnSpeed / 4*3));
     } else { 
       sweep180Done = true;
     }
@@ -86,7 +86,7 @@ void updateDistance() {
 
   // 3. المسافة الإجمالية لمركز الروبوت (للرادار)
   distanceNow = (distanceLeft + distanceRight) / 2.0;
-  absDistanceNow = (abs(distanceLeft) + abs(distanceRight)) / 2.0;
+  //absDistanceNow = (abs(distanceLeft) + abs(distanceRight)) / 2.0;
 
   // 4. حساب زاوية الدوران المطلقة بالراديان ثم تحويلها لدرجات
   // الدوران لليسار سينتج زاوية موجبة، ولليمين زاوية سالبة (مطابق لنظام MPU)
