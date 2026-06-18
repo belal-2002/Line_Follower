@@ -51,6 +51,30 @@ void forwardMotor() {
   ledcWrite(PWMB, baseSpeed);
 }
 
+void forwardStraight() {
+  // السير للأمام مع تصحيح المسار (P-Controller)
+  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
+  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
+
+  // 1. معامل التصحيح (Kp_Straight): 
+  // رقم بسيط يحدد شراسة تعديل المسار (ابحث عن القيمة المثالية بالتجربة، غالباً بين 5.0 و 15.0)
+  float Kp_Straight = 8.0; 
+
+  // 2. حساب قيمة الانحراف بناءً على زاوية الإنكودر الحالية
+  // إذا انحرف الروبوت لليسار ستكون الزاوية موجبة -> فقيمة التصحيح موجبة
+  // إذا انحرف لليمين ستكون الزاوية سالبة -> فقيمة التصحيح سالبة
+  int correction = currentAngleZ * Kp_Straight; 
+
+  // 3. تطبيق التصحيح الذكي:
+  // العجل الأيسر: نضيف له قيمة التصحيح (لزيادة سرعته إذا انحرفنا يساراً ليعيدنا لليمين)
+  // العجل الأيمن: نطرح منه قيمة التصحيح
+  int leftPWM  = constrain(baseSpeed + correction, 0, maximumSpeed);
+  int rightPWM = constrain(baseSpeed - correction, 0, maximumSpeed);
+
+  ledcWrite(PWMA, leftPWM);
+  ledcWrite(PWMB, rightPWM);
+}
+
 void sweepSearchTurn() {
   if (abs(currentAngleZ) < 180.0) { 
   // المحرك الأيسر للخلف بسرعة الدوران
