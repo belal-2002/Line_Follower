@@ -1,4 +1,13 @@
 void loopStrategy5() { //Left
+  if (midSensor == 8){
+    if (!zeroAngleZ){
+      resetAngleZ();
+      zeroAngleZ = true;
+    }
+    forwardStraight(); 
+    return;
+  }
+  zeroAngleZ = false;
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midMidSensor) { 
@@ -27,7 +36,7 @@ void loopStrategy5() { //Left
     }
     */
     if ((abs(currentAngleZ) >= 50.0) || 
-        (abs(currentAngleZ) >= 40.0 && (midSensor)) ||
+        (abs(currentAngleZ) >= 40.0 && (midMidSensor)) ||
         (millis() - turnStartTime >= 400)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
       turnLeft = false;
     }
