@@ -74,26 +74,29 @@ void sweepSearchTurn() {
 }
 
 void updateDistance() {
-  // 1. إيقاف المقاطعات لحظياً لنسخ القيم بأمان
   noInterrupts();
   long currentLeftTicks = leftTicks;
   long currentRightTicks = rightTicks;
   interrupts();
 
-  // 2. حساب المسافة المقطوعة لكل عجل بالسنتيمتر
+  // --- حسابات الإزاحة والزاوية الحالية (كما هي في كودك) ---
   float distanceLeft = currentLeftTicks * distancePerTick;
   float distanceRight = currentRightTicks * distancePerTick;
-
-  // 3. المسافة الإجمالية لمركز الروبوت (للرادار)
-  distanceNow = (distanceLeft + distanceRight) / 2.0;
-  //absDistanceNow = (abs(distanceLeft) + abs(distanceRight)) / 2.0;
-
-  // 4. حساب زاوية الدوران المطلقة بالراديان ثم تحويلها لدرجات
-  // الدوران لليسار سينتج زاوية موجبة، ولليمين زاوية سالبة (مطابق لنظام MPU)
+  distanceNow = (distanceLeft + distanceRight) / 2.0; 
   float absoluteAngle = ((distanceRight - distanceLeft) / trackWidth) * (180.0 / PI);
-  
-  // 5. تحديث الزاوية الحالية بناءً على نقطة التصفير
   currentAngleZ = absoluteAngle - angleOffset;
+
+  // --- الإضافة الجديدة: العداد التراكمي (Odometer) ---
+  long deltaLeft = currentLeftTicks - lastLeftTicks_odo;
+  long deltaRight = currentRightTicks - lastRightTicks_odo;
+  
+  // تحديث القيم السابقة للدورة القادمة
+  lastLeftTicks_odo = currentLeftTicks;
+  lastRightTicks_odo = currentRightTicks;
+
+  // نحسب مقدار الحركة الفعلي (موجب دائماً) ونضيفه للعداد التراكمي
+  float deltaDistance = (abs(deltaLeft) + abs(deltaRight)) / 2.0 * distancePerTick;
+  totalOdometer += deltaDistance; 
 }
 
 // دالة نستخدمها بدلاً من (currentAngleZ = 0.0) لتصفير الزاوية دون فقدان المسافة
