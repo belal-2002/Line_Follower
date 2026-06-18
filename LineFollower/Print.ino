@@ -20,7 +20,7 @@ void loopPrint() {
 
 
   TelnetStream.print("\t");
-  TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  strategy:%d", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, strategy);
+  TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  strategy:%d  Angle:%.1f", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, strategy, pitchAngle);
   TelnetStream.print("\t");
   //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
 
