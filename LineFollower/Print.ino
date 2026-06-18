@@ -2,16 +2,15 @@ void loopPrint() {
   ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
   if (!(strategy == 0)){
   if (millis() - lastPrintTime > 1500) {
-
+  /*
   String output = "";
   for (int i = 0; i < 10; i++) {
     output += bitRead(sensorBit, 9 - i);
     output += "\t";
   }
   TelnetStream.print(output);
-
   TelnetStream.println();    
-
+  */
   for (int i = 0; i < 10; i++) {
     TelnetStream.print(sensorValue[i]);  
     TelnetStream.print("\t");               
@@ -51,6 +50,7 @@ void loopPrint() {
     if (Kd < 0) Kd = 0;
     if (baseSpeed < 0) baseSpeed = 0;
     if (turnSpeed < 0) turnSpeed = 0;
+    if (innerTurnSpeed < 0) innerTurnSpeed = 0;
     if (maximumSpeed < 0) maximumSpeed = 0;
   }
   } else {
