@@ -51,37 +51,37 @@ void loopSensors() {
 
 if (leftRadar){
     leftRadarOn = true;
-    leftRadarStartDistance = distanceNow; // تسجيل المسافة الحالية كنقطة بداية
+    leftRadarStartDistance = totalOdometer; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
     // إذا اختفى الخط عن الرادار، نتحقق مما إذا كان الروبوت قد قطع المسافة المحددة (5 سم)
-    if ((distanceNow - leftRadarStartDistance) > RadarDistanceThreshold) {
+    if ((totalOdometer - leftRadarStartDistance) > RadarDistanceThreshold) {
         leftRadarOn = false;
     }
   } 
   
   if (rightRadar){
     rightRadarOn = true;
-    rightRadarStartDistance = distanceNow; // تسجيل المسافة الحالية كنقطة بداية
+    rightRadarStartDistance = totalOdometer; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
-    if ((distanceNow - rightRadarStartDistance) > RadarDistanceThreshold) {
+    if ((totalOdometer - rightRadarStartDistance) > RadarDistanceThreshold) {
         rightRadarOn = false;
     }
   }
 
   if (leftMidRadar){
     leftMidRadarOn = true;
-    leftMidRadarStartDistance = distanceNow;
+    leftMidRadarStartDistance = totalOdometer;
   } else { 
-    if ((distanceNow - leftMidRadarStartDistance) > RadarDistanceThreshold) {
+    if ((totalOdometer - leftMidRadarStartDistance) > RadarDistanceThreshold) {
         leftMidRadarOn = false;
     }
   } 
   
   if (rightMidRadar){
     rightMidRadarOn = true;
-    rightMidRadarStartDistance = distanceNow;
+    rightMidRadarStartDistance = totalOdometer;
   } else { 
-    if ((distanceNow - rightMidRadarStartDistance) > RadarDistanceThreshold) {
+    if ((totalOdometer - rightMidRadarStartDistance) > RadarDistanceThreshold) {
         rightMidRadarOn = false;
     }
   }
