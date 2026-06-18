@@ -19,7 +19,7 @@ void loopStrategy6() { //Right
   // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
   if (turnRight) {
     if ((abs(currentAngleZ) >= 50.0) || 
-        (abs(currentAngleZ) >= 40.0 && (bitRead(sensorBit, 5) || bitRead(sensorBit, 6))) ||
+        (abs(currentAngleZ) >= 40.0 && (midMidSensor))||
         (millis() - turnStartTime >= 400)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
       turnRight = false;
     }
