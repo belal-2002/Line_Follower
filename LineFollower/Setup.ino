@@ -50,24 +50,11 @@ void turnOnService() {
 }
 
 void setupMPU() {
-  Wire.begin(SDA_PIN, SCL_PIN); // <-- الحل الجوهري هنا: تحديد مسار الاتصال
+  Wire.begin(SDA_PIN, SCL_PIN); // تحديد مسار الاتصال
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x6B); // سجل إدارة الطاقة
   Wire.write(0);    // إيقاظ الحساس
   Wire.endTransmission(true);
-
-  // حساب الـ Offset لمعايرة الحساس عند بدء التشغيل (يجب أن يكون الروبوت ثابتاً)
-  long sumZ = 0;
-  for(int i=0; i<200; i++){
-    Wire.beginTransmission(MPU_ADDR);
-    Wire.write(0x47); // مسجل Gyro Z
-    Wire.endTransmission(false);
-    Wire.requestFrom(MPU_ADDR, 2, true);
-    sumZ += (int16_t)(Wire.read() << 8 | Wire.read());
-    delay(3);
-  }
-  gyroZ_offset = sumZ / 200.0;
-  lastMpuTime = micros();
 }
 
 // دالة مقاطعة العجل الأيسر
