@@ -118,6 +118,9 @@
   const float distancePerTick = 0.8639; // المسافة لكل نبضة بالسنتيمتر
   const float trackWidth = 8.75; // المسافة بين العجلتين بالسنتيمتر
   float angleOffset = 0.0;       // لحفظ نقطة الصفر عند كل دوران
+  float totalOdometer = 0.0;     // عداد المسافة التراكمي (دائماً يزداد)
+  long lastLeftTicks_odo = 0;    // لحفظ النبضات السابقة للعجل الأيسر
+  long lastRightTicks_odo = 0;   // لحفظ النبضات السابقة للعجل الأيمن
 
 
 
