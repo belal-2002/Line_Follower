@@ -59,7 +59,6 @@ void loopStrategy0() {
 
     // إبقاء الاتصال نشطاً وتفريغ البفر
     if (TelnetStream.available()) { TelnetStream.read(); }
-    lastMpuTime = micros();
 }
 
 void runCalibrationPhase(bool isBlack) {
