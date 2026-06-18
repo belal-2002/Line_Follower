@@ -50,7 +50,7 @@ void loopStrategy5() { //Left
       return;
     }
     LineNotFoundTime = millis();
-    if ((distanceNow - lostLineDistance) > gapDistance) {
+    if ((totalOdometer - lostLineDistance) > gapDistance) {
       if (!Turn180now) {  // الاستشفاء عبر الدوران الموضعي 180 درجة (الملاذ الأخير)
         Turn180now = true;  // إذا لم نكن في حالة الدوران، نبدأها الآن
         sweep180Done = false;
@@ -77,7 +77,7 @@ void loopStrategy5() { //Left
   if (millis() - LineNotFoundTime >= 10) {
     Turn180now = false; // إنهاء حالة البحث
     sweep180Done = false;
-    lostLineDistance = distanceNow;
+    lostLineDistance = totalOdometer;
   }
 
   // --- نقطة تفعيل الدوران ---
