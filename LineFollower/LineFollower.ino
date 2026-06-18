@@ -7,9 +7,6 @@
   const int MPU_ADDR = 0x68;
   #define SDA_PIN 15  // إضافة رقم الدبوس
   #define SCL_PIN 16  // إضافة رقم الدبوس
-  float currentAngleZ = 0.0;
-  unsigned long lastMpuTime = 0;
-  float gyroZ_offset = 0.0;
 
 // --- إعدادات شبكة الواي فاي ---
   const char* ssid = "Zain_B530_A013";      
@@ -94,12 +91,16 @@
 
   float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
   float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
-  int maximumSpeed = 400;     
-  int baseSpeed = 200;    
-  int turnSpeed = 250;  
-  int innerTurnSpeed = turnSpeed / 5*4;  
+  int originalMaximumSpeed = 400;     
+  int originalBaseSpeed = 200;    
+  int originalTurnSpeed = 250;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
+
+  int maximumSpeed = originalMaximumSpeed;     
+  int baseSpeed = originalBaseSpeed; 
+  int turnSpeed = originalTurnSpeed; 
+  int innerTurnSpeed = turnSpeed / 5*4; 
 
   float P = 0;
   float D = 0;
@@ -112,6 +113,8 @@
 
 // --- متغيرات الـ Odometry ---
   // استخدام volatile ضروري جداً للمتغيرات التي يتم تعديلها داخل المقاطعات (Interrupts)
+  float currentAngleZ = 0.0;
+  bool zeroAngleZ = false;
   volatile long leftTicks = 0;
   volatile long rightTicks = 0;
 
@@ -122,7 +125,9 @@
   long lastLeftTicks_odo = 0;    // لحفظ النبضات السابقة للعجل الأيسر
   long lastRightTicks_odo = 0;   // لحفظ النبضات السابقة للعجل الأيمن
 
-
+  // --- متغيرات كشف المنحدر ---
+  float pitchAngle = 0.0;        // الزاوية الرأسية النهائية المعدلة
+  float pitchOffset = 0.0;       // <--- (جديد) لحفظ زاوية الميلان عند لحظة الانطلاق
 
 
 //Error
@@ -160,7 +165,7 @@ void setup() {
 void loop() {
   loopSwitch();
   updateDistance();
-  //updateMPU();
+  updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
     loopStrategy();
