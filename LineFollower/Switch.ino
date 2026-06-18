@@ -17,6 +17,8 @@ void loopSwitch() {
       
       if (isRunning) {
         digitalWrite(STBY, HIGH);
+        resetPitchOffset(); // <--- تمت إضافتها هنا لتتم المعايرة مرة واحدة قبل الانطلاق
+        resetAngleZ();
       } else {
         stopMotor();  
       }
