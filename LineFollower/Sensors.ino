@@ -18,6 +18,58 @@ void loopSensors() {
     sensorValue[i] = constrain(sensorValue[i], 0, 4095);
   }
   
+  // =========================================================
+  // --- [بداية كود اكتشاف التبديل الشفاف للألوان] ---
+  // =========================================================
+  /*
+  int currentBlackCount = 0;
+  for (int i = 0; i < 10; i++) {
+    // نعد الحساسات التي ترى اللون الأسود "الفيزيائي" على الأرضية
+    if (sensorValue[i] > lineThreshold) {
+      currentBlackCount++;
+    }
+  }
+
+  // 1. اكتشاف الدخول في المنطقة المعكوسة (الخلفية تصبح سوداء فجأة)
+  // إذا رأينا 8 حساسات أو أكثر تقرأ لوناً أسوداً
+  if (!isInverted && currentBlackCount >= 7 && currentBlackCount != 10) {
+    inversionCounterBlack++;
+    if (inversionCounterBlack > INVERSION_THRESH) {
+      isInverted = true;
+      inversionCounterBlack = 0; 
+      // اختياري: إطلاق نغمة سريعة للتأكيد أثناء السباق
+      tone(buzzerPin, 3000, 90); 
+    }
+  } 
+  // 2. اكتشاف الخروج والعودة للوضع الطبيعي (الخلفية تعود بيضاء)
+  // إذا رأينا حساسين أو أقل يقرأون اللون الأسود (وهو الخط الطبيعي)
+  else if (isInverted && currentBlackCount <= 2) {
+    inversionCounterWhite++;
+    if (inversionCounterWhite > (INVERSION_THRESH / 3)) {
+      isInverted = false;
+      inversionCounterWhite = 0;
+      tone(buzzerPin, 3000, 90);
+    }
+  } 
+  // 3. تصفير العداد إذا كانت الحالة مؤقتة
+  // هذا السطر يحمي الروبوت من التقاطعات (+) العادية، حيث سيقرأ 10 حساسات أسود
+  // ولكن لفترة قصيرة جداً لا تتجاوز الـ INVERSION_THRESH فيصفر العداد.
+  else {
+    inversionCounterBlack = 0;
+    inversionCounterWhite = 0;
+  }
+
+  // 4. الخدعة الرياضية: عكس القيم إذا كنا في وضع التبديل
+  if (isInverted) {
+    for (int i = 0; i < 10; i++) {
+      // معادلة العكس السحرية
+      sensorValue[i] = (target_Black + target_White) - sensorValue[i];
+    }
+  }
+  */
+  // =========================================================
+  // --- [نهاية كود التبديل] ---
+  // =========================================================
 
   for (int i = 0; i < 10; i++) {
     if (sensorValue[i] > lineThreshold) {
@@ -51,37 +103,37 @@ void loopSensors() {
 
 if (leftRadar){
     leftRadarOn = true;
-    leftRadarStartDistance = totalOdometer; // تسجيل المسافة الحالية كنقطة بداية
+    leftRadarStartDistance = distanceNow; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
     // إذا اختفى الخط عن الرادار، نتحقق مما إذا كان الروبوت قد قطع المسافة المحددة (5 سم)
-    if ((totalOdometer - leftRadarStartDistance) > RadarDistanceThreshold) {
+    if ((distanceNow - leftRadarStartDistance) > RadarDistanceThreshold) {
         leftRadarOn = false;
     }
   } 
   
   if (rightRadar){
     rightRadarOn = true;
-    rightRadarStartDistance = totalOdometer; // تسجيل المسافة الحالية كنقطة بداية
+    rightRadarStartDistance = distanceNow; // تسجيل المسافة الحالية كنقطة بداية
   } else { 
-    if ((totalOdometer - rightRadarStartDistance) > RadarDistanceThreshold) {
+    if ((distanceNow - rightRadarStartDistance) > RadarDistanceThreshold) {
         rightRadarOn = false;
     }
   }
 
   if (leftMidRadar){
     leftMidRadarOn = true;
-    leftMidRadarStartDistance = totalOdometer;
+    leftMidRadarStartDistance = distanceNow;
   } else { 
-    if ((totalOdometer - leftMidRadarStartDistance) > RadarDistanceThreshold) {
+    if ((distanceNow - leftMidRadarStartDistance) > RadarDistanceThreshold) {
         leftMidRadarOn = false;
     }
   } 
   
   if (rightMidRadar){
     rightMidRadarOn = true;
-    rightMidRadarStartDistance = totalOdometer;
+    rightMidRadarStartDistance = distanceNow;
   } else { 
-    if ((totalOdometer - rightMidRadarStartDistance) > RadarDistanceThreshold) {
+    if ((distanceNow - rightMidRadarStartDistance) > RadarDistanceThreshold) {
         rightMidRadarOn = false;
     }
   }
