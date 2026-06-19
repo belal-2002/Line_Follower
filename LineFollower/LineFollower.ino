@@ -42,8 +42,8 @@
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
 // --- متغيرات حساب المسافة الافتراضية للرادار ---
-  float RadarDistanceThreshold = 2.4;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
-  float gapDistance = 7.0;   // مسافة تخطي الفجوات بالسنتيمتر
+  float RadarDistanceThreshold = 5.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
+  float gapDistance = 17.0;   // مسافة تخطي الفجوات بالسنتيمتر
   float distanceNow = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
   float absDistanceNow = 0.0;
   float leftRadarStartDistance = 0.0;   // المسافة المسجلة لحظة التقاط رادار اليسار
@@ -91,9 +91,9 @@
 
   float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
   float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
-  int originalMaximumSpeed = 400;     
-  int originalBaseSpeed = 200;    
-  int originalTurnSpeed = 250;  
+  int originalMaximumSpeed = 430;     
+  int originalBaseSpeed = 230;    
+  int originalTurnSpeed = 230;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
@@ -118,6 +118,8 @@
   volatile long leftTicks = 0;
   volatile long rightTicks = 0;
 
+  long currentLeftTicks = 0;
+  long currentRightTicks = 0;
   const float distancePerTick = 0.8639; // المسافة لكل نبضة بالسنتيمتر
   const float trackWidth = 8.75; // المسافة بين العجلتين بالسنتيمتر
   float angleOffset = 0.0;       // لحفظ نقطة الصفر عند كل دوران
@@ -128,6 +130,12 @@
   // --- متغيرات كشف المنحدر ---
   float pitchAngle = 0.0;        // الزاوية الرأسية النهائية المعدلة
   float pitchOffset = 0.0;       // <--- (جديد) لحفظ زاوية الميلان عند لحظة الانطلاق
+
+  // --- متغيرات منطقة تبديل الألوان (Inversion Zone) ---
+  bool isInverted = false;       // حالة الألوان الحالية (هل نحن في المنطقة المعكوسة؟)
+  int inversionCounterBlack = 0;      // عداد الفلترة للتأكد من التبديل
+  int inversionCounterWhite = 0;
+  const int INVERSION_THRESH = 30; // عدد اللفات المطلوبة لتأكيد التبديل (يحمي من التقاطعات)
 
 
 //Error
