@@ -11,6 +11,7 @@ void loopPrint() {
   TelnetStream.print(output);
   TelnetStream.println();    
   */
+  /*
   for (int i = 0; i < 10; i++) {
     TelnetStream.print(sensorValue[i]);  
     TelnetStream.print("\t");               
@@ -19,11 +20,15 @@ void loopPrint() {
    
 
 
-  TelnetStream.print("\t");
+  TelnetStream.println();
   TelnetStream.printf("Kp:%.2f  Kd:%.1f  maxSpeed:%d  Speed:%d  TSpeed:%d  strategy:%d  Angle:%.1f", Kp, Kd, maximumSpeed, baseSpeed, turnSpeed, strategy, pitchAngle);
-  TelnetStream.print("\t");
+  //TelnetStream.print("\t");
   //TelnetStream.printf("Err:%4.1f | ML:%d MR:%d", currentError, leftMotorSpeed, rightMotorSpeed);
-
+  */
+  TelnetStream.print("  Left: ");
+  TelnetStream.print(currentLeftTicks);
+  TelnetStream.print("  Right: ");
+  TelnetStream.print(currentRightTicks);
   TelnetStream.println();
   lastPrintTime = millis();
   }
