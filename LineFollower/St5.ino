@@ -1,13 +1,8 @@
 void loopStrategy5() { //Left
-  if (midSensor == 8){
-    if (!zeroAngleZ){
-      resetAngleZ();
-      zeroAngleZ = true;
-    }
-    forwardStraight(); 
-    return;
-  }
-  zeroAngleZ = false;
+
+   if(midSensor){
+    lostLineDistance = distanceNow;
+   }
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midMidSensor) { 
@@ -20,6 +15,16 @@ void loopStrategy5() { //Left
     goLeft = false;
     goRight = false;
   }
+
+  if (midSensor == 8){
+    if (!zeroAngleZ){
+      resetAngleZ();
+      zeroAngleZ = true;
+    }
+    forwardStraight(); 
+    return;
+  }
+  zeroAngleZ = false;
 
   // الاستشفاء المبكر
   if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return; }
@@ -35,9 +40,9 @@ void loopStrategy5() { //Left
       rightMidRadarOn = false;
     }
     */
-    if ((abs(currentAngleZ) >= 50.0) || 
-        (abs(currentAngleZ) >= 40.0 && (midMidSensor)) ||
-        (millis() - turnStartTime >= 400)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
+    if ((abs(currentAngleZ) >= 110.0) || 
+        (abs(currentAngleZ) >= 80.0 && (midMidSensor)) ||
+        (millis() - turnStartTime >= 350)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
       turnLeft = false;
     }
   }
@@ -59,7 +64,7 @@ void loopStrategy5() { //Left
       return;
     }
     LineNotFoundTime = millis();
-    if ((totalOdometer - lostLineDistance) > gapDistance) {
+    if ((distanceNow - lostLineDistance) > gapDistance && !allSensor) {
       if (!Turn180now) {  // الاستشفاء عبر الدوران الموضعي 180 درجة (الملاذ الأخير)
         Turn180now = true;  // إذا لم نكن في حالة الدوران، نبدأها الآن
         sweep180Done = false;
@@ -90,7 +95,7 @@ void loopStrategy5() { //Left
   }
 
   // --- نقطة تفعيل الدوران ---
-  if ((leftMidRadar) && (midMidSensor >= 4) && (!rightMidRadar)) {
+  if ((leftMidRadar) && (midMidSensor >= 3) && (!rightMidRadar)) {
     turnLeft = true; 
     //goLeft = true;
     leftMotor();
