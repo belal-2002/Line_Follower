@@ -99,8 +99,8 @@ void sweepSearchTurn() {
 
 void updateDistance() {
   noInterrupts();
-  long currentLeftTicks = leftTicks;
-  long currentRightTicks = rightTicks;
+  currentLeftTicks = leftTicks;
+  currentRightTicks = rightTicks;
   interrupts();
 
   // --- حسابات الإزاحة والزاوية الحالية (كما هي في كودك) ---
