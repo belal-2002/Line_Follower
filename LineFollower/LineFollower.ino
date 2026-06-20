@@ -42,8 +42,8 @@
 
 // --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
 // --- متغيرات حساب المسافة الافتراضية للرادار ---
-  float RadarDistanceThreshold = 10.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
-  float gapDistance = 17.0;   // مسافة تخطي الفجوات بالسنتيمتر
+  float RadarDistanceThreshold = 6.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
+  float gapDistance = 9.0;   // مسافة تخطي الفجوات بالسنتيمتر
   float distanceNow = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
   float absDistanceNow = 0.0;
   float leftRadarStartDistance = 0.0;   // المسافة المسجلة لحظة التقاط رادار اليسار
@@ -91,8 +91,8 @@
 
   float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
   float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
-  int originalMaximumSpeed = 430;     
-  int originalBaseSpeed = 230;    
+  int originalMaximumSpeed = 400;     
+  int originalBaseSpeed = 200;    
   int originalTurnSpeed = 230;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
@@ -150,11 +150,11 @@
 
 
 
-int S_White[10] = {173, 178, 172, 215, 182, 197, 169, 175, 233, 906};
-int S_Black[10] = {2468, 2804, 2721, 3377, 3118, 3720, 3020, 2962, 3801, 3942};
-int target_White = 152;
-int target_Black = 2552;
-int lineThreshold = 1352;
+int S_White[10] = {163, 166, 163, 197, 174, 178, 160, 159, 205, 304};
+int S_Black[10] = {2573, 2675, 2394, 3300, 3346, 3015, 2856, 2472, 3458, 3583};
+int target_White = 140;
+int target_Black = 2352;
+int lineThreshold = 1246;
 
 
 
