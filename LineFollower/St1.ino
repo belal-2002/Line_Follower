@@ -16,15 +16,7 @@ void loopStrategy1() { //Left
     goRight = false;
   }
 
-  if (midSensor == 8){
-    if (!zeroAngleZ){
-      resetAngleZ();
-      zeroAngleZ = true;
-    }
-    forwardStraight(); 
-    return;
-  }
-  zeroAngleZ = false;
+
 
   // الاستشفاء المبكر
   if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return; }
@@ -32,14 +24,6 @@ void loopStrategy1() { //Left
 
   // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
   if (turnLeft) {
-    /*
-    if (midMidSensor) { 
-      leftRadarOn = false;
-      rightRadarOn = false;
-      leftMidRadarOn = false;
-      rightMidRadarOn = false;
-    }
-    */
     if ((abs(currentAngleZ) >= 80.0) || 
         (abs(currentAngleZ) >= 60.0 && (midMidSensor)) ||
         (millis() - turnStartTime >= 350)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
