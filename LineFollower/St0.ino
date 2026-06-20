@@ -95,7 +95,7 @@ void runCalibrationPhase(bool isBlack) {
     TelnetStream.println();
 
     // قسمة على 10 لأننا استثنينا حساسين
-    float overall = overallSum / 10.0; 
+    float overall = overallSum / 8.0; 
     
     if (isBlack) {
         overallBlackAvg = overall;
