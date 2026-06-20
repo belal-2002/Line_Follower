@@ -40,8 +40,8 @@ void loopStrategy1() { //Left
       rightMidRadarOn = false;
     }
     */
-    if ((abs(currentAngleZ) >= 110.0) || 
-        (abs(currentAngleZ) >= 80.0 && (midMidSensor)) ||
+    if ((abs(currentAngleZ) >= 80.0) || 
+        (abs(currentAngleZ) >= 60.0 && (midMidSensor)) ||
         (millis() - turnStartTime >= 350)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
       turnLeft = false;
     }
