@@ -173,7 +173,7 @@ void setup() {
 void loop() {
   loopSwitch();
   updateDistance();
-  updateMPU();
+  //updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
     loopStrategy();
