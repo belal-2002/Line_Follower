@@ -1,3 +1,8 @@
+// إضافة متغيرات لحفظ زمن آخر نبضة لتطبيق الفلتر (توضع في الأعلى)
+  volatile unsigned long lastLeftPulseTime = 0;
+  volatile unsigned long lastRightPulseTime = 0;
+  const unsigned long debounceDelayMicros = ((5000000 / originalMaximumSpeed) / 1.5); // فلتر زمني: 12.5 ملي ثانية
+
 void setupMotors() {
   pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
   pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
@@ -57,35 +62,38 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-// دالة مقاطعة العجل الأيسر
+// دالة مقاطعة العجل الأيسر المعدلة
 void IRAM_ATTR leftEncoderISR() {
-  // نقرأ دبابيس المحرك لمعرفة الاتجاه
-  // المحرك الأيسر: AIN1=LOW و AIN2=HIGH تعني للأمام
-  if (digitalRead(AIN1) == LOW && digitalRead(AIN2) == HIGH) {
-    leftTicks++;
-  } 
-  // AIN1=HIGH و AIN2=LOW تعني للخلف
-  else if (digitalRead(AIN1) == HIGH && digitalRead(AIN2) == LOW) {
-    leftTicks--;
-  } 
-  // في حالة الفرملة أو الانزلاق الحر (الافتراضي نزيد المسافة)
-  else {
-    leftTicks++; 
+  unsigned long currentTime = micros();
+  // التأكد من مرور وقت كافٍ لتجاهل التشويش الوهمي
+  if (currentTime - lastLeftPulseTime > debounceDelayMicros) {
+    if (digitalRead(AIN1) == LOW && digitalRead(AIN2) == HIGH) {
+      leftTicks++;
+    } 
+    else if (digitalRead(AIN1) == HIGH && digitalRead(AIN2) == LOW) {
+      leftTicks--;
+    } 
+    else {
+      leftTicks++;
+    }
+    lastLeftPulseTime = currentTime;
   }
 }
 
-// دالة مقاطعة العجل الأيمن
+// دالة مقاطعة العجل الأيمن المعدلة
 void IRAM_ATTR rightEncoderISR() {
-  // المحرك الأيمن: BIN1=HIGH و BIN2=LOW تعني للأمام
-  if (digitalRead(BIN1) == HIGH && digitalRead(BIN2) == LOW) {
-    rightTicks++;
-  } 
-  // BIN1=LOW و BIN2=HIGH تعني للخلف
-  else if (digitalRead(BIN1) == LOW && digitalRead(BIN2) == HIGH) {
-    rightTicks--;
-  } 
-  else {
-    rightTicks++;
+  unsigned long currentTime = micros();
+  if (currentTime - lastRightPulseTime > debounceDelayMicros) {
+    if (digitalRead(BIN1) == HIGH && digitalRead(BIN2) == LOW) {
+      rightTicks++;
+    } 
+    else if (digitalRead(BIN1) == LOW && digitalRead(BIN2) == HIGH) {
+      rightTicks--;
+    } 
+    else {
+      rightTicks++;
+    }
+    lastRightPulseTime = currentTime;
   }
 }
 
