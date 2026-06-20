@@ -1,7 +1,7 @@
 void loopStrategy1() { //Left
 
    if(midSensor){
-    lostLineDistance = distanceNow;
+    lostLineDistance = totalOdometer;
    }
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
@@ -24,8 +24,8 @@ void loopStrategy1() { //Left
 
   // --- التعديل الجديد باستخدام MPU6050 بدلاً من الوقت ---
   if (turnLeft) {
-    if ((abs(currentAngleZ) >= 80.0) || 
-        (abs(currentAngleZ) >= 60.0 && (midMidSensor)) ||
+    if ((abs(currentAngleZ) >= 70.0) || 
+        (abs(currentAngleZ) >= 50.0 && (midMidSensor)) ||
         (millis() - turnStartTime >= 350)) {  // <-- إضافة شرط الـ 400 ملي ثانية هنا
       turnLeft = false;
     }
@@ -48,7 +48,7 @@ void loopStrategy1() { //Left
       return;
     }
     LineNotFoundTime = millis();
-    if ((distanceNow - lostLineDistance) > gapDistance && !allSensor) {
+    if ((totalOdometer - lostLineDistance) > gapDistance && !allSensor) {
       if (!Turn180now) {  // الاستشفاء عبر الدوران الموضعي 180 درجة (الملاذ الأخير)
         Turn180now = true;  // إذا لم نكن في حالة الدوران، نبدأها الآن
         sweep180Done = false;
