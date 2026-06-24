@@ -147,14 +147,14 @@
   bool lineWasFound = true;
   
 
+  
 
+int S_White[10] = {168, 165, 161, 192, 168, 173, 158, 160, 205, 334};
+int S_Black[10] = {2140, 2340, 2023, 2866, 2252, 2585, 2201, 2245, 3044, 3650};
+int target_White = 173;
+int target_Black = 2445;
+int lineThreshold = 1309;
 
-
-int S_White[10] = {163, 166, 163, 197, 174, 178, 160, 159, 205, 304};
-int S_Black[10] = {2573, 2675, 2394, 3300, 3346, 3015, 2856, 2472, 3458, 3583};
-int target_White = 140;
-int target_Black = 2352;
-int lineThreshold = 1246;
 
 
 
