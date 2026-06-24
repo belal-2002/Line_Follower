@@ -1,6 +1,4 @@
 // إضافة متغيرات لحفظ زمن آخر نبضة لتطبيق الفلتر (توضع في الأعلى)
-  volatile unsigned long lastLeftPulseTime = 0;
-  volatile unsigned long lastRightPulseTime = 0;
   const unsigned long debounceDelayMicros = ((3000000 / 175) / 1.5); // فلتر زمني: 11.5 ملي ثانية
 
 void setupMotors() {
@@ -64,6 +62,7 @@ void setupMPU() {
 
 // دالة مقاطعة العجل الأيسر المعدلة
 void IRAM_ATTR leftEncoderISR() {
+  static volatile unsigned long lastLeftPulseTime = 0;
   unsigned long currentTime = micros();
   // التأكد من مرور وقت كافٍ لتجاهل التشويش الوهمي
   if (currentTime - lastLeftPulseTime > debounceDelayMicros) {
@@ -82,6 +81,7 @@ void IRAM_ATTR leftEncoderISR() {
 
 // دالة مقاطعة العجل الأيمن المعدلة
 void IRAM_ATTR rightEncoderISR() {
+  static volatile unsigned long lastRightPulseTime = 0;
   unsigned long currentTime = micros();
   if (currentTime - lastRightPulseTime > debounceDelayMicros) {
     if (digitalRead(BIN1) == HIGH && digitalRead(BIN2) == LOW) {
