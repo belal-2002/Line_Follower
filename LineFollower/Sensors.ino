@@ -96,7 +96,7 @@ void loopSensors() {
 
   leftRadar = bitRead(sensorBit, 9);
   rightRadar = bitRead(sensorBit, 0);
-  radar = leftRadar + rightRadar;
+  //radar = leftRadar + rightRadar;
 
   leftMidRadar = bitRead(sensorBit, 8);
   rightMidRadar = bitRead(sensorBit, 1);
