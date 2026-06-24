@@ -1,6 +1,6 @@
 void loopPrint() {
   static unsigned long lastPrintTime = 0;
-  
+
   ArduinoOTA.handle(); // استقبال أكواد البرمجة عبر الهواء
   if (!(strategy == 0)){
   if (millis() - lastPrintTime > 1500) {
@@ -43,7 +43,7 @@ void loopPrint() {
   TelnetStream.print("  Kd: ");
   TelnetStream.print(Kd);
   TelnetStream.println();
-  /*
+  */
 
   lastPrintTime = millis();
   }
