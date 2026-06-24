@@ -47,8 +47,8 @@ void forwardMotor() {
   digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
   digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
 
-  ledcWrite(PWMA, baseSpeed);
-  ledcWrite(PWMB, baseSpeed);
+  ledcWrite(PWMA, maximumSpeed);
+  ledcWrite(PWMB, maximumSpeed);
 }
 
 void forwardStraight() {
