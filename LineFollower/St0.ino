@@ -1,102 +1,139 @@
-// تعريف المتغيرات محلياً (static) لتحتفظ بقيمتها
-static int calibState = 0;
-static bool lastIsRunning = false;
-static byte lastStrategyForCalib = 255;
+// ====================================================================
+// ملف الاستراتيجية 0: المعايرة الذكية للحساسات (Calibration Mode)
+// ====================================================================
 
-// متغيرات التخزين المؤقت للمعايرة
-static float whiteAvg[10];
-static float blackAvg[10];
-static float overallWhiteAvg = 0;
-static float overallBlackAvg = 0;
+// --- المتغيرات المحلية (Static) ---
+// استخدام static يحفظ قيم المتغيرات في الذاكرة حتى بعد الخروج من الدالة
+static int calibState = 0;              // آلة الحالة (0 = انتظار الأبيض، 1 = انتظار الأسود)
+static bool lastIsRunning = false;      // ذاكرة لحالة زر التشغيل السابقة لاكتشاف لحظة الضغط (Edge Detection)
+static byte lastStrategyForCalib = 255; // ذاكرة لرقم الاستراتيجية السابقة لاكتشاف لحظة الدخول لوضع المعايرة
 
+// مصفوفات ومتغيرات لتخزين قيم المعايرة مؤقتاً قبل اعتمادها
+static float whiteAvg[10];              // متوسط القراءات الـ 100 للون الأبيض لكل حساس
+static float blackAvg[10];              // متوسط القراءات الـ 100 للون الأسود لكل حساس
+static float overallWhiteAvg = 0;       // المتوسط العام الموحد للون الأبيض (لجميع الحساسات الوسطى)
+static float overallBlackAvg = 0;       // المتوسط العام الموحد للون الأسود (لجميع الحساسات الوسطى)
+
+// ====================================================================
+// الدالة الرئيسية للاستراتيجية 0 (تُستدعى باستمرار داخل الـ Loop)
+// ====================================================================
 void loopStrategy0() {
-    // 1. إجبار المحركات على التوقف التام دائماً أثناء وضع المعايرة للأمان
+    
+    // 1. الأمان أولاً: إجبار المحركات على التوقف التام دائماً أثناء وضع المعايرة
     stopMotor();
 
-    // 2. اكتشاف الدخول الجديد للاستراتيجية 7 لتصفير المتغيرات (يحميك عند تغيير الاستراتيجيات والعودة)
+    // 2. تهيئة النظام عند الدخول لأول مرة في وضع المعايرة
+    // (يحمي النظام من التداخل إذا قمت بتغيير الاستراتيجيات والعودة للصفر)
     if (strategy != lastStrategyForCalib) {
-        calibState = 0;
-        lastIsRunning = isRunning; // مزامنة الحالة الحالية لتجاهل الـ false عند التشغيل
+        calibState = 0;            // تصفير آلة الحالة لتبدأ من معايرة الأبيض
+        lastIsRunning = isRunning; // مزامنة حالة الزر الحالية لمنع بدء المعايرة فوراً بشكل خاطئ
+        
+        // طباعة تعليمات الاستخدام على شاشة التلنت
         TelnetStream.println("\n=========================================");
         TelnetStream.println("⚙️ تم تفعيل وضع المعايرة (الاستراتيجية 0)");
-        TelnetStream.println("1. ضع الروبوت على [الخط الأبيض].");
+        TelnetStream.println("1. ضع الروبوت على [الخط الأبيض] تماماً.");
         TelnetStream.println("2. اضغط زر التشغيل (سيصبح isRunning = True).");
         TelnetStream.println("=========================================\n");
-        lastStrategyForCalib = strategy;
+        
+        lastStrategyForCalib = strategy; // حفظ الحالة لمنع تكرار الطباعة
     }
 
-    // 3. قراءة الحالة الحالية للتشغيل (التي يتم التحكم بها بشكل آمن من Switch.ino)
+    // 3. قراءة الحالة الحية لزر التشغيل (التي يتم التحكم بها بشكل آمن من Switch.ino)
     bool currentIsRunning = isRunning;
 
-    // 4. آلة الحالة (State Machine) للمعايرة حسب طلبك المخصص
+    // ==========================================
+    // 4. آلة الحالة (State Machine) لإدارة المعايرة
+    // ==========================================
+    
+    // --- الحالة 0: في انتظار معايرة الخط الأبيض ---
     if (calibState == 0) {
-        // انتظار التحول من إيقاف (false) إلى تشغيل (true) -> معايرة الأبيض
+        // نكتشف لحظة "تشغيل" الزر (من False إلى True)
         if (currentIsRunning == true && lastIsRunning == false) {
             TelnetStream.println("\n=== بدء معايرة الخط الأبيض ===");
-            runCalibrationPhase(false);
-            playToneWhiteDone();
-            calibState = 1; // الانتقال لانتظار الأسود
-            TelnetStream.println("\n✅ تمت معايرة الأبيض.");
-            TelnetStream.println("--> الروبوت الآن في وضع التشغيل (الآن انقله للون الأسود).");
+            
+            runCalibrationPhase(false); // استدعاء دالة أخذ القراءات وتمرير (false) لتعني "هذا ليس أسود"
+            playToneWhiteDone();        // إطلاق 3 نغمات سريعة للتأكيد
+            
+            calibState = 1;             // الانتقال للحالة 1 (انتظار الأسود)
+            
+            TelnetStream.println("\n✅ تمت معايرة الأبيض بنجاح.");
+            TelnetStream.println("--> الروبوت الآن في وضع التشغيل (الآن انقله وضعه فوق الخط الأسود).");
             TelnetStream.println("--> اضغط الزر مرة أخرى للإيقاف (سيصبح isRunning = False) لتبدأ معايرة الأسود...");
         }
     }
+    // --- الحالة 1: في انتظار معايرة الخط الأسود ---
     else if (calibState == 1) {
-        // انتظار التحول من تشغيل (true) إلى إيقاف (false) -> معايرة الأسود
+        // نكتشف لحظة "إيقاف" الزر (من True إلى False)
         if (currentIsRunning == false && lastIsRunning == true) {
             TelnetStream.println("\n=== بدء معايرة الخط الأسود ===");
-            runCalibrationPhase(true);
-            finalizeCalibration();
-            playToneCalibrationComplete();
-            calibState = 0; // تصفير الحالة للتمكن من الإعادة فوراً دون الحاجة لترسيت
-            TelnetStream.println("\n🎉 تمت المعايرة بالكامل! النظام جاهز.");
-            TelnetStream.println("يمكنك تغيير الاستراتيجية للانطلاق، أو تكرار العملية بوضع الروبوت على الأبيض والضغط مجدداً.");
+            
+            runCalibrationPhase(true);     // استدعاء دالة أخذ القراءات وتمرير (true) لتعني "هذا أسود"
+            finalizeCalibration();         // استدعاء دالة الحسابات النهائية وطباعة الأكواد
+            playToneCalibrationComplete(); // إطلاق نغمة المعايرة الطويلة
+            
+            calibState = 0;                // تصفير الحالة للتمكن من إعادة المعايرة فوراً دون إطفاء الروبوت
+            
+            TelnetStream.println("\n🎉 تمت المعايرة بالكامل! النظام جاهز والمصفوفات الحية تم تحديثها.");
+            TelnetStream.println("يمكنك تغيير مفاتيح الاستراتيجية للانطلاق، أو تكرار العملية بوضع الروبوت على الأبيض والضغط مجدداً.");
         }
     }
 
-    // تحديث الحالة السابقة للمقارنة في الدورة القادمة
+    // 5. تحديث حالة الزر السابقة للمقارنة في الدورة الزمنية القادمة
     lastIsRunning = currentIsRunning;
 
-    // إبقاء الاتصال نشطاً وتفريغ البفر
-    if (TelnetStream.available()) { TelnetStream.read(); }
+    // 6. تفريغ الذاكرة المؤقتة (Buffer) للتلنت لمنع تكدس البيانات
+    if (TelnetStream.available()) { 
+        TelnetStream.read(); 
+    }
 }
 
+// ====================================================================
+// دالة فرعية: أخذ قراءات الحساسات وحساب المتوسطات (Sampling Phase)
+// المتغير (isBlack) يحدد ما إذا كنا نحفظ البيانات في مصفوفة الأسود أم الأبيض
+// ====================================================================
 void runCalibrationPhase(bool isBlack) {
-    long sums[10] = {0};
-    TelnetStream.println("جاري أخذ 100 قراءة لضمان الدقة...");
+    long sums[10] = {0}; // مصفوفة لتجميع ناتج 100 قراءة لكل حساس
+    TelnetStream.println("جاري أخذ 100 قراءة متتالية لضمان الدقة...");
 
+    // أخذ 100 قراءة متتالية
     for (int i = 0; i < 100; i++) {
         for (int s = 0; s < 10; s++) {
             int val = analogRead(sensorPins[s]);
-            sums[s] += val;
+            sums[s] += val; // إضافة القراءة الحالية للمجموع
         }
-        delay(10); // تأخير زمني بسيط لضمان استقرار القراءات التناظرية
+        delay(10); // تأخير 10 ملي ثانية لضمان استقرار محول الـ ADC التناظري
     }
 
     TelnetStream.println("--- متوسط الحساسات الـ 10 ---");
-    float overallSum = 0;
+    float overallSum = 0; // لجمع متوسطات الحساسات الثمانية الوسطى
 
+    // حساب المتوسط لكل حساس
     for (int s = 0; s < 10; s++) {
-        float avg = (float)sums[s] / 100.0;
+        float avg = (float)sums[s] / 100.0; // القسمة على عدد القراءات
+        
+        // تخزين المتوسط في المصفوفة المناسبة (أبيض أو أسود)
         if (isBlack) {
             blackAvg[s] = avg;
         } else {
             whiteAvg[s] = avg;
         }
 
-        TelnetStream.print(avg, 0);
+        // طباعة قيمة الحساس الحالي للمراقبة
+        TelnetStream.print(avg, 0); 
         TelnetStream.print("\t");
 
-        // استثناء S1 و S10 من المتوسط العام (كما في الكود الأصلي)
+        // استثناء الحساسات الطرفية S1 (رقم 0) و S10 (رقم 9) من المتوسط العام
+        // لأنها مخصصة للتقاطعات (رقمية) وقد تشوه متوسط قراءة تتبع الخط
         if (s != 0 && s != 9) {
             overallSum += avg;
         }
     }
-    TelnetStream.println();
+    TelnetStream.println(); // سطر جديد بعد طباعة الـ 10 حساسات
 
-    // قسمة على 10 لأننا استثنينا حساسين
+    // حساب المتوسط العام الموحد (قسمة على 8 لأننا استثنينا حساسين طرفيين)
     float overall = overallSum / 8.0; 
     
+    // حفظ المتوسط العام في المتغير المناسب
     if (isBlack) {
         overallBlackAvg = overall;
     } else {
@@ -104,10 +141,14 @@ void runCalibrationPhase(bool isBlack) {
     }
 }
 
+// ====================================================================
+// دالة فرعية: الحسابات النهائية وتحديث المتغيرات الحية وتوليد الكود
+// ====================================================================
 void finalizeCalibration() {
+    // 1. حساب نقطة المنتصف (عتبة التمييز) بين الأبيض والأسود
     int calculatedThreshold = round((overallWhiteAvg + overallBlackAvg) / 2.0);
 
-    // تحديث المتغيرات العامة الحية
+    // 2. تحديث المتغيرات العامة الحية (تُطبق فوراً في الروبوت دون الحاجة لإعادة تشغيل)
     target_White = round(overallWhiteAvg);
     target_Black = round(overallBlackAvg);
     lineThreshold = calculatedThreshold;
@@ -117,11 +158,13 @@ void finalizeCalibration() {
         S_Black[i] = round(blackAvg[i]);
     }
 
+    // 3. توليد وطباعة الكود الجاهز لنسخه ولصقه في ملف LineFollower.ino
     TelnetStream.println("\n=======================================================");
     TelnetStream.println("🎉 اكتملت المعايرة بنجاح! تم تحديث الذاكرة الحية.");
-    TelnetStream.println("يمكنك نسخ الكود التالي ولصقه في ملف LineFollower.ino:");
+    TelnetStream.println("يمكنك نسخ الكود التالي ولصقه في ملف LineFollower.ino لحفظه دائماً:");
     TelnetStream.println("=======================================================\n");
 
+    // طباعة مصفوفة الأبيض
     TelnetStream.print("int S_White[10] = {");
     for (int i = 0; i < 10; i++) {
         TelnetStream.print(S_White[i]);
@@ -129,6 +172,7 @@ void finalizeCalibration() {
     }
     TelnetStream.println("};");
 
+    // طباعة مصفوفة الأسود
     TelnetStream.print("int S_Black[10] = {");
     for (int i = 0; i < 10; i++) {
         TelnetStream.print(S_Black[i]);
@@ -136,6 +180,7 @@ void finalizeCalibration() {
     }
     TelnetStream.println("};");
 
+    // طباعة المتغيرات العامة للون
     TelnetStream.print("int target_White = "); TelnetStream.print(target_White); TelnetStream.println(";");
     TelnetStream.print("int target_Black = "); TelnetStream.print(target_Black); TelnetStream.println(";");
     TelnetStream.print("int lineThreshold = "); TelnetStream.print(lineThreshold); TelnetStream.println(";");
