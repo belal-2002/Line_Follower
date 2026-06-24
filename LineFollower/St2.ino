@@ -1,26 +1,33 @@
 void loopStrategy2() { // للأمام ثم لليسار
+
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
-  if (midSensor) { 
+  if (midMidSensor) { 
+    if (goLeft || goRight){
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+    }
     goLeft = false;
     goRight = false;
   }
 
   // الاستشفاء المبكر (إنهاء الدوران فور التقاط الرادار للخط)
-  if (goLeft && leftRadar) { goLeft = false; calculateError(); return; }
-  if (goRight && rightRadar) { goRight = false; calculateError(); return; }
+  if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return; }
+  if (goRight && rightMidRadar) { goRight = false; calculateError(); return; }
   
   // الاستمرار في الدوران إذا بدأناه
-  if (goLeft || goRight) return;
+  if (turnLeft || goLeft || goRight) return;
 
   // الدخول في حالة الفقدان الكلي للخط
-  if (!allSensor) {
+  if (!midSensor) {
     lineWasFound = false;
-    if (leftRadarOn) {
+    if (leftMidRadarOn) {
       goLeft = true; 
       leftMotor();
       return;
     }
-    if (rightRadarOn) {
+    if (rightMidRadarOn) {
       goRight = true;
       rightMotor();      
       return;
@@ -29,17 +36,8 @@ void loopStrategy2() { // للأمام ثم لليسار
     return;
   }
 
-  /*
-  // تجاوز التقاطعات العرضية بأمان
-  if (radar && midSensor){
-    bitClear(sensorBit, 0);
-    bitClear(sensorBit, 1);
-    bitClear(sensorBit, 10);
-    bitClear(sensorBit, 11);
-  }
-  */
 
-  bitClear(sensorBit, 0);
-  bitClear(sensorBit, 9);
   calculateError();
+  //calculateError();
 }
+  
