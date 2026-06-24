@@ -23,6 +23,9 @@ void loopSwitch() {
         rightRadarOn = false;
         leftMidRadarOn = false;
         rightMidRadarOn = false;
+        goLeft = false;
+        goRight = false;
+        turnLeft = false;
       } else {
         stopMotor();  
       }
