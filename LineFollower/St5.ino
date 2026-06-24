@@ -116,9 +116,10 @@ void loopStrategy5() { //Left
 
 
 /*
-   if(midSensor){
+  bool zeroAngleZ = false;
+  if(midSensor){
     lostLineDistance = distanceNow;
-   }
+  }
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midMidSensor) { 
