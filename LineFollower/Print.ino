@@ -12,12 +12,12 @@ void loopPrint() {
   TelnetStream.println();    
   */
   
+  /*
   for (int i = 0; i < 10; i++) {
     TelnetStream.print(sensorValue[i]);  
     TelnetStream.print("\t");               
   }
-
-   
+  */
 
 
   TelnetStream.print("\t");
@@ -34,6 +34,15 @@ void loopPrint() {
   TelnetStream.print("  distanceNow: ");
   TelnetStream.print(distanceNow);  
   TelnetStream.println();
+
+  /*
+  TelnetStream.print("  Kp: ");
+  TelnetStream.print(Kp);
+  TelnetStream.print("  Kd: ");
+  TelnetStream.print(Kd);
+  TelnetStream.println();
+  /*
+
   lastPrintTime = millis();
   }
 
