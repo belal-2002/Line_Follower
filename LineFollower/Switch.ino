@@ -19,6 +19,10 @@ void loopSwitch() {
         digitalWrite(STBY, HIGH);
         resetPitchOffset(); // <--- تمت إضافتها هنا لتتم المعايرة مرة واحدة قبل الانطلاق
         resetAngleZ();
+        leftRadarOn = false;
+        rightRadarOn = false;
+        leftMidRadarOn = false;
+        rightMidRadarOn = false;
       } else {
         stopMotor();  
       }
