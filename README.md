@@ -121,7 +121,7 @@ ESP32-S3 based autonomous Line Follower Robot. Programmed in C++ via Arduino IDE
 - **Motor Type:** DC brushed motor with gearbox
 - **Application:** Smart robot car and robotics projects
 - مع العلم ان وزن الروبوت يساوي 390 غرام.
-- وهو ما جعل السرعة الخطية القصوى للروبوت تصل إلى حوالي  متر/ثانية.
+- وهو ما جعل السرعة الخطية القصوى للروبوت تصل إلى حوالي**0.3 متر/ثانية**.
 - عرض العجلين الخلفيان يساوي 19ملم لكل عجل.
 - ومثبت بكل عجل انكودر يحتوي على 20 ثقب.
 
