@@ -54,16 +54,12 @@
   bool Turn180now = false; 
   bool sweep180Done = false; // يمنع الروبوت من الدوران 180 درجة مرتين متتاليتين
 
-  static unsigned long lastPrintTime = 0;
+  
   unsigned long turnStartTime = 0;
   unsigned long LineNotFoundTime = 0;
   unsigned long lastButtonPress = 0;
   const unsigned long debounceDelay = 400;
-  bool bit1 = false;
-  bool bit2 = false;
-  bool bit3 = false;
   byte strategy = 1;
-  byte buzzer = 0;
   int sensorBit = 0;
   byte rightSensor = 0;
   byte leftSensor = 0;
@@ -96,6 +92,7 @@
   int originalTurnSpeed = 290;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
+  float Kp_Straight = 8.0;
 
   int maximumSpeed = originalMaximumSpeed;     
   int baseSpeed = originalBaseSpeed; 
