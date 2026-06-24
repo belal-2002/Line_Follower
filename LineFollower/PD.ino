@@ -4,7 +4,7 @@ void calculatePD() {
   float D = currentError - lastError; 
   lastError = currentError;
   
-  float PD_Value = (Kp * P) + (Kd * D);
+  PD_Value = (Kp * P) + (Kd * D);
 
   moveMotor();
 }
