@@ -1,126 +1,152 @@
+// ====================================================================
+// ملف قراءة الحساسات، فلترتها، وتحديث متغيرات الرادارات (Sensors.ino)
+// ====================================================================
+
 void loopSensors() {
-// 1. قراءة جميع الحساسات باستخدام فلتر (متوسط 3 قراءات)
+  
+  // =========================================================
+  // 1. مرحلة قراءة الحساسات والفلترة (Oversampling Filter)
+  // =========================================================
   for (int i = 0; i < 10; i++) {
-    long tempSum = 0; // متغير مؤقت لتخزين مجموع القراءات
-    // أخذ 3 قراءات متتالية لنفس الحساس
+    long tempSum = 0; // متغير مؤقت لتجميع القراءات
+    
+    // أخذ 3 قراءات متتالية لنفس الحساس في نفس اللحظة
     for (int j = 0; j < 3; j++) {
       tempSum += analogRead(sensorPins[i]);
     }
-    // حساب المتوسط وتخزينه كقراءة نهائية للحساس
+    
+    // حساب المتوسط وتخزينه كقراءة نهائية لتقليل التشويش (Noise)
     sensorValue[i] = tempSum / 3;
   }
   
+  // =========================================================
+  // 2. مرحلة المعايرة الخطية وتقييد القيم (Linear Mapping)
+  // =========================================================
   for (int i = 0; i < 10; i++) {
-    // المعايرة الخطية الفردية لكل حساس ليطابق المرجع المثالي
+    // توحيد القراءات: تحويل قراءة كل حساس بناءً على مرجعه الخاص ليطابق المرجع المثالي
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
     
-    // حماية القيم
+    // حماية النظام: تقييد القيم بين 0 و 4095 (دقة 12-بت لـ ESP32) لمنع القيم الشاذة
     sensorValue[i] = constrain(sensorValue[i], 0, 4095);
   }
   
   // =========================================================
-  // --- [بداية كود اكتشاف التبديل الشفاف للألوان] ---
+  // 3. مرحلة اكتشاف التبديل الشفاف للألوان (Inversion Zone)
   // =========================================================
   /*
   int currentBlackCount = 0;
+  
+  // حساب عدد الحساسات التي ترى لوناً "أسود فيزيائي" حالياً
   for (int i = 0; i < 10; i++) {
-    // نعد الحساسات التي ترى اللون الأسود "الفيزيائي" على الأرضية
     if (sensorValue[i] > lineThreshold) {
       currentBlackCount++;
     }
   }
 
-  // 1. اكتشاف الدخول في المنطقة المعكوسة (الخلفية تصبح سوداء فجأة)
-  // إذا رأينا 8 حساسات أو أكثر تقرأ لوناً أسوداً
+  // أ. اكتشاف الدخول في المنطقة المعكوسة (الخلفية أصبحت سوداء والخط أبيض)
+  // الشرط != 10 هو لحماية الروبوت من التقاطعات العادية (+) التي تعطي 10 أسود مؤقتاً
   if (!isInverted && currentBlackCount >= 7 && currentBlackCount != 10) {
-    inversionCounterBlack++;
+    inversionCounterBlack++; // زيادة عداد التأكيد
+    
     if (inversionCounterBlack > INVERSION_THRESH) {
-      isInverted = true;
-      inversionCounterBlack = 0; 
-      // اختياري: إطلاق نغمة سريعة للتأكيد أثناء السباق
-      tone(buzzerPin, 3000, 90); 
+      isInverted = true;           // تأكيد الدخول في المنطقة المعكوسة
+      inversionCounterBlack = 0;   // تصفير العداد
+      tone(buzzerPin, 3000, 90);   // إطلاق نغمة سريعة لتأكيد التبديل
     }
   } 
-  // 2. اكتشاف الخروج والعودة للوضع الطبيعي (الخلفية تعود بيضاء)
-  // إذا رأينا حساسين أو أقل يقرأون اللون الأسود (وهو الخط الطبيعي)
+  
+  // ب. اكتشاف الخروج من المنطقة المعكوسة (العودة للوضع الطبيعي)
+  // إذا كنا في وضع معكوس ورأينا حساسين أو أقل باللون الأسود الفيزيائي
   else if (isInverted && currentBlackCount <= 2) {
-    inversionCounterWhite++;
-    if (inversionCounterWhite > (INVERSION_THRESH / 3)) {
-      isInverted = false;
-      inversionCounterWhite = 0;
-      tone(buzzerPin, 3000, 90);
+    inversionCounterWhite++; // زيادة عداد التأكيد للعودة
+    
+    if (inversionCounterWhite > (INVERSION_THRESH / 3)) { // استجابة العودة أسرع بـ 3 مرات
+      isInverted = false;          // تأكيد العودة للوضع الطبيعي
+      inversionCounterWhite = 0;   // تصفير العداد
+      tone(buzzerPin, 3000, 90);   // إطلاق نغمة التبديل
     }
   } 
-  // 3. تصفير العداد إذا كانت الحالة مؤقتة
-  // هذا السطر يحمي الروبوت من التقاطعات (+) العادية، حيث سيقرأ 10 حساسات أسود
-  // ولكن لفترة قصيرة جداً لا تتجاوز الـ INVERSION_THRESH فيصفر العداد.
+  
+  // ج. تصفير العدادات إذا كانت الحالات مؤقتة (مثل المرور فوق أوساخ أو تقاطع)
   else {
     inversionCounterBlack = 0;
     inversionCounterWhite = 0;
   }
 
-  // 4. الخدعة الرياضية: عكس القيم إذا كنا في وضع التبديل
+  // د. الخدعة الرياضية: عكس القيم فعلياً إذا تم تأكيد وضع التبديل
   if (isInverted) {
     for (int i = 0; i < 10; i++) {
-      // معادلة العكس السحرية
+      // معادلة العكس السحرية: تحويل الأسود لأبيض والأبيض لأسود رياضياً
       sensorValue[i] = (target_Black + target_White) - sensorValue[i];
     }
   }
   */
-  // =========================================================
-  // --- [نهاية كود التبديل] ---
-  // =========================================================
 
+  // =========================================================
+  // 4. مرحلة التشفير الثنائي (Bitmasking) للحساسات
+  // =========================================================
   for (int i = 0; i < 10; i++) {
     if (sensorValue[i] > lineThreshold) {
-      bitSet(sensorBit, 9 - i);
+      bitSet(sensorBit, 9 - i);  // تحويل القراءة إلى 1 إذا كانت فوق العتبة
     } else {
-      bitClear(sensorBit, 9 - i);
+      bitClear(sensorBit, 9 - i); // تحويل القراءة إلى 0 إذا كانت تحت العتبة
     }
   }
 
-  // إزاحة البتات 6 خطوات لليمين لاستخراج بتات الحساسات اليسرى (من 6 إلى 11) وعدّها
+  // =========================================================
+  // 5. استخراج البيانات وعدّ الحساسات النشطة (Popcount Logic)
+  // =========================================================
+  
+  // إزاحة البتات 5 خطوات لليمين لاستخراج بتات الحساسات اليسرى الـ 5 وعدّها
   leftSensor = __builtin_popcount((sensorBit >> 5) & 0x1F); 
 
-  // استخراج أول 6 بتات (من 0 إلى 5) الخاصة بالحساسات اليمنى وعدّها بسرعة
-  rightSensor = __builtin_popcount(sensorBit & 0x1F); // 0x3F تعادل 000000111111 ثنائياً
+  // استخراج أول 5 بتات للحساسات اليمنى وعدّها بسرعة (0x1F تعادل 11111 ثنائياً)
+  rightSensor = __builtin_popcount(sensorBit & 0x1F); 
 
-  // حساسات المنتصف
+  // حساسات المنتصف الـ 8 (تجاهل S1 و S10)
   midSensor = __builtin_popcount((sensorBit >> 1) & 0xFF);
 
-  // حساسات المنتصف
+  // حساسات عمق المنتصف الـ 6 (تجاهل S1, S2 و S9, S10) للتأكد من التمركز
   midMidSensor = __builtin_popcount((sensorBit >> 2) & 0x3F);
 
-  // إجمالي الحساسات
+  // إجمالي الحساسات النشطة
   allSensor = __builtin_popcount(sensorBit & 0x3FF);
 
-  leftRadar = bitRead(sensorBit, 9);
-  rightRadar = bitRead(sensorBit, 0);
-  //radar = leftRadar + rightRadar;
+  // =========================================================
+  // 6. تخصيص قراءات الرادارات الموضعية
+  // =========================================================
+  leftRadar     = bitRead(sensorBit, 9); // S1
+  leftMidRadar  = bitRead(sensorBit, 8); // S2
+  rightMidRadar = bitRead(sensorBit, 1); // S9
+  rightRadar    = bitRead(sensorBit, 0); // S10
 
-  leftMidRadar = bitRead(sensorBit, 8);
-  rightMidRadar = bitRead(sensorBit, 1);
-
-if (leftRadar){
+  // =========================================================
+  // 7. خوارزمية الذاكرة المكانية للرادارات (Radar Distance Memory)
+  // =========================================================
+  
+  // --- رادار أقصى اليسار (S1) ---
+  if (leftRadar) {
     leftRadarOn = true;
-    leftRadarStartDistance = totalOdometer; // تسجيل المسافة الحالية كنقطة بداية
+    leftRadarStartDistance = totalOdometer; // تحديث نقطة البداية طالما الرادار يرى الخط
   } else { 
-    // إذا اختفى الخط عن الرادار، نتحقق مما إذا كان الروبوت قد قطع المسافة المحددة (5 سم)
+    // إذا اختفى الخط، نبقي الرادار مفعلاً كـ (ذاكرة) حتى نقطع المسافة المسموحة (RadarDistanceThreshold)
     if ((totalOdometer - leftRadarStartDistance) > RadarDistanceThreshold) {
         leftRadarOn = false;
     }
   } 
   
-  if (rightRadar){
+  // --- رادار أقصى اليمين (S10) ---
+  if (rightRadar) {
     rightRadarOn = true;
-    rightRadarStartDistance = totalOdometer; // تسجيل المسافة الحالية كنقطة بداية
+    rightRadarStartDistance = totalOdometer; 
   } else { 
     if ((totalOdometer - rightRadarStartDistance) > RadarDistanceThreshold) {
         rightRadarOn = false;
     }
   }
 
-  if (leftMidRadar){
+  // --- رادار اليسار الداخلي (S2) ---
+  if (leftMidRadar) {
     leftMidRadarOn = true;
     leftMidRadarStartDistance = totalOdometer;
   } else { 
@@ -129,7 +155,8 @@ if (leftRadar){
     }
   } 
   
-  if (rightMidRadar){
+  // --- رادار اليمين الداخلي (S9) ---
+  if (rightMidRadar) {
     rightMidRadarOn = true;
     rightMidRadarStartDistance = totalOdometer;
   } else { 
@@ -139,5 +166,3 @@ if (leftRadar){
   }
 
 }
-
-
