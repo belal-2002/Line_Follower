@@ -1,7 +1,7 @@
 // إضافة متغيرات لحفظ زمن آخر نبضة لتطبيق الفلتر (توضع في الأعلى)
   volatile unsigned long lastLeftPulseTime = 0;
   volatile unsigned long lastRightPulseTime = 0;
-  const unsigned long debounceDelayMicros = ((5000000 / originalMaximumSpeed) / 1.5); // فلتر زمني: 12.5 ملي ثانية
+  const unsigned long debounceDelayMicros = ((3000000 / 175) / 1.5); // فلتر زمني: 11.5 ملي ثانية
 
 void setupMotors() {
   pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
