@@ -92,7 +92,7 @@
   float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
   float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
   int originalMaximumSpeed = 500;     
-  int originalBaseSpeed = 200;    
+  int originalBaseSpeed = 250;    
   int originalTurnSpeed = 250;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
