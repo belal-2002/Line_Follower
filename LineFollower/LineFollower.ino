@@ -89,8 +89,8 @@
   bool isRunning = false;
   bool serviceStarted = false;
 
-  float Kp = 2.35;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
-  float Kd = 15.3;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
+  float Kp = 1.80;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
+  float Kd = 15.30;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
   int originalMaximumSpeed = 500;     
   int originalBaseSpeed = 250;    
   int originalTurnSpeed = 290;  
@@ -147,7 +147,7 @@
   bool lineWasFound = true;
   
 
-  
+
 
 int S_White[10] = {168, 165, 161, 192, 168, 173, 158, 160, 205, 334};
 int S_Black[10] = {2140, 2340, 2023, 2866, 2252, 2585, 2201, 2245, 3044, 3650};
