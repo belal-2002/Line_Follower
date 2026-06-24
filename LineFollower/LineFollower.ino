@@ -40,110 +40,129 @@
 // --- تعريف دبابيس الحساسات الـ 12 ---
   const int sensorPins[10] = {13, 10, 9, 8, 7, 6, 5, 4, 2, 12};
 
-// --- المتغيرات العامة (Global Variables) لتتشاركها جميع الملفات ---
-// --- متغيرات حساب المسافة الافتراضية للرادار ---
-  float RadarDistanceThreshold = 6.0;   // المسافة المطلوبة بالسنتيمتر (يمكنك تعديلها في أي وقت)
-  float gapDistance = 9.0;   // مسافة تخطي الفجوات بالسنتيمتر
-  float distanceNow = 0.0; // المسافة التراكمية الإجمالية التي قطعها الروبوت
-  float absDistanceNow = 0.0;
-  float leftRadarStartDistance = 0.0;   // المسافة المسجلة لحظة التقاط رادار اليسار
-  float rightRadarStartDistance = 0.0;  // المسافة المسجلة لحظة التقاط رادار اليمين
-  float leftMidRadarStartDistance = 0.0;   
-  float rightMidRadarStartDistance = 0.0; 
-  float lostLineDistance = 0.0;
-  bool Turn180now = false; 
-  bool sweep180Done = false; // يمنع الروبوت من الدوران 180 درجة مرتين متتاليتين
+// ====================================================================
+// --- المتغيرات العامة (Global Variables) ---
+// ====================================================================
 
-  
-  unsigned long turnStartTime = 0;
-  unsigned long LineNotFoundTime = 0;
-  unsigned long lastButtonPress = 0;
-  const unsigned long debounceDelay = 400;
-  byte strategy = 1;
-  int sensorBit = 0;
-  byte rightSensor = 0;
-  byte leftSensor = 0;
-  byte midSensor = 0; 
-  byte midMidSensor = 0;
-  byte allSensor = 0;
-  byte radar = 0;
-  byte leftRadar = 0;
-  byte rightRadar = 0;
-  byte leftMidRadar = 0;
-  byte rightMidRadar = 0;
-  bool leftRadarOn = false;
-  bool rightRadarOn = false;
-  bool leftMidRadarOn = false;
-  bool rightMidRadarOn = false;
-  bool allRadarOn = false;
-  bool goRight = false;
-  bool goLeft = false;
-  bool turnLeft = false;
-  bool turnRight = false;
+// ---------------------------------------------------------
+// 1. متغيرات حالة الروبوت والنظام (System & State)
+// ---------------------------------------------------------
+  bool isRunning = false;        // حالة الروبوت (يعمل أم متوقف)
+  bool serviceStarted = false;   // للتأكد من تشغيل خدمات الواي فاي و OTA
+  byte strategy = 1;             // رقم الاستراتيجية الحالية (يتم تحديده من المفاتيح)
 
-//PD
-  bool isRunning = false;
-  bool serviceStarted = false;
+// ---------------------------------------------------------
+// 2. متغيرات إعدادات السرعة (Speed Configuration)
+// ---------------------------------------------------------
+  int originalMaximumSpeed = 500; // السرعة القصوى المرجعية
+  int originalBaseSpeed = 250;    // السرعة الأساسية المرجعية في الخط المستقيم
+  int originalTurnSpeed = 290;    // سرعة الانعطاف المرجعية
 
-  float Kp = 1.80;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
-  float Kd = 15.30;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
-  int originalMaximumSpeed = 500;     
-  int originalBaseSpeed = 250;    
-  int originalTurnSpeed = 290;  
-  int leftMotorSpeed = 0;
-  int rightMotorSpeed = 0;
-  float Kp_Straight = 8.0;
+  int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
+  int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
+  int turnSpeed = originalTurnSpeed;       // سرعة الانعطاف الفعّالة للعجل الخارجي
+  int innerTurnSpeed = turnSpeed / 5 * 4;  // سرعة الانعطاف التفاضلية للعجل الداخلي
 
-  int maximumSpeed = originalMaximumSpeed;     
-  int baseSpeed = originalBaseSpeed; 
-  int turnSpeed = originalTurnSpeed; 
-  int innerTurnSpeed = turnSpeed / 5*4; 
+  int leftMotorSpeed = 0;         // السرعة اللحظية المُرسلة للمحرك الأيسر
+  int rightMotorSpeed = 0;        // السرعة اللحظية المُرسلة للمحرك الأيمن
 
-  float P = 0;
-  float D = 0;
-  float PD_Value =0;
-  float lastError = 0;
-  float currentError = 0;
+// ---------------------------------------------------------
+// 3. متغيرات التحكم وتصحيح المسار (PID Control)
+// ---------------------------------------------------------
+  float Kp = 1.80;                // معامل التصحيح التناسبي (شراسة العودة للمنتصف)
+  float Kd = 15.30;               // معامل التصحيح التفاضلي (نعومة الحركة وإخماد الاهتزاز)
+  float Kp_Straight = 8.0;        // معامل تصحيح المسار عند السير في خط مستقيم (باستخدام الإنكودر)
+  float currentError = 0;         // نسبة الخطأ اللحظية عن مركز الخط
+  float lastError = 0;            // نسبة الخطأ السابقة (لحساب المعامل التفاضلي D)
 
+// ---------------------------------------------------------
+// 4. متغيرات الحساسات وقراءاتها (Sensors & Arrays)
+// ---------------------------------------------------------
+  const int sensorWeights[10] = {-444, -267, -190, -114, -38, 38, 114, 190, 267, 444}; // أوزان الحساسات هندسياً
+  int sensorValue[10];            // القيم التناظرية للحساسات بعد المعايرة
+  int sensorBit = 0;              // تجميع حالة الحساسات (أبيض/أسود) في متغير واحد (Bitmask)
 
+  byte rightSensor = 0;           // عدد حساسات الجهة اليمنى التي ترى الخط
+  byte leftSensor = 0;            // عدد حساسات الجهة اليسرى التي ترى الخط
+  byte midSensor = 0;             // عدد حساسات المنتصف التي ترى الخط
+  byte midMidSensor = 0;          // عدد حساسات عمق المنتصف (للتأكد من التمركز التام)
+  byte allSensor = 0;             // إجمالي عدد الحساسات التي ترى الخط
 
+// ---------------------------------------------------------
+// 5. متغيرات الرادار والاستكشاف الجانبي (Radars & Discovery)
+// ---------------------------------------------------------
+  byte leftRadar = 0;             // حالة الحساس الجانبي الأيسر المتطرف (S1)
+  byte rightRadar = 0;            // حالة الحساس الجانبي الأيمن المتطرف (S10)
+  byte leftMidRadar = 0;          // حالة الحساس الجانبي الأيسر الداخلي (S2)
+  byte rightMidRadar = 0;         // حالة الحساس الجانبي الأيمن الداخلي (S9)
 
-// --- متغيرات الـ Odometry ---
-  // استخدام volatile ضروري جداً للمتغيرات التي يتم تعديلها داخل المقاطعات (Interrupts)
-  float currentAngleZ = 0.0;
-  bool zeroAngleZ = false;
-  volatile long leftTicks = 0;
-  volatile long rightTicks = 0;
+  bool leftRadarOn = false;       // راية (Flag) لتفعيل حدث التقاط رادار اليسار
+  bool rightRadarOn = false;      // راية (Flag) لتفعيل حدث التقاط رادار اليمين
+  bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
+  bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  long currentLeftTicks = 0;
-  long currentRightTicks = 0;
-  const float distancePerTick = 0.51836; // المسافة لكل نبضة بالسنتيمتر 
-  const float trackWidth = 9.15; // المسافة بين العجلتين بالسنتيمتر
-  float angleOffset = 0.0;       // لحفظ نقطة الصفر عند كل دوران
-  float totalOdometer = 0.0;     // عداد المسافة التراكمي (دائماً يزداد)
-  long lastLeftTicks_odo = 0;    // لحفظ النبضات السابقة للعجل الأيسر
-  long lastRightTicks_odo = 0;   // لحفظ النبضات السابقة للعجل الأيمن
+  float RadarDistanceThreshold = 6.0;         // المسافة المسموح للرادار بتذكر الخط خلالها (سم)
+  float leftRadarStartDistance = 0.0;         // المسافة المسجلة لحظة التقاط رادار اليسار
+  float rightRadarStartDistance = 0.0;        // المسافة المسجلة لحظة التقاط رادار اليمين
+  float leftMidRadarStartDistance = 0.0;      // المسافة المسجلة لحظة التقاط الرادار الأيسر الداخلي
+  float rightMidRadarStartDistance = 0.0;     // المسافة المسجلة لحظة التقاط الرادار الأيمن الداخلي
 
-  // --- متغيرات كشف المنحدر ---
-  float pitchAngle = 0.0;        // الزاوية الرأسية النهائية المعدلة
-  float pitchOffset = 0.0;       // <--- (جديد) لحفظ زاوية الميلان عند لحظة الانطلاق
+// ---------------------------------------------------------
+// 6. متغيرات التوقيت الزمني (Timers & Delays)
+// ---------------------------------------------------------
+  unsigned long turnStartTime = 0;     // توقيت بدء عملية الانعطاف
+  unsigned long LineNotFoundTime = 0;  // توقيت لحظة فقدان الخط بالكامل
+  unsigned long lastButtonPress = 0;   // توقيت آخر ضغطة زر (لمنع التداخل Debounce)
+  const unsigned long debounceDelay = 400; // زمن الفلترة لضغطة الزر (ملي ثانية)
 
-  // --- متغيرات منطقة تبديل الألوان (Inversion Zone) ---
-  bool isInverted = false;       // حالة الألوان الحالية (هل نحن في المنطقة المعكوسة؟)
-  int inversionCounterBlack = 0;      // عداد الفلترة للتأكد من التبديل
-  int inversionCounterWhite = 0;
-  const int INVERSION_THRESH = 30; // عدد اللفات المطلوبة لتأكيد التبديل (يحمي من التقاطعات)
+// ---------------------------------------------------------
+// 7. متغيرات الملاحة والإنكودر (Odometry & Navigation)
+// ---------------------------------------------------------
+  const float distancePerTick = 0.51836; // المسافة المقطوعة لكل نبضة من الإنكودر (سم)
+  const float trackWidth = 9.15;         // المسافة بين مركزي العجلتين الخلفيتين (قاعدة العجلات) (سم)
 
+  volatile long leftTicks = 0;     // العداد الحي لنبضات العجل الأيسر (يُعدل داخل المقاطعة)
+  volatile long rightTicks = 0;    // العداد الحي لنبضات العجل الأيمن (يُعدل داخل المقاطعة)
+  long currentLeftTicks = 0;       // نبضات العجل الأيسر المستنسخة (للاستخدام الآمن داخل الكود)
+  long currentRightTicks = 0;      // نبضات العجل الأيمن المستنسخة (للاستخدام الآمن داخل الكود)
+  long lastLeftTicks_odo = 0;      // النبضات السابقة للعجل الأيسر (لحساب الإزاحة الجديدة)
+  long lastRightTicks_odo = 0;     // النبضات السابقة للعجل الأيمن (لحساب الإزاحة الجديدة)
 
-//Error
-  const int sensorWeights[10] = {-444, -267, -190, -114, -38, 38, 114, 190, 267, 444};
-  int sensorValue[10]; 
-  long weightedSum = 0;
-  long sum = 0;
-  bool lineAvailable = true;
-  bool lineWasFound = true;
-  
+  float distanceNow = 0.0;         // المسافة الصافية اللحظية (تتأثر بالدوران للخلف)
+  float totalOdometer = 0.0;       // المسافة التراكمية الإجمالية (تزداد دائماً)
+  float currentAngleZ = 0.0;       // زاوية الروبوت الحالية مقارنة بنقطة الصفر الديكارتية
+  float angleOffset = 0.0;         // زاوية الإزاحة لتصفير الحسابات عند كل منعطف
 
+// ---------------------------------------------------------
+// 8. متغيرات الفقدان والاستشفاء (Recovery & Movement Flags)
+// ---------------------------------------------------------
+  bool lineWasFound = true;        // راية تؤكد أن الروبوت يرى الخط حالياً
+  float lostLineDistance = 0.0;    // المسافة المسجلة لحظة فقدان الخط
+  float gapDistance = 9.0;         // المسافة المسموح بقطعها أعمى لتجاوز الفجوات المقطوعة (سم)
+
+  bool Turn180now = false;         // تفعيل وضع الدوران 180 درجة للبحث عن الخط
+  bool sweep180Done = false;       // راية تمنع الروبوت من الدوران 180 درجة مرتين متتاليتين
+
+  bool goRight = false;            // أمر توجيه الروبوت لليمين
+  bool goLeft = false;             // أمر توجيه الروبوت لليسار
+  bool turnLeft = false;           // أمر تفعيل دوران اليسار الحاد
+  bool turnRight = false;          // أمر تفعيل دوران اليمين الحاد
+
+// ---------------------------------------------------------
+// 9. متغيرات الانحدار والتوازن (MPU6050 Slope)
+// ---------------------------------------------------------
+  float pitchAngle = 0.0;          // زاوية ميل الروبوت الرأسية (موجب للصعود، سالب للنزول)
+  float pitchOffset = 0.0;         // زاوية الميل المرجعية (تؤخذ عند معايرة نقطة الانطلاق)
+
+// ---------------------------------------------------------
+// 10. متغيرات منطقة التبديل الشفاف للألوان (Inversion Zone)
+// ---------------------------------------------------------
+  const int INVERSION_THRESH = 30; // عدد دورات القراءة المتتالية المطلوبة لتأكيد تبديل الألوان
+  bool isInverted = false;         // هل الروبوت حالياً في منطقة ألوان معكوسة؟
+  int inversionCounterBlack = 0;   // عداد مرشح (Filter) لاكتشاف الدخول في المنطقة المعكوسة
+  int inversionCounterWhite = 0;   // عداد مرشح (Filter) لاكتشاف الخروج والعودة للمنطقة البيضاء
+
+// ---------------------------------------------------------
 
 
 int S_White[10] = {168, 165, 161, 192, 168, 173, 158, 160, 205, 334};
@@ -151,8 +170,6 @@ int S_Black[10] = {2140, 2340, 2023, 2866, 2252, 2585, 2201, 2245, 3044, 3650};
 int target_White = 173;
 int target_Black = 2445;
 int lineThreshold = 1309;
-
-
 
 
 
