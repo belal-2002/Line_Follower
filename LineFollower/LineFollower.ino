@@ -89,11 +89,11 @@
   bool isRunning = false;
   bool serviceStarted = false;
 
-  float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
-  float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
+  float Kp = 2.35;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
+  float Kd = 15.3;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
   int originalMaximumSpeed = 500;     
   int originalBaseSpeed = 250;    
-  int originalTurnSpeed = 250;  
+  int originalTurnSpeed = 290;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
