@@ -91,9 +91,9 @@
 
   float Kp = 1.8;   // تم رفعه لزيادة شراسة الانعطاف نحو المنتصف
   float Kd = 15.0;  // سيعمل الآن بشكل صحيح وناعم بعد إزالة الـ dt
-  int originalMaximumSpeed = 400;     
+  int originalMaximumSpeed = 500;     
   int originalBaseSpeed = 200;    
-  int originalTurnSpeed = 230;  
+  int originalTurnSpeed = 250;  
   int leftMotorSpeed = 0;
   int rightMotorSpeed = 0;
 
@@ -120,8 +120,8 @@
 
   long currentLeftTicks = 0;
   long currentRightTicks = 0;
-  const float distancePerTick = 0.8639; // المسافة لكل نبضة بالسنتيمتر
-  const float trackWidth = 8.75; // المسافة بين العجلتين بالسنتيمتر
+  const float distancePerTick = 0.51836; // المسافة لكل نبضة بالسنتيمتر 
+  const float trackWidth = 9.15; // المسافة بين العجلتين بالسنتيمتر
   float angleOffset = 0.0;       // لحفظ نقطة الصفر عند كل دوران
   float totalOdometer = 0.0;     // عداد المسافة التراكمي (دائماً يزداد)
   long lastLeftTicks_odo = 0;    // لحفظ النبضات السابقة للعجل الأيسر
