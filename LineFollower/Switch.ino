@@ -1,4 +1,7 @@
 void loopSwitch() {
+  bool bit1 = false;
+  bool bit2 = false;
+  bool bit3 = false;
   // فحص الأزرار وتحديد رقم الاستراتيجية (فقط عندما يكون الروبوت متوقفاً)
   if (!isRunning) {
     bit1 = (digitalRead(switchPin1) == LOW) ? 1 : 0; // يمثل الرقم 1
