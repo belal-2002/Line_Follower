@@ -47,7 +47,12 @@ void turnOnService() {
     // بدء الخدمات بعد ضبط الحماية
     ArduinoOTA.begin();
     TelnetStream.begin();
-    playToneWiFiConnected(); // --> إطلاق نغمة النجاح الجديدة هنا <--
+
+    // الحل السريع: تشغيل النغمة فقط إذا كان الروبوت متوقفاً
+    if (!isRunning) {
+      playToneWiFiConnected(); 
+    }
+    
     serviceStarted = true; 
   }
 }
