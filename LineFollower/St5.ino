@@ -90,8 +90,7 @@ void loopStrategy5() { //Left
     return;   
   }
 
-  bitClear(sensorBit, 0);
-  bitClear(sensorBit, 9);
+
 
 
   calculateError();
