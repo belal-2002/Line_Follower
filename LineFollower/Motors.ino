@@ -58,6 +58,7 @@ void forwardStraight() {
 
   // 1. معامل التصحيح (Kp_Straight): 
   // رقم بسيط يحدد شراسة تعديل المسار (ابحث عن القيمة المثالية بالتجربة، غالباً بين 5.0 و 15.0) 
+  float Kp_Straight = 8.0;        // معامل تصحيح المسار عند السير في خط مستقيم (باستخدام الإنكودر)
 
   // 2. حساب قيمة الانحراف بناءً على زاوية الإنكودر الحالية
   // إذا انحرف الروبوت لليسار ستكون الزاوية موجبة -> فقيمة التصحيح موجبة
@@ -76,18 +77,18 @@ void forwardStraight() {
 
 void sweepSearchTurn() {
   if (abs(currentAngleZ) < 180.0) { 
-  // المحرك الأيسر للخلف بسرعة الدوران
+
   digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH);
   ledcWrite(PWMA, (turnSpeed / 4*3)); 
-  // المحرك الأيمن للأمام بنفس سرعة الدوران
+
   digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
   ledcWrite(PWMB, (turnSpeed / 4*3));
   } else { 
     if (abs(currentAngleZ) < 675.0) {
-      // المحرك الأيسر للخلف بسرعة الدوران
+
       digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH);
       ledcWrite(PWMA, turnSpeed); 
-      // المحرك الأيمن للأمام بنفس سرعة الدوران
+
       digitalWrite(BIN1, LOW);  digitalWrite(BIN2, HIGH); 
       ledcWrite(PWMB, (turnSpeed / 4*3));
     } else { 
@@ -125,12 +126,13 @@ void updateDistance() {
 // دالة نستخدمها بدلاً من (currentAngleZ = 0.0) لتصفير الزاوية دون فقدان المسافة
 void resetAngleZ() {
   noInterrupts();
-  long currentLeftTicks = leftTicks;
-  long currentRightTicks = rightTicks;
+  // استخدام متغيرات محلية بأسماء جديدة (للسرعة ولحماية العداد العام)
+  long tempLeftTicks = leftTicks;
+  long tempRightTicks = rightTicks;
   interrupts();
 
-  float distanceLeft = currentLeftTicks * distancePerTick;
-  float distanceRight = currentRightTicks * distancePerTick;
+  float distanceLeft = tempLeftTicks * distancePerTick;
+  float distanceRight = tempRightTicks * distancePerTick;
 
   // نجعل الإزاحة تساوي الزاوية المطلقة الحالية، فتصبح currentAngleZ صفر
   angleOffset = ((distanceRight - distanceLeft) / trackWidth) * (180.0 / PI);
