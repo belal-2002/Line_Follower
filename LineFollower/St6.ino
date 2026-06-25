@@ -87,8 +87,6 @@ void loopStrategy6() { //Right
     return;   
   }
 
-  bitClear(sensorBit, 0);
-  bitClear(sensorBit, 9);
 
 
   calculateError();
