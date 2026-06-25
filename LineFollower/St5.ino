@@ -1,7 +1,7 @@
 void loopStrategy5() { //Left
-   if(midSensor){
-    lostLineDistance = totalOdometer;
-   }
+
+  //if(midSensor){ lostLineDistance = totalOdometer; }
+  if(allSensor){ lostLineDistance = totalOdometer; }
 
   // إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
   if (midMidSensor) { 
