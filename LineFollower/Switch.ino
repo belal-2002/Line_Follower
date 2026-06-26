@@ -29,6 +29,7 @@ void loopSwitch() {
         goLeft = false;
         goRight = false;
         turnLeft = false;
+        turnRight = false;
       } else {
         stopMotor();  
       }
