@@ -39,17 +39,9 @@ void cancelBlindTurn_1() {
 }
 
 // الاستشفاء المبكر (تُرجع true إذا تم إنهاء الدوران)
-bool checkEarlyRecovery_2(bool leftRadarSignal, bool rightRadarSignal) {
-  if (goLeft && leftRadarSignal) { 
-    goLeft = false; 
-    calculateError(); 
-    return true; 
-  }
-  if (goRight && rightRadarSignal) { 
-    goRight = false; 
-    calculateError(); 
-    return true; 
-  }
+bool checkEarlyRecovery_2() {
+  if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return true; }
+  if (goRight && rightMidRadar) { goRight = false; calculateError(); return true; }
   return false;
 }
 
@@ -79,18 +71,18 @@ bool isCurrentlyTurning_4() {
 }
 
 // معالجة الفقدان الكلي للخط (تُرجع true إذا تصرفت)
-bool handleLineLoss_5(byte lineSensorCheck, bool leftR_On, bool rightR_On) {
-  if (!lineSensorCheck) {
+bool handleLineLoss_5() {
+  if (!midSensor) {
     lineWasFound = false;
-    if (leftR_On) { 
+    if (leftMidRadarOn) {
       goLeft = true; 
-      leftMotor(); 
-      return true; 
+      leftMotor();
+      return true;
     }
-    if (rightR_On) { 
-      goRight = true; 
-      rightMotor(); 
-      return true; 
+    if (rightMidRadarOn) {
+      goRight = true;
+      rightMotor();      
+      return true;
     }
     forwardMotor();
     return true;
@@ -98,23 +90,21 @@ bool handleLineLoss_5(byte lineSensorCheck, bool leftR_On, bool rightR_On) {
   return false;
 }
 
+
+
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
 bool activateTurn_6(bool isLeftTurn, bool triggerRadar, byte midCondition, bool oppositeRadar) {
-  if (triggerRadar && (midMidSensor >= midCondition) && !oppositeRadar) {
-    if (isLeftTurn) {
-      turnLeft = true;
-      leftMotor();
-    } else {
-      turnRight = true;
-      rightMotor();
-    }
+  if ((leftMidRadar) && (midMidSensor >= 3) && (!rightRadar)) {
+    turnLeft = true; 
+    leftMotor();
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
     lineWasFound = false;
-    return true;
+    return true;  
   }
   return false;
 }
+
 
 // تنظيف البتات لتجاهل التقاطعات (تم تصحيح البتات 10 و 11 الكارثية!)
 void ignoreIntersections_7() {
