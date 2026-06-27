@@ -93,7 +93,7 @@ bool handleLineLoss_5() {
 
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
-bool activateTurn_6(bool isLeftTurn, bool triggerRadar, byte midCondition, bool oppositeRadar) {
+bool activateTurn_6() {
   if ((leftMidRadar) && (midMidSensor >= 3) && (!rightRadar)) {
     turnLeft = true; 
     leftMotor();
@@ -110,20 +110,16 @@ bool activateTurn_6(bool isLeftTurn, bool triggerRadar, byte midCondition, bool 
 void ignoreIntersections_7() {
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
   if (leftRadar && rightRadar && midSensor) {
-    bitClear(sensorBit, 0); // يمين خارجي
-    bitClear(sensorBit, 1); // يمين داخلي
-    bitClear(sensorBit, 9); // يسار خارجي (تم تصحيحها)
-    bitClear(sensorBit, 8); // يسار داخلي (تم تصحيحها)
+  sensorValue[1] = 0; 
+  sensorValue[8] = 0;
   }
   // 2. تجاهل الفخاخ اليمنى (حرف T المتجه لليمين)
   else if (rightRadar && midSensor) {
-    bitClear(sensorBit, 0);
-    bitClear(sensorBit, 1);
+    sensorValue[1] = 0; 
   }
   // 3. تجاهل الفخاخ اليسرى (ميزة إضافية مجانية!)
   else if (leftRadar && midSensor) {
-    bitClear(sensorBit, 9);
-    bitClear(sensorBit, 8);
+    sensorValue[8] = 0;
   }
 }
 
