@@ -1,5 +1,8 @@
 void loopStrategy2() {
-  cancelBlindTurn_1();
+
+  ignoreIntersections_7();
+
+  calculateError();
   
 }
   
