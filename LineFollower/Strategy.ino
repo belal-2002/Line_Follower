@@ -72,8 +72,20 @@ bool isCurrentlyTurning_4() {
 
 // معالجة الفقدان الكلي للخط (تُرجع true إذا تصرفت)
 bool handleLineLoss_5() {
-  if (!midSensor) {
+  if (midSensor == 0) {
     lineWasFound = false;
+    if (leftMidRadarOn && rightMidRadarOn){
+      if (leftRadarOn) {
+        goLeft = true; 
+        leftMotor();
+        return true;
+      }
+      if (rightRadarOn) {
+        goRight = true;
+        rightMotor();      
+        return true;
+      }
+    }
     if (leftMidRadarOn) {
       goLeft = true; 
       leftMotor();
@@ -84,12 +96,11 @@ bool handleLineLoss_5() {
       rightMotor();      
       return true;
     }
-    forwardMotor();
+    stopMotor();
     return true;
   }
   return false;
 }
-
 
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
