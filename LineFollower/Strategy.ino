@@ -109,16 +109,24 @@ bool activateTurn_6() {
 // تنظيف البتات لتجاهل التقاطعات (تم تصحيح البتات 10 و 11 الكارثية!)
 void ignoreIntersections_7() {
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
-  if (leftRadar && rightRadar && midSensor) {
+  if (leftMidRadar && rightMidRadar && midMidSensor) {
   sensorValue[1] = 0; 
   sensorValue[8] = 0;
   }
   // 2. تجاهل الفخاخ اليمنى (حرف T المتجه لليمين)
-  else if (rightRadar && midSensor) {
+  else if (rightMidRadar && midMidSensor) {
     sensorValue[1] = 0; 
   }
   // 3. تجاهل الفخاخ اليسرى (ميزة إضافية مجانية!)
-  else if (leftRadar && midSensor) {
+  else if (leftMidRadar && midMidSensor) {
+    sensorValue[8] = 0;
+  }
+  if (bitRead(sensorBit, 4) && bitRead(sensorBit, 5)){
+    sensorValue[1] = 0; 
+    sensorValue[2] = 0;
+    sensorValue[3] = 0; 
+    sensorValue[6] = 0;
+    sensorValue[7] = 0; 
     sensorValue[8] = 0;
   }
 }
