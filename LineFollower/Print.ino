@@ -48,28 +48,50 @@ void loopPrint() {
   
   // إذا لم نكن في وضع المعايرة (لأن الاستراتيجية 0 تتولى طباعة بياناتها بنفسها)
   if (strategy != 0) {
-    
+    /*
     if (millis() - lastPrintTime > 1500) { // الطباعة كل ثانية ونصف
       
       TelnetStream.println("\n-------------------------------------------------");
+      TelnetStream.println();
       
-      // [القسم الأول]: طباعة متغيرات التحكم والسرعة والاستراتيجية
       TelnetStream.printf("Kp: %.2f  | Kd: %.1f  | Strategy: %d", Kp, Kd, strategy);
       TelnetStream.printf("  | Max: %d   | Base: %d  | Turn: %d", maximumSpeed, baseSpeed, turnSpeed);
-      
-      // [القسم الثاني]: طباعة متغيرات الملاحة والمسافات
-      TelnetStream.printf("  | Angle: %.1f | Dist: %.2f cm", pitchAngle, distanceNow);
+      TelnetStream.printf("  | Dist: %.2f cm", distanceNow);
       TelnetStream.printf("  | Left: %ld   | Right: %ld", currentLeftTicks, currentRightTicks);
 
-      // 💡 (قالب جاهز): إذا أردت يوماً رؤية الحساسات الـ 10 كرقم ثنائي، أزل علامة التعليق عن السطرين التاليين:
-      // TelnetStream.print("👀 Sensors : ");
-      // for(int i=0; i<10; i++) { TelnetStream.print(bitRead(sensorBit, 9-i)); } TelnetStream.println();
-      
-      TelnetStream.println("-------------------------------------------------");
-
       lastPrintTime = millis(); // تصفير العداد الزمني للطباعة
-    }
+    }*/    
+
+    static bool LeftRadar = false;
+    static bool RightRadar = false;
+    static unsigned long lastLeftChange = 0;
+    static unsigned long lastRightChange = 0;
     
+    unsigned long currentTime = millis();
+    /*
+    if (leftMidRadarOn != LeftRadar) {
+      unsigned long duration = currentTime - lastLeftChange;
+      TelnetStream.print("LeftRadar: ");
+      TelnetStream.print(leftMidRadarOn ? "ON" : "OFF");
+      TelnetStream.print(" | Time elapsed: ");
+      TelnetStream.print(duration);
+      TelnetStream.println(" ms");
+      LeftRadar = leftMidRadarOn;
+      lastLeftChange = currentTime;
+    }*/
+    
+    if (rightMidRadarOn != RightRadar) {
+      unsigned long duration = currentTime - lastRightChange;
+      TelnetStream.print("RightRadar: ");
+      TelnetStream.print(rightMidRadarOn ? "ON" : "OFF"); 
+      TelnetStream.print(" | Time elapsed: ");
+      TelnetStream.print(duration);
+      TelnetStream.println(" ms");
+      RightRadar = rightMidRadarOn;
+      lastRightChange = currentTime;
+    }
+
+
   } 
   else {
     // إذا كنا في وضع المعايرة (الاستراتيجية 0)، نطبع تذكير بسيط كل 3.5 ثانية
