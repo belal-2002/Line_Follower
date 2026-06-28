@@ -101,7 +101,7 @@
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  float RadarDistanceThreshold = 6.0;         // المسافة المسموح للرادار بتذكر الخط خلالها (سم)
+  float RadarDistanceThreshold = 4.0;         // المسافة المسموح للرادار بتذكر الخط خلالها (سم)
   float leftRadarStartDistance = 0.0;         // المسافة المسجلة لحظة التقاط رادار اليسار
   float rightRadarStartDistance = 0.0;        // المسافة المسجلة لحظة التقاط رادار اليمين
   float leftMidRadarStartDistance = 0.0;      // المسافة المسجلة لحظة التقاط الرادار الأيسر الداخلي
@@ -165,11 +165,11 @@
 // ---------------------------------------------------------
 
 
-int S_White[10] = {168, 165, 161, 192, 168, 173, 158, 160, 205, 334};
-int S_Black[10] = {2140, 2340, 2023, 2866, 2252, 2585, 2201, 2245, 3044, 3650};
-int target_White = 173;
-int target_Black = 2445;
-int lineThreshold = 1309;
+int S_White[10] = {189, 183, 182, 214, 198, 198, 178, 179, 225, 395};
+int S_Black[10] = {2652, 2431, 2332, 2988, 2961, 2712, 2268, 1940, 2931, 3707};
+int target_White = 194;
+int target_Black = 2570;
+int lineThreshold = 1382;
 
 
 
