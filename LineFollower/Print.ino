@@ -48,27 +48,35 @@ void loopPrint() {
   
   // إذا لم نكن في وضع المعايرة (لأن الاستراتيجية 0 تتولى طباعة بياناتها بنفسها)
   if (strategy != 0) {
-    /*
+    
     if (millis() - lastPrintTime > 1500) { // الطباعة كل ثانية ونصف
       
-      TelnetStream.println("\n-------------------------------------------------");
+      /*TelnetStream.println("\n-------------------------------------------------");
       TelnetStream.println();
       
       TelnetStream.printf("Kp: %.2f  | Kd: %.1f  | Strategy: %d", Kp, Kd, strategy);
       TelnetStream.printf("  | Max: %d   | Base: %d  | Turn: %d", maximumSpeed, baseSpeed, turnSpeed);
       TelnetStream.printf("  | Dist: %.2f cm", distanceNow);
-      TelnetStream.printf("  | Left: %ld   | Right: %ld", currentLeftTicks, currentRightTicks);
+      TelnetStream.printf("  | Left: %ld   | Right: %ld", currentLeftTicks, currentRightTicks);*/
+
+      for (int i = 0; i < 10; i++) {
+        TelnetStream.print(sensorValue[i]);  
+        TelnetStream.print("\t");               
+      }
+      TelnetStream.print("midSensor: ");
+      TelnetStream.println(midSensor);
+
 
       lastPrintTime = millis(); // تصفير العداد الزمني للطباعة
-    }*/    
+    }  
 
-    static bool LeftRadar = false;
+    /*static bool LeftRadar = false;
     static bool RightRadar = false;
     static unsigned long lastLeftChange = 0;
     static unsigned long lastRightChange = 0;
     
     unsigned long currentTime = millis();
-    /*
+    
     if (leftMidRadarOn != LeftRadar) {
       unsigned long duration = currentTime - lastLeftChange;
       TelnetStream.print("LeftRadar: ");
@@ -78,8 +86,7 @@ void loopPrint() {
       TelnetStream.println(" ms");
       LeftRadar = leftMidRadarOn;
       lastLeftChange = currentTime;
-    }*/
-    
+    }
     if (rightMidRadarOn != RightRadar) {
       unsigned long duration = currentTime - lastRightChange;
       TelnetStream.print("RightRadar: ");
@@ -89,7 +96,7 @@ void loopPrint() {
       TelnetStream.println(" ms");
       RightRadar = rightMidRadarOn;
       lastRightChange = currentTime;
-    }
+    }*/
 
 
   } 
