@@ -17,8 +17,8 @@ void loopPrint() {
     // تعديل قيم التحكم (PID)
     if (c == 'q') Kp += 0.1;
     if (c == 'a') Kp -= 0.1;
-    if (c == 'w') Kd += 1.0;
-    if (c == 's') Kd -= 1.0;
+    if (c == 'w') Kd += 0.1;
+    if (c == 's') Kd -= 0.1;
     
     // تعديل السرعات
     if (c == 'e') maximumSpeed += 25;
@@ -54,12 +54,12 @@ void loopPrint() {
       TelnetStream.println("\n-------------------------------------------------");
       
       // [القسم الأول]: طباعة متغيرات التحكم والسرعة والاستراتيجية
-      TelnetStream.printf("⚙️ Control : Kp: %.2f  | Kd: %.1f  | Strategy: %d\n", Kp, Kd, strategy);
-      TelnetStream.printf("🚀 Speeds  : Max: %d   | Base: %d  | Turn: %d\n", maximumSpeed, baseSpeed, turnSpeed);
+      TelnetStream.printf("Kp: %.2f  | Kd: %.1f  | Strategy: %d", Kp, Kd, strategy);
+      TelnetStream.printf("  | Max: %d   | Base: %d  | Turn: %d", maximumSpeed, baseSpeed, turnSpeed);
       
       // [القسم الثاني]: طباعة متغيرات الملاحة والمسافات
-      TelnetStream.printf("🧭 Nav     : Angle: %.1f | Dist: %.2f cm\n", pitchAngle, distanceNow);
-      TelnetStream.printf("🔄 Encoders: Left: %ld   | Right: %ld\n", currentLeftTicks, currentRightTicks);
+      TelnetStream.printf("  | Angle: %.1f | Dist: %.2f cm", pitchAngle, distanceNow);
+      TelnetStream.printf("  | Left: %ld   | Right: %ld", currentLeftTicks, currentRightTicks);
 
       // 💡 (قالب جاهز): إذا أردت يوماً رؤية الحساسات الـ 10 كرقم ثنائي، أزل علامة التعليق عن السطرين التاليين:
       // TelnetStream.print("👀 Sensors : ");
