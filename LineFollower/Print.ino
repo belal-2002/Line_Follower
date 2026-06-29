@@ -25,8 +25,8 @@ void loopPrint() {
     if (c == 'd') maximumSpeed -= 25;
     if (c == 'r') baseSpeed += 25;
     if (c == 'f') baseSpeed -= 25;
-    if (c == 't') { turnSpeed += 25; innerTurnSpeed = (turnSpeed / 5) * 4; }
-    if (c == 'g') { turnSpeed -= 25; innerTurnSpeed = (turnSpeed / 5) * 4; }
+    if (c == 't') { turnSpeed += 25; innerTurnSpeed = turnSpeed * 0.73; }
+    if (c == 'g') { turnSpeed -= 25; innerTurnSpeed = turnSpeed * 0.73; }
     
     // تغيير الاستراتيجية يدوياً (تحويل الحرف المدخل مباشرة إلى رقم الاستراتيجية)
     if (c >= '0' && c <= '7') {
@@ -63,8 +63,8 @@ void loopPrint() {
         TelnetStream.print(sensorValue[i]);  
         TelnetStream.print("\t");               
       }
-      TelnetStream.print("midSensor: ");
-      TelnetStream.println(midSensor);
+      TelnetStream.print("midMidSensor: ");
+      TelnetStream.println(midMidSensor);
 
 
       lastPrintTime = millis(); // تصفير العداد الزمني للطباعة
