@@ -51,6 +51,7 @@ void checkMPUTurnCompletion_3() {
     
     if ((millis() - turnStartTime >= 250) && (midMidSensor)) {
       turnLeft = false;
+      trackTurnLeftState("checkMPUTurnCompletion_3");
     }
   }
 }
@@ -99,7 +100,8 @@ bool activateTurn_6() {
   if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
   (bitRead(sensorBit, 2) == 0) && (rightMidRadar == 0) && (rightRadar == 0)) {
     lineWasFound = false;
-    turnLeft = true; 
+    turnLeft = true;
+    trackTurnLeftState("activateTurn_6");/////////// 
     leftMotor();
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
@@ -154,3 +156,32 @@ bool checkFullLineForward_8() {
   zeroAngleZ = false;
   return false;
 }
+
+
+void trackTurnLeftState(String locationName) {
+  unsigned long currentTime = millis();
+  
+  if (turnLeft != lastTurnLeftState) {
+    turnLeftChangeCount++; 
+    unsigned long duration = currentTime - lastTurnLeftChangeTime; 
+    
+    TelnetStream.print("turnLeft: ");
+    TelnetStream.print(turnLeft ? "ON" : "OFF"); 
+    
+    // الميزة الجديدة: طباعة اسم الدالة التي تسببت في التغيير
+    TelnetStream.print(" | Changed By: ");
+    TelnetStream.print(locationName); 
+    
+    TelnetStream.print(" | Changes Count: ");
+    TelnetStream.print(turnLeftChangeCount);     
+    TelnetStream.print(" | Time elapsed: ");
+    TelnetStream.print(duration);
+    TelnetStream.println(" ms");
+    
+    lastTurnLeftState = turnLeft;
+    lastTurnLeftChangeTime = currentTime;
+  }
+}
+
+
+
