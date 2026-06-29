@@ -26,13 +26,7 @@ void loopStrategy() {
 
 //  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelBlindTurn_1() {
-  if (midMidSensor) { 
-    if (goLeft || goRight){
-      leftRadarOn = false;
-      rightRadarOn = false;
-      leftMidRadarOn = false;
-      rightMidRadarOn = false;
-    }
+  if (bitRead(sensorBit, 3) || bitRead(sensorBit, 4) || bitRead(sensorBit, 5) || bitRead(sensorBit, 6)) { 
     goLeft = false;
     goRight = false;
   }
@@ -46,21 +40,17 @@ bool checkEarlyRecovery_2() {
 }
 
 // فحص اكتمال الدوران المبرمج باستخدام زاوية والوقت
-void checkMPUTurnCompletion_3(float maxAngle, float minAngle, unsigned long timeOut) {
-  // فحص اكتمال دوران اليسار
+void checkMPUTurnCompletion_3() {
   if (turnLeft) {
-    if ((abs(currentAngleZ) >= maxAngle) || 
-        (abs(currentAngleZ) >= minAngle && midMidSensor) ||
-        (millis() - turnStartTime >= timeOut)) {  
+    leftRadarOn = false;
+    rightRadarOn = false;
+    leftMidRadarOn = false;
+    rightMidRadarOn = false;
+    goLeft = false;
+    goRight = false;
+    
+    if ((millis() - turnStartTime >= 250) && (midMidSensor)) {
       turnLeft = false;
-    }
-  }
-  // فحص اكتمال دوران اليمين
-  if (turnRight) {
-    if ((abs(currentAngleZ) >= maxAngle) || 
-        (abs(currentAngleZ) >= minAngle && midMidSensor) ||
-        (millis() - turnStartTime >= timeOut)) {  
-      turnRight = false;
     }
   }
 }
@@ -76,27 +66,28 @@ bool handleLineLoss_5() {
     lineWasFound = false;
     if (leftMidRadarOn && rightMidRadarOn){
       if (leftRadarOn) {
-        goLeft = true; 
+        goLeft = true;
         leftMotor();
         return true;
       }
       if (rightRadarOn) {
         goRight = true;
-        rightMotor();      
+        rightMotor(); 
         return true;
       }
     }
     if (leftMidRadarOn) {
-      goLeft = true; 
+      goLeft = true;
       leftMotor();
       return true;
     }
     if (rightMidRadarOn) {
       goRight = true;
-      rightMotor();      
+      rightMotor();
       return true;
     }
-    stopMotor();
+    //stopMotor();
+    forwardMotor();
     return true;
   }
   return false;
@@ -105,12 +96,20 @@ bool handleLineLoss_5() {
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
 bool activateTurn_6() {
-  if ((leftMidRadar) && (midMidSensor >= 3) && (!rightRadar)) {
+  if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
+  (bitRead(sensorBit, 2) == 0) && (rightMidRadar == 0) && (rightRadar == 0)) {
+    lineWasFound = false;
     turnLeft = true; 
     leftMotor();
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
-    lineWasFound = false;
+
+    leftRadarOn = false;
+    rightRadarOn = false;
+    leftMidRadarOn = false;
+    rightMidRadarOn = false;
+    goLeft = false;
+    goRight = false;
     return true;  
   }
   return false;
@@ -139,7 +138,7 @@ void ignoreIntersections_7() {
     sensorValue[6] = 0;
     sensorValue[7] = 0; 
     sensorValue[8] = 0;
-  }
+  } 
 }
 
 // السير للأمام بالإنكودر فقط عند وجود خط عريض (+)
