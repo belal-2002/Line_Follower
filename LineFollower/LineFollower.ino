@@ -173,6 +173,12 @@ int target_Black = 2570;
 int lineThreshold = 1382;
 
 
+// --- متغيرات تتبع حالة الدوران (مصيدة الديباج) ---
+bool lastTurnLeftState = false;          // أزلنا كلمة static لتصبح عامة
+unsigned long turnLeftChangeCount = 0;   
+unsigned long lastTurnLeftChangeTime = 0;
+
+
 
 void setup() {
   //Serial.begin(115200);
