@@ -48,33 +48,6 @@ void loopPrint() {
   
   // إذا لم نكن في وضع المعايرة (لأن الاستراتيجية 0 تتولى طباعة بياناتها بنفسها)
   if (strategy != 0) {
-
-    static bool lastTurnLeftState = false;           // لتخزين الحالة السابقة للمتغير
-    static unsigned long turnLeftChangeCount = 0;    // عداد لحساب إجمالي عدد مرات التغير
-    static unsigned long lastTurnLeftChangeTime = 0; // لتخزين وقت آخر تغير (لحساب المدة)
-    
-    unsigned long currentTime = millis();
-    
-    // إذا اختلفت الحالة الحالية لمتغير turnLeft عن الحالة السابقة
-    if (turnLeft != lastTurnLeftState) {
-      turnLeftChangeCount++; // زيادة العداد بمقدار 1 مع كل تغير
-      unsigned long duration = currentTime - lastTurnLeftChangeTime; // حساب الوقت المنقضي منذ التغير الأخير
-      
-      // طباعة التحديثات عبر Telnet
-      TelnetStream.print("turnLeft: ");
-      TelnetStream.print(turnLeft ? "ON" : "OFF"); // سيطبع ON إذا كانت القيمة true و OFF إذا كانت false
-      TelnetStream.print(" | Changes Count: ");
-      TelnetStream.print(turnLeftChangeCount);     // طباعة إجمالي عدد التغيرات
-      TelnetStream.print(" | Time elapsed: ");
-      TelnetStream.print(duration);
-      TelnetStream.println(" ms");
-      
-      // تحديث المتغيرات الثابتة للدورة القادمة
-      lastTurnLeftState = turnLeft;
-      lastTurnLeftChangeTime = currentTime;
-    }
-
-
     if (millis() - lastPrintTime > 1500) { // الطباعة كل ثانية ونصف
       
       /*TelnetStream.println("\n-------------------------------------------------");
