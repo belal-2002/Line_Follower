@@ -61,7 +61,8 @@
   int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
   int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
   int turnSpeed = originalTurnSpeed;       // سرعة الانعطاف الفعّالة للعجل الخارجي
-  int innerTurnSpeed = turnSpeed / 5 * 4;  // سرعة الانعطاف التفاضلية للعجل الداخلي
+  int innerTurnSpeed = turnSpeed * 0.73;  // سرعة الانعطاف التفاضلية للعجل الداخلي
+  //int innerTurnSpeed = turnSpeed * 1.73;
 
   int leftMotorSpeed = 0;         // السرعة اللحظية المُرسلة للمحرك الأيسر
   int rightMotorSpeed = 0;        // السرعة اللحظية المُرسلة للمحرك الأيمن
@@ -78,7 +79,7 @@
 // ---------------------------------------------------------
 // 4. متغيرات الحساسات وقراءاتها (Sensors & Arrays)
 // ---------------------------------------------------------
-  const int sensorWeights[10] = {-444, -267, -190, -114, -38, 38, 114, 190, 267, 444}; // أوزان الحساسات هندسياً
+  const int sensorWeights[10] = {0, -267, -190, -114, -38, 38, 114, 190, 267, 0}; // أوزان الحساسات هندسياً
   int sensorValue[10];            // القيم التناظرية للحساسات بعد المعايرة
   int sensorBit = 0;              // تجميع حالة الحساسات (أبيض/أسود) في متغير واحد (Bitmask)
 
@@ -101,7 +102,7 @@
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  float RadarDistanceThreshold = 4.0;         // المسافة المسموح للرادار بتذكر الخط خلالها (سم)
+  float RadarDistanceThreshold = 8.0;         // المسافة المسموح للرادار بتذكر الخط خلالها (سم)
   float leftRadarStartDistance = 0.0;         // المسافة المسجلة لحظة التقاط رادار اليسار
   float rightRadarStartDistance = 0.0;        // المسافة المسجلة لحظة التقاط رادار اليمين
   float leftMidRadarStartDistance = 0.0;      // المسافة المسجلة لحظة التقاط الرادار الأيسر الداخلي
@@ -165,8 +166,8 @@
 // ---------------------------------------------------------
 
 
-int S_White[10] = {189, 183, 182, 214, 198, 198, 178, 179, 225, 395};
-int S_Black[10] = {2652, 2431, 2332, 2988, 2961, 2712, 2268, 1940, 2931, 3707};
+int S_White[10] = {189, 183, 182, 214, 198, 198, 178, 179, 225, 212};
+int S_Black[10] = {2652, 2431, 2332, 2988, 2961, 2712, 2268, 1940, 2931, 3019};
 int target_White = 194;
 int target_Black = 2570;
 int lineThreshold = 1382;
