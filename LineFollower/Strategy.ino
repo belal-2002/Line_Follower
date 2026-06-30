@@ -3,6 +3,7 @@
  // ====================================================================
 
  static bool zeroAngleZ = false; // متغير لحفظ حالة تصفير الزاوية للمسار العريض
+ unsigned long turnCooldownTime = 0; // متغير لحفظ زمن بدء فترة الحصانة
 
  // --------------------------------------------------------------------
  // الموزع الرئيسي للاستراتيجيات
@@ -37,23 +38,6 @@ bool checkEarlyRecovery_2() {
   if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return true; }
   if (goRight && rightMidRadar) { goRight = false; calculateError(); return true; }
   return false;
-}
-
-// فحص اكتمال الدوران المبرمج باستخدام زاوية والوقت
-void checkMPUTurnCompletion_3() {
-  if (turnLeft) {
-    leftRadarOn = false;
-    rightRadarOn = false;
-    leftMidRadarOn = false;
-    rightMidRadarOn = false;
-    goLeft = false;
-    goRight = false;
-    
-    if ((millis() - turnStartTime >= 250) && (midMidSensor)) {
-      turnLeft = false;
-      trackTurnLeftState("checkMPUTurnCompletion_3");
-    }
-  }
 }
 
 // التحقق مما إذا كان الروبوت في حالة دوران حالياً
@@ -94,18 +78,37 @@ bool handleLineLoss_5() {
   return false;
 }
 
+// فحص اكتمال الدوران المبرمج باستخدام زاوية والوقت
+void checkMPUTurnCompletion_3() {
+  if (turnLeft) {
+    leftRadarOn = false;
+    rightRadarOn = false;
+    leftMidRadarOn = false;
+    rightMidRadarOn = false;
+    goLeft = false;
+    goRight = false;
+    
+    if ((millis() - turnStartTime >= 250) && (midMidSensor > 0) { 
+      turnLeft = false;
+      turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
+      trackTurnLeftState("checkMPUTurnCompletion_3"); ///////////
+    }
+  }
+}
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
 bool activateTurn_6() {
+  if (millis() - turnCooldownTime < 250) {
+    return false; 
+  }
   if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
-  (bitRead(sensorBit, 2) == 0) && (rightMidRadar == 0) && (rightRadar == 0)) {
+      (bitRead(sensorBit, 2) == 0) && (rightMidRadar == 0) && (rightRadar == 0)) {
     lineWasFound = false;
     turnLeft = true;
     trackTurnLeftState("activateTurn_6");/////////// 
     leftMotor();
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
-
     leftRadarOn = false;
     rightRadarOn = false;
     leftMidRadarOn = false;
