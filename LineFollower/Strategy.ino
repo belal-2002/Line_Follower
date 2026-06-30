@@ -27,7 +27,7 @@ void loopStrategy() {
 
 //  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelBlindTurn_1() {
-  if (bitRead(sensorBit, 3) || bitRead(sensorBit, 4) || bitRead(sensorBit, 5) || bitRead(sensorBit, 6)) { 
+  if (midMidMidSensor) { 
     goLeft = false;
     goRight = false;
   }
@@ -88,7 +88,7 @@ void checkMPUTurnCompletion_3() {
     goLeft = false;
     goRight = false;
     
-    if ((millis() - turnStartTime >= 250) && (midMidSensor > 0) { 
+    if ((millis() - turnStartTime >= 250) && (midMidMidSensor > 0)) { 
       turnLeft = false;
       turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
       trackTurnLeftState("checkMPUTurnCompletion_3"); ///////////
@@ -103,6 +103,25 @@ bool activateTurn_6() {
   }
   if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
       (bitRead(sensorBit, 2) == 0) && (rightMidRadar == 0) && (rightRadar == 0)) {
+    // =================================================================
+    // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
+    // =================================================================
+    
+    // 1. أخذ نقطة مرجعية للوقت والمسافة كعامل أمان (Failsafe)
+    unsigned long waitStartTime = millis();
+
+    // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
+    while (leftMidRadar == 1) {
+      loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
+      updateDistance();   // تحديث الأودومتري (الإنكودرات) لضمان عدم ضياع نبضات العجلات أثناء الانتظار
+      forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
+
+      if (millis() - waitStartTime > 550) {
+        break; 
+      }
+    }
+    // =================================================================
+    
     lineWasFound = false;
     turnLeft = true;
     trackTurnLeftState("activateTurn_6");/////////// 
