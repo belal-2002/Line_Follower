@@ -109,6 +109,9 @@ void loopSensors() {
   // حساسات عمق المنتصف الـ 6 (تجاهل S1, S2 و S9, S10) للتأكد من التمركز
   midMidSensor = __builtin_popcount((sensorBit >> 2) & 0x3F);
 
+  // مركز المنتصف الكثيف جداً (البتات 3 و 4 و 5 و 6)
+  midMidMidSensor = __builtin_popcount((sensorBit >> 3) & 0x0F);
+
   // إجمالي الحساسات النشطة
   allSensor = __builtin_popcount(sensorBit & 0x3FF);
 
