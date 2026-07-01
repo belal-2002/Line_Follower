@@ -33,6 +33,7 @@ void cancelBlindTurn_1() {
       rightRadarOn = false;
       leftMidRadarOn = false;
       rightMidRadarOn = false;
+      specialMemory = false;
     }
     goLeft = false;
     goRight = false;
@@ -53,27 +54,48 @@ bool isCurrentlyTurning_4() {
 
 // معالجة الفقدان الكلي للخط (تُرجع true إذا تصرفت)
 bool handleLineLoss_5() {
-  if (midSensor == 0) {
+  if (midMidMidSensor == 0) {
     lineWasFound = false;
     if (leftMidRadarOn && rightMidRadarOn){
       if (leftRadarOn) {
         goLeft = true;
         leftMotor();
+
+        leftRadarOn = false;
+        rightRadarOn = false;
+        leftMidRadarOn = false;
+        rightMidRadarOn = false;
+        specialMemory = false;
         return true;
       }
       if (rightRadarOn) {
         goRight = true;
-        rightMotor(); 
+        rightMotor();
+        leftRadarOn = false;
+        rightRadarOn = false;
+        leftMidRadarOn = false;
+        rightMidRadarOn = false;
+        specialMemory = false; 
         return true;
       }
     }
     if (leftMidRadarOn) {
       goLeft = true;
       leftMotor();
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+      specialMemory = false;
       return true;
     }
     if (rightMidRadarOn) {
       goRight = true;
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+      specialMemory = false;
       rightMotor();
       return true;
     }
@@ -91,6 +113,7 @@ void checkMPUTurnCompletion_3() {
     rightRadarOn = false;
     leftMidRadarOn = false;
     rightMidRadarOn = false;
+    specialMemory = false;
     goLeft = false;
     goRight = false;
     
@@ -107,8 +130,7 @@ bool activateTurn_6() {
   if (millis() - turnCooldownTime < 250) {
     return false; 
   }
-  if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
-      (rightMidRadar == 0) && (rightRadar == 0)) {
+  if (specialMemory && (leftRadar == 1)){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -117,7 +139,7 @@ bool activateTurn_6() {
     unsigned long waitStartTime = millis();
 
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
-    while (leftMidRadar == 1) {
+    while ((leftMidRadar == 1) || (leftRadar == 1)) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       updateDistance();   // تحديث الأودومتري (الإنكودرات) لضمان عدم ضياع نبضات العجلات أثناء الانتظار
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
@@ -138,6 +160,7 @@ bool activateTurn_6() {
     rightRadarOn = false;
     leftMidRadarOn = false;
     rightMidRadarOn = false;
+    specialMemory = false;
     goLeft = false;
     goRight = false;
     return true;  
