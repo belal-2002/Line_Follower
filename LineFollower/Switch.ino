@@ -26,6 +26,7 @@ void loopSwitch() {
         rightRadarOn = false;
         leftMidRadarOn = false;
         rightMidRadarOn = false;
+        specialMemory = false;
         goLeft = false;
         goRight = false;
         turnLeft = false;
