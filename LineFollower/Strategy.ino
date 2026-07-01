@@ -28,6 +28,12 @@ void loopStrategy() {
 //  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelBlindTurn_1() {
   if (midMidMidSensor) { 
+    if (goLeft || goRight){
+      leftRadarOn = false;
+      rightRadarOn = false;
+      leftMidRadarOn = false;
+      rightMidRadarOn = false;
+    }
     goLeft = false;
     goRight = false;
   }
@@ -102,7 +108,7 @@ bool activateTurn_6() {
     return false; 
   }
   if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
-      (bitRead(sensorBit, 2) == 0) && (rightMidRadar == 0) && (rightRadar == 0)) {
+      (rightMidRadar == 0) && (rightRadar == 0)) {
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -116,7 +122,7 @@ bool activateTurn_6() {
       updateDistance();   // تحديث الأودومتري (الإنكودرات) لضمان عدم ضياع نبضات العجلات أثناء الانتظار
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
-      if (millis() - waitStartTime > 550) {
+      if (millis() - waitStartTime > 250) {
         break; 
       }
     }
