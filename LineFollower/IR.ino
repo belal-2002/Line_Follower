@@ -124,16 +124,16 @@ void loopSensors() {
   rightRadar    = bitRead(sensorBit, 0); // S10
 
   // =========================================================
-  // 7. خوارزمية الذاكرة المكانية للرادارات (Radar Distance Memory)
+  // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory)
   // =========================================================
   
   // --- رادار أقصى اليسار (S1) ---
   if (leftRadar) {
     leftRadarOn = true;
-    leftRadarStartDistance = totalOdometer; // تحديث نقطة البداية طالما الرادار يرى الخط
+    leftRadarStartTime = millis(); // تحديث نقطة البداية الزمنية طالما الرادار يرى الخط
   } else { 
-    // إذا اختفى الخط، نبقي الرادار مفعلاً كـ (ذاكرة) حتى نقطع المسافة المسموحة (RadarDistanceThreshold)
-    if ((totalOdometer - leftRadarStartDistance) > RadarDistanceThreshold) {
+    // إذا اختفى الخط، نبقي الرادار مفعلاً كـ (ذاكرة) حتى ينقضي الزمن المسموح (RadarTimeThreshold)
+    if ((millis() - leftRadarStartTime) > RadarTimeThreshold) {
         leftRadarOn = false;
     }
   } 
@@ -141,9 +141,9 @@ void loopSensors() {
   // --- رادار أقصى اليمين (S10) ---
   if (rightRadar) {
     rightRadarOn = true;
-    rightRadarStartDistance = totalOdometer; 
+    rightRadarStartTime = millis(); 
   } else { 
-    if ((totalOdometer - rightRadarStartDistance) > RadarDistanceThreshold) {
+    if ((millis() - rightRadarStartTime) > RadarTimeThreshold) {
         rightRadarOn = false;
     }
   }
@@ -151,9 +151,9 @@ void loopSensors() {
   // --- رادار اليسار الداخلي (S2) ---
   if (leftMidRadar) {
     leftMidRadarOn = true;
-    leftMidRadarStartDistance = totalOdometer;
+    leftMidRadarStartTime = millis();
   } else { 
-    if ((totalOdometer - leftMidRadarStartDistance) > RadarDistanceThreshold) {
+    if ((millis() - leftMidRadarStartTime) > RadarTimeThreshold) {
         leftMidRadarOn = false;
     }
   } 
@@ -161,10 +161,24 @@ void loopSensors() {
   // --- رادار اليمين الداخلي (S9) ---
   if (rightMidRadar) {
     rightMidRadarOn = true;
-    rightMidRadarStartDistance = totalOdometer;
+    rightMidRadarStartTime = millis();
   } else { 
-    if ((totalOdometer - rightMidRadarStartDistance) > RadarDistanceThreshold) {
+    if ((millis() - rightMidRadarStartTime) > RadarTimeThreshold) {
         rightMidRadarOn = false;
+    }
+  }
+
+  // =========================================================
+  // 8. خوارزمية الذاكرة للشرط المخصص (Special Condition Memory)
+  // =========================================================
+  
+  if ((leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && 
+      (rightMidRadar == 0) && (rightRadar == 0)) {
+    specialMemory = true;
+    specialMemoryStartTime = millis(); 
+  } else { 
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 100)) {
+        specialMemory = false;
     }
   }
 
