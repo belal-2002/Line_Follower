@@ -20,18 +20,43 @@ void loopSwitch() {
       
       if (isRunning) {
         digitalWrite(STBY, HIGH);
-        resetPitchOffset(); // <--- تمت إضافتها هنا لتتم المعايرة مرة واحدة قبل الانطلاق
+        
+        // 1. تصفير الملاحة والزوايا
+        resetPitchOffset(); // <--- لتتم المعايرة مرة واحدة قبل الانطلاق
         resetAngleZ();
+        totalOdometer = 0.0;
+        lostLineDistance = 0.0;
+
+        // 2. تصفير رادارات الاستكشاف 
         leftRadarOn = false;
         leftRadarOn2 = false;
         rightRadarOn = false;
         leftMidRadarOn = false;
         rightMidRadarOn = false;
         specialMemory = false;
+
+        // 3. تصفير أوامر التوجيه
         goLeft = false;
         goRight = false;
         turnLeft = false;
         turnRight = false;
+
+        // 4. تصفير ذاكرة الـ PID (لضمان بداية ناعمة)
+        currentError = 0;
+        lastError = 0;
+        PD_Value = 0;
+
+        // 5. تصفير أعلام الاستشفاء والبحث (Recovery)
+        lineWasFound = true;
+        Turn180now = false;
+        sweep180Done = false;
+        turnCooldownTime = 0;
+        
+        // 6. تصفير حالة الألوان المعكوسة
+        isInverted = false;
+        inversionCounterBlack = 0;
+        inversionCounterWhite = 0;
+
       } else {
         stopMotor();  
       }
