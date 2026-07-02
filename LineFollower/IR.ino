@@ -184,7 +184,7 @@ void loopSensors() {
 
   // --- رادار أقصى اليسار (S1) ---
   if (leftRadar) {
-    leftRadarOn2 = true;
+    //leftRadarOn2 = true;
     leftRadarStartTime2 = millis();
   } else { 
     if ((millis() - leftRadarStartTime2) > 100) {
@@ -193,3 +193,15 @@ void loopSensors() {
   }
 
 }
+
+void turnOffRadar() {
+  leftRadarOn = false;
+  leftRadarOn2 = false;
+  rightRadarOn = false;
+  leftMidRadarOn = false;
+  rightMidRadarOn = false;
+  specialMemory = false;
+}
+
+
+
