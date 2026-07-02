@@ -99,12 +99,14 @@
   byte rightMidRadar = 0;         // حالة الحساس الجانبي الأيمن الداخلي (S9)
 
   bool leftRadarOn = false;       // راية (Flag) لتفعيل حدث التقاط رادار اليسار
+  bool leftRadarOn2 = false;
   bool rightRadarOn = false;      // راية (Flag) لتفعيل حدث التقاط رادار اليمين
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
   unsigned long RadarTimeThreshold = 750; // الزمن المسموح للرادار بتذكر الخط خلاله (ملي ثانية)
   unsigned long leftRadarStartTime = 0;   // الوقت المسجل لحظة التقاط رادار اليسار
+  unsigned long leftRadarStartTime2 = 0;
   unsigned long rightRadarStartTime = 0;  // الوقت المسجل لحظة التقاط رادار اليمين
   unsigned long leftMidRadarStartTime = 0;// الوقت المسجل لحظة التقاط الرادار الأيسر الداخلي
   unsigned long rightMidRadarStartTime = 0;// الوقت المسجل لحظة التقاط الرادار الأيمن الداخلي
