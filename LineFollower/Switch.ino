@@ -23,6 +23,7 @@ void loopSwitch() {
         resetPitchOffset(); // <--- تمت إضافتها هنا لتتم المعايرة مرة واحدة قبل الانطلاق
         resetAngleZ();
         leftRadarOn = false;
+        leftRadarOn2 = false;
         rightRadarOn = false;
         leftMidRadarOn = false;
         rightMidRadarOn = false;
