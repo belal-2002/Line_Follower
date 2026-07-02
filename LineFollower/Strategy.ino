@@ -30,6 +30,7 @@ void cancelBlindTurn_1() {
   if (midMidMidSensor) { 
     if (goLeft || goRight){
       leftRadarOn = false;
+      leftRadarOn2 = false;
       rightRadarOn = false;
       leftMidRadarOn = false;
       rightMidRadarOn = false;
@@ -62,6 +63,7 @@ bool handleLineLoss_5() {
         leftMotor();
 
         leftRadarOn = false;
+        leftRadarOn2 = false;
         rightRadarOn = false;
         leftMidRadarOn = false;
         rightMidRadarOn = false;
@@ -72,6 +74,7 @@ bool handleLineLoss_5() {
         goRight = true;
         rightMotor();
         leftRadarOn = false;
+        leftRadarOn2 = false;
         rightRadarOn = false;
         leftMidRadarOn = false;
         rightMidRadarOn = false;
@@ -83,6 +86,7 @@ bool handleLineLoss_5() {
       goLeft = true;
       leftMotor();
       leftRadarOn = false;
+      leftRadarOn2 = false;
       rightRadarOn = false;
       leftMidRadarOn = false;
       rightMidRadarOn = false;
@@ -92,6 +96,7 @@ bool handleLineLoss_5() {
     if (rightMidRadarOn) {
       goRight = true;
       leftRadarOn = false;
+      leftRadarOn2 = false;
       rightRadarOn = false;
       leftMidRadarOn = false;
       rightMidRadarOn = false;
@@ -110,6 +115,7 @@ bool handleLineLoss_5() {
 void checkMPUTurnCompletion_3() {
   if (turnLeft) {
     leftRadarOn = false;
+    leftRadarOn2 = false;
     rightRadarOn = false;
     leftMidRadarOn = false;
     rightMidRadarOn = false;
@@ -130,7 +136,9 @@ bool activateTurn_6() {
   if (millis() - turnCooldownTime < 250) {
     return false; 
   }
-  if (specialMemory && (leftRadar == 1)){
+  if ((specialMemory && (leftRadar == 1)) ||
+      ( leftRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && (bitRead(sensorBit, 6) == 1) &&
+      (rightRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 2) == 0) && (bitRead(sensorBit, 3) == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -157,6 +165,7 @@ bool activateTurn_6() {
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
     leftRadarOn = false;
+    leftRadarOn2 = false;
     rightRadarOn = false;
     leftMidRadarOn = false;
     rightMidRadarOn = false;
