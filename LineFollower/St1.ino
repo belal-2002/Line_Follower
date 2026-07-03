@@ -1,12 +1,14 @@
 void loopStrategy1() { // للأمام ثم لليسار
 
-  cancelBlindTurn_1();
+  cancelTurn_1();
 
-  if (isCurrentlyTurning_4()) return;
+  if (isTurning_2()) return;
 
-  if (handleLineLoss_5()) return;
+  if (activateGo_3()) return;
 
-  ignoreIntersections_7();
+  if (noLine_401()) return;
+
+  cleanIR_6();
 
   calculateError();
 }
