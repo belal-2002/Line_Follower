@@ -37,11 +37,12 @@ void cancelTurn_1() {
       goLeft = false;
       goRight = false;
       
-      if ((millis() - turnStartTime >= 250) && ((turnLeft) || (turnRight)) { 
-      turnLeft = false;
-      turnRight = false;
-      turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
-      resetRadarMemory();
+      if ((millis() - turnStartTime >= 250) && ((turnLeft) || (turnRight))) { 
+        turnLeft = false;
+        turnRight = false;
+        turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
+        resetRadarMemory();
+      }
     }
   }
 }
@@ -75,7 +76,6 @@ bool noLine_401() {
   return false;
 }
 
-// 3. الدالة الخاصة بك كما طلبتها بالضبط
 bool noLine_402() {
   static unsigned long lostTimeStart = 0;
   static bool isSearching = false;
@@ -138,10 +138,6 @@ bool noLine_402() {
   }
 }
 
-
-
-
-
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
 bool activateTurn_5() {
   if (millis() - turnCooldownTime < 250) {
@@ -183,7 +179,6 @@ bool activateTurn_5() {
   }
   return false;
 }
-
 
 // تنظيف البتات لتجاهل التقاطعات (تم تصحيح البتات 10 و 11 الكارثية!)
 void cleanIR_6() {
