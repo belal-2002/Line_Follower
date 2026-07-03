@@ -194,14 +194,6 @@ void loopSensors() {
 
 }
 
-void turnOffRadar() {
-  leftRadarOn = false;
-  leftRadarOn2 = false;
-  rightRadarOn = false;
-  leftMidRadarOn = false;
-  rightMidRadarOn = false;
-  specialMemory = false;
-}
 
 
 
