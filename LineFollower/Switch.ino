@@ -28,12 +28,7 @@ void loopSwitch() {
         lostLineDistance = 0.0;
 
         // 2. تصفير رادارات الاستكشاف 
-        leftRadarOn = false;
-        leftRadarOn2 = false;
-        rightRadarOn = false;
-        leftMidRadarOn = false;
-        rightMidRadarOn = false;
-        specialMemory = false;
+        resetRadarMemory();
 
         // 3. تصفير أوامر التوجيه
         goLeft = false;
