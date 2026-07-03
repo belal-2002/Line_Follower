@@ -28,24 +28,22 @@ void loopStrategy() {
 //  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelBlindTurn_1() {
   if (midMidMidSensor) { 
-    if (goLeft || goRight){
-      leftRadarOn = false;
-      leftRadarOn2 = false;
-      rightRadarOn = false;
-      leftMidRadarOn = false;
-      rightMidRadarOn = false;
-      specialMemory = false;
-    }
-    goLeft = false;
-    goRight = false;
-  }
-}
+    if (turnLeft || turnRight || goLeft || goRight){
+      resetRadarMemory();
+      currentError = 0;
+      lastError = 0;
+      PD_Value = 0;
 
-// الاستشفاء المبكر (تُرجع true إذا تم إنهاء الدوران)
-bool checkEarlyRecovery_2() {
-  if (goLeft && leftMidRadar) { goLeft = false; calculateError(); return true; }
-  if (goRight && rightMidRadar) { goRight = false; calculateError(); return true; }
-  return false;
+      goLeft = false;
+      goRight = false;
+      
+      if ((millis() - turnStartTime >= 250) && ((turnLeft) || (turnRight)) { 
+      turnLeft = false;
+      turnRight = false;
+      turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
+      resetRadarMemory();
+    }
+  }
 }
 
 // التحقق مما إذا كان الروبوت في حالة دوران حالياً
@@ -61,47 +59,26 @@ bool handleLineLoss_5() {
       if (leftRadarOn) {
         goLeft = true;
         leftMotor();
-
-        leftRadarOn = false;
-        leftRadarOn2 = false;
-        rightRadarOn = false;
-        leftMidRadarOn = false;
-        rightMidRadarOn = false;
-        specialMemory = false;
+        resetRadarMemory();
         return true;
       }
       if (rightRadarOn) {
         goRight = true;
         rightMotor();
-        leftRadarOn = false;
-        leftRadarOn2 = false;
-        rightRadarOn = false;
-        leftMidRadarOn = false;
-        rightMidRadarOn = false;
-        specialMemory = false; 
+        resetRadarMemory();
         return true;
       }
     }
     if (leftMidRadarOn) {
       goLeft = true;
       leftMotor();
-      leftRadarOn = false;
-      leftRadarOn2 = false;
-      rightRadarOn = false;
-      leftMidRadarOn = false;
-      rightMidRadarOn = false;
-      specialMemory = false;
+      resetRadarMemory();
       return true;
     }
     if (rightMidRadarOn) {
       goRight = true;
-      leftRadarOn = false;
-      leftRadarOn2 = false;
-      rightRadarOn = false;
-      leftMidRadarOn = false;
-      rightMidRadarOn = false;
-      specialMemory = false;
       rightMotor();
+      resetRadarMemory();
       return true;
     }
     //stopMotor();
@@ -109,26 +86,6 @@ bool handleLineLoss_5() {
     return true;
   }
   return false;
-}
-
-// فحص اكتمال الدوران المبرمج باستخدام زاوية والوقت
-void checkMPUTurnCompletion_3() {
-  if (turnLeft) {
-    leftRadarOn = false;
-    leftRadarOn2 = false;
-    rightRadarOn = false;
-    leftMidRadarOn = false;
-    rightMidRadarOn = false;
-    specialMemory = false;
-    goLeft = false;
-    goRight = false;
-    
-    if ((millis() - turnStartTime >= 250) && (midMidMidSensor > 0)) { 
-      turnLeft = false;
-      turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
-      trackTurnLeftState("checkMPUTurnCompletion_3"); ///////////
-    }
-  }
 }
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
@@ -164,12 +121,8 @@ bool activateTurn_6() {
     leftMotor();
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
-    leftRadarOn = false;
-    leftRadarOn2 = false;
-    rightRadarOn = false;
-    leftMidRadarOn = false;
-    rightMidRadarOn = false;
-    specialMemory = false;
+    resetRadarMemory();
+    turnRight = false;
     goLeft = false;
     goRight = false;
     return true;  
@@ -242,6 +195,19 @@ void trackTurnLeftState(String locationName) {
     lastTurnLeftChangeTime = currentTime;
   }
 }
+
+void resetRadarMemory() {
+  leftRadarOn = false;
+  leftRadarOn2 = false;
+  rightRadarOn = false;
+  leftMidRadarOn = false;
+  rightMidRadarOn = false;
+  specialMemory = false;
+}
+
+
+
+
 
 
 
