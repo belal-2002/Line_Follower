@@ -1,8 +1,6 @@
-void loopStrategy4() {  //يسار
+void loopStrategy4() { // لليسار
 
   cancelBlindTurn_1();
-  
-  checkMPUTurnCompletion_3();
 
   if (isCurrentlyTurning_4()) return;
 
