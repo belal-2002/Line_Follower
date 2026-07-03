@@ -26,7 +26,7 @@ void loopStrategy() {
 // ====================================================================
 
 //  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
-void cancelBlindTurn_1() {
+void cancelTurn_1() {
   if (midMidMidSensor) { 
     if (turnLeft || turnRight || goLeft || goRight){
       resetRadarMemory();
@@ -47,49 +47,103 @@ void cancelBlindTurn_1() {
 }
 
 // التحقق مما إذا كان الروبوت في حالة دوران حالياً
-bool isCurrentlyTurning_4() {
+bool isTurning_2() {
   return (turnLeft || turnRight || goLeft || goRight);
 }
 
-// معالجة الفقدان الكلي للخط (تُرجع true إذا تصرفت)
-bool handleLineLoss_5() {
+bool activateGo_3() {
   if (midMidMidSensor == 0) {
     lineWasFound = false;
+   
     if (leftMidRadarOn && rightMidRadarOn){
-      if (leftRadarOn) {
-        goLeft = true;
-        leftMotor();
-        resetRadarMemory();
-        return true;
-      }
-      if (rightRadarOn) {
-        goRight = true;
-        rightMotor();
-        resetRadarMemory();
-        return true;
-      }
+      if (leftRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+      if (rightRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
     }
-    if (leftMidRadarOn) {
-      goLeft = true;
-      leftMotor();
-      resetRadarMemory();
-      return true;
-    }
-    if (rightMidRadarOn) {
-      goRight = true;
-      rightMotor();
-      resetRadarMemory();
-      return true;
-    }
-    //stopMotor();
+    if (leftMidRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+    if (rightMidRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+
+    return false; 
+  }
+  return false;
+}
+
+bool noLine_401() {
+  if (midMidMidSensor == 0) {
     forwardMotor();
     return true;
   }
   return false;
 }
 
+// 3. الدالة الخاصة بك كما طلبتها بالضبط
+bool noLine_402() {
+  static unsigned long lostTimeStart = 0;
+  static bool isSearching = false;
+  static unsigned long lineFoundTime = 0;
+  static bool verifyingLine = false;
+
+  // أ. في حال التقط الروبوت الخط 
+  if (midMidMidSensor > 0) { 
+    // إذا كنا في حالة (بحث بالتقدم للأمام)
+    if (isSearching) {
+      if (!verifyingLine) {
+        // بدأنا نرى الخط، نشغل مانع التشويش (10ms)
+        verifyingLine = true;
+        lineFoundTime = millis();
+        forwardMotor(); // نستمر بالتقدم للحفاظ على الزخم
+        return true;
+      } 
+      else {
+        // التحقق من مرور 10 ملي ثانية والخط لا يزال موجوداً
+        if (millis() - lineFoundTime >= 10) { 
+          // تم تأكيد الخط! ننهي البحث ونسلم القيادة
+          isSearching = false;
+          verifyingLine = false;
+          return false; // نرجع false لتنطلق دالة calculateError (PID)
+        }
+        forwardMotor(); // لم تمر الـ 10ms، نستمر بالتقدم
+        return true; 
+      }
+    }
+    return false; // الروبوت يرى الخط بشكل طبيعي ولا يبحث
+  }
+
+  // ب. وصلنا هنا يعني أن (midMidMidSensor == 0) والخط مفقود بالكامل
+  verifyingLine = false; // تصفير المانع فوراً إذا قطع الخط أثناء الـ 10ms
+
+  if (!isSearching) {
+    // اللحظة الأولى لفقدان الخط (بعد أن فشلت رادارات handleLineLoss)
+    isSearching = true;
+    lostTimeStart = millis();
+    forwardMotor();
+    return true;
+  }
+
+  // ج. مرحلة البحث 
+  if (millis() - lostTimeStart < 750) {
+    // لم تنتهِ الـ 750 ملي ثانية -> استمر بالتقدم للأمام
+    forwardMotor();
+    return true;
+  } 
+  else {
+    // انتهى الوقت ولم نجد الخط -> تفعيل الدوران لليمين
+    goRight = true;
+    rightMotor();
+    
+    // (مهم جداً): ننهي حالة البحث isSearching = false هنا. 
+    // لماذا؟ لأن الروبوت الآن "يدور"، والمسؤول عن إيقاف الدوران 
+    // سيكون cancelBlindTurn_1، ولا نريد مانع تشويش أثناء الدوران.
+    isSearching = false; 
+    return true;
+  }
+}
+
+
+
+
+
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
-bool activateTurn_6() {
+bool activateTurn_5() {
   if (millis() - turnCooldownTime < 250) {
     return false; 
   }
@@ -132,7 +186,7 @@ bool activateTurn_6() {
 
 
 // تنظيف البتات لتجاهل التقاطعات (تم تصحيح البتات 10 و 11 الكارثية!)
-void ignoreIntersections_7() {
+void cleanIR_6() {
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
   if (leftMidRadar && rightMidRadar && midMidSensor) {
   sensorValue[1] = 0; 
@@ -205,9 +259,6 @@ void resetRadarMemory() {
   specialMemory = false;
 }
 
-void noLine() {
-
-}
 
 
 
