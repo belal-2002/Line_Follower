@@ -205,9 +205,9 @@ void resetRadarMemory() {
   specialMemory = false;
 }
 
+void noLine() {
 
-
-
+}
 
 
 
