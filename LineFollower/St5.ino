@@ -1,5 +1,7 @@
-void loopStrategy5() { //Left
-
+void loopStrategy5() { 
+calculateError();
+}
+/*
   //if(midSensor){ lostLineDistance = totalOdometer; }
   if(allSensor){ lostLineDistance = totalOdometer; }
 
@@ -114,7 +116,7 @@ void loopStrategy5() { //Left
 
 
 
-/*
+
   bool zeroAngleZ = false;
   if(midSensor){
     lostLineDistance = distanceNow;
