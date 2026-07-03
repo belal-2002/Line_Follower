@@ -2,9 +2,9 @@ void loopStrategy2() { // Left Strategy
 
   cancelBlindTurn_1();
   
-  if (checkEarlyRecovery_2()) return;
+  //if (checkEarlyRecovery_2()) return;
   
-  checkMPUTurnCompletion_3(); 
+  //checkMPUTurnCompletion_3();
   
   if (isCurrentlyTurning_4()) return;
   
