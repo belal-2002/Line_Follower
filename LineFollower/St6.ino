@@ -1,3 +1,3 @@
-void loopStrategy6() { //Right 
+void loopStrategy6() {
   calculateError();
 }
