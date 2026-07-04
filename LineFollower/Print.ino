@@ -116,8 +116,10 @@ void loopPrint() {
 // =================================================================
 void checkStateChanges() {
   // 1. تعريف الذاكرة (استخدام static يجعل المتغيرات تحتفظ بقيمتها بين كل دورة)
-  static byte prevLeftRadar = 0;
-  static byte prevRightRadar = 0;
+  static bool prevleftRadarOn = 0;
+  static bool prevrightRadarOn = 0;
+  static bool prevleftMidRadarOn = 0;
+  static bool prevrightMidRadarOn = 0;
   static bool prevGoLeft = false;
   static bool prevGoRight = false;
   
@@ -125,18 +127,32 @@ void checkStateChanges() {
   static unsigned long lastStateChangePrintTime = millis(); 
 
   // 2. التحقق مما إذا كان أي من المتغيرات الأربعة قد تغيرت قيمته
-  if (leftRadarOn != prevLeftRadar || rightRadarOn != prevRightRadar ||
-      goLeft != prevGoLeft || goRight != prevGoRight) {
+  if (leftRadarOn != prevleftRadarOn ||
+      rightRadarOn != prevrightRadarOn ||
+      leftMidRadarOn != prevleftMidRadarOn ||
+      rightMidRadarOn != prevrightMidRadarOn ||
+      goLeft != prevGoLeft ||
+      goRight != prevGoRight) {
 
       // 4. فحص أي المتغيرات تغير بالضبط وطباعته
-      if (leftRadarOn != prevLeftRadar) {
+      if (leftRadarOn != prevleftRadarOn) {
         TelnetStream.print(" - leftRadarOn: "); 
         TelnetStream.print(leftRadarOn);
       }
-      if (rightRadarOn != prevRightRadar) {
+      if (rightRadarOn != prevrightRadarOn) {
         TelnetStream.print(" - rightRadarOn: "); 
         TelnetStream.print(rightRadarOn);
       }
+      //////////////////////////////////
+      if (leftMidRadarOn != prevleftMidRadarOn) {
+        TelnetStream.print(" - leftMidRadarOn: "); 
+        TelnetStream.print(leftMidRadarOn);
+      }
+      if (rightMidRadarOn != prevrightMidRadarOn) {
+        TelnetStream.print(" - rightMidRadarOn: "); 
+        TelnetStream.print(rightMidRadarOn);
+      }
+      ////////////////////////////////
       if (goLeft != prevGoLeft) {
         TelnetStream.print(" - goLeft: "); 
         TelnetStream.print(goLeft ? "True (1)" : "False (0)");
@@ -157,8 +173,10 @@ void checkStateChanges() {
       TelnetStream.println(timeDiff);
 
       // 6. تحديث الذاكرة بالقيم الجديدة لانتظار التغيير القادم
-      prevLeftRadar = leftRadarOn;
-      prevRightRadar = rightRadarOn;
+      prevleftRadarOn = leftRadarOn;
+      prevrightRadarOn = rightRadarOn;
+      prevleftMidRadarOn = leftMidRadarOn;
+      prevrightMidRadarOn = rightMidRadarOn;
       prevGoLeft = goLeft;
       prevGoRight = goRight;
       
