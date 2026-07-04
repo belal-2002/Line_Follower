@@ -197,6 +197,7 @@ void loop() {
   //updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
+    
     loopStrategy();
     } //else {  
     if (serviceStarted) {
