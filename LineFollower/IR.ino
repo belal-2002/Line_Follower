@@ -208,14 +208,14 @@ void loopSensors() {
     specialMemory = true;
     specialMemoryStartTime = millis(); 
   } else { 
-    if (specialMemory && ((millis() - specialMemoryStartTime) > 50)) {
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 100)) {
         specialMemory = false;
     }
   }
 
   // --- رادار أقصى اليسار (S1) ---
   if (leftRadar) {
-    //leftRadarOn2 = true;
+    leftRadarOn2 = true;
     leftRadarStartTime2 = millis();
   } else { 
     if (((millis() - leftRadarStartTime2) > 100) && leftRadarOn2) {
