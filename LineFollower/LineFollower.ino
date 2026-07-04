@@ -104,7 +104,9 @@
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  unsigned long RadarTimeThreshold = 450; // الزمن المسموح للرادار بتذكر الخط خلاله (ملي ثانية)
+  unsigned long RadarTimeThreshold = 200; // الزمن المسموح للرادار بتذكر الخط خلاله (ملي ثانية)
+  //650
+  //200
   unsigned long leftRadarStartTime = 0;   // الوقت المسجل لحظة التقاط رادار اليسار
   unsigned long leftRadarStartTime2 = 0;
   unsigned long rightRadarStartTime = 0;  // الوقت المسجل لحظة التقاط رادار اليمين
