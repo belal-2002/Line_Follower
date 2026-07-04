@@ -94,8 +94,8 @@ bool gap_4() {
         return true;
       } 
       else {
-        // التحقق من مرور 10 ملي ثانية والخط لا يزال موجوداً
-        if (millis() - lineFoundTime >= 10) { 
+        // التحقق من مرور 27 ملي ثانية والخط لا يزال موجوداً
+        if (millis() - lineFoundTime >= 27) { 
           // تم تأكيد الخط! ننهي البحث ونسلم القيادة
           isSearching = false;
           verifyingLine = false;
@@ -225,6 +225,7 @@ void resetRadarMemory() {
   leftMidRadarOn = false;
   rightMidRadarOn = false;
   specialMemory = false;
+  checkStateChanges();
 }
 
 
