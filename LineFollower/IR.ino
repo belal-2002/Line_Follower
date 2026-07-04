@@ -133,7 +133,7 @@ void loopSensors() {
     leftRadarStartTime = millis(); // تحديث نقطة البداية الزمنية طالما الرادار يرى الخط
   } else { 
     // إذا اختفى الخط، نبقي الرادار مفعلاً كـ (ذاكرة) حتى ينقضي الزمن المسموح (RadarTimeThreshold)
-    if ((millis() - leftRadarStartTime) > RadarTimeThreshold) {
+    if (((millis() - leftRadarStartTime) > RadarTimeThreshold) && leftRadarOn) {
         leftRadarOn = false;
     }
   } 
@@ -143,7 +143,7 @@ void loopSensors() {
     rightRadarOn = true;
     rightRadarStartTime = millis(); 
   } else { 
-    if ((millis() - rightRadarStartTime) > RadarTimeThreshold) {
+    if (((millis() - rightRadarStartTime) > RadarTimeThreshold) && rightRadarOn) {
         rightRadarOn = false;
     }
   }
@@ -153,7 +153,7 @@ void loopSensors() {
     leftMidRadarOn = true;
     leftMidRadarStartTime = millis();
   } else { 
-    if ((millis() - leftMidRadarStartTime) > RadarTimeThreshold) {
+    if (((millis() - leftMidRadarStartTime) > RadarTimeThreshold) && leftMidRadarOn) {
         leftMidRadarOn = false;
     }
   } 
@@ -163,7 +163,7 @@ void loopSensors() {
     rightMidRadarOn = true;
     rightMidRadarStartTime = millis();
   } else { 
-    if ((millis() - rightMidRadarStartTime) > RadarTimeThreshold) {
+    if (((millis() - rightMidRadarStartTime) > RadarTimeThreshold) && rightMidRadarOn) {
         rightMidRadarOn = false;
     }
   }
@@ -187,7 +187,7 @@ void loopSensors() {
     //leftRadarOn2 = true;
     leftRadarStartTime2 = millis();
   } else { 
-    if ((millis() - leftRadarStartTime2) > 100) {
+    if (((millis() - leftRadarStartTime2) > 100) && leftRadarOn2) {
         leftRadarOn2 = false;
     }
   }
