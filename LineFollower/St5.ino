@@ -1,3 +1,3 @@
 void loopStrategy5() { 
-calculateError();
+  calculateError();
 }
