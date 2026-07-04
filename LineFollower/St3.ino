@@ -6,7 +6,7 @@ void loopStrategy3() { // لليسار
 
   if (activateGo_3()) return;
 
-  if (noLine_401()) return;
+  if (noLine_4()) return;
 
   if (activateTurn_5()) return; 
 
