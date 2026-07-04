@@ -28,19 +28,23 @@ void loopStrategy() {
 //  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelTurn_1() {
   if (midMidMidSensor) { 
-    if (turnLeft || turnRight || goLeft || goRight){
-      resetRadarMemory();
+    if (goLeft || goRight) {
+      goLeft = false;
+      goRight = false;
       currentError = 0;
       lastError = 0;
       PD_Value = 0;
+      resetRadarMemory();
+    }
 
-      goLeft = false;
-      goRight = false;
-      
-      if ((millis() - turnStartTime >= 250) && ((turnLeft) || (turnRight))) { 
+    if (turnLeft || turnRight) {
+      if (millis() - turnStartTime >= 250) { 
         turnLeft = false;
         turnRight = false;
-        turnCooldownTime = millis(); // <-- إضافة: بدء فترة الحصانة فور الخروج
+        turnCooldownTime = millis();
+        currentError = 0;
+        lastError = 0;
+        PD_Value = 0;
         resetRadarMemory();
       }
     }
