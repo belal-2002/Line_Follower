@@ -65,10 +65,6 @@ void loopPrint() {
       TelnetStream.print("midMidSensor: ");
       TelnetStream.print(midMidSensor);
 
-      TelnetStream.print(" | turnLeft: ");
-      TelnetStream.print(turnLeft ? "ON" : "OFF"); // سيطبع ON إذا كانت القيمة true و OFF إذا كانت false
-      TelnetStream.print(" | Changes Count: ");
-      TelnetStream.println(turnLeftChangeCount);     // طباعة إجمالي عدد التغيرات
 
 
       lastPrintTime = millis(); // تصفير العداد الزمني للطباعة
