@@ -1,4 +1,4 @@
-void loopStrategy2() { // Left Strategy
-calculateError();
+void loopStrategy2() {
+  calculateError();
 }
   
