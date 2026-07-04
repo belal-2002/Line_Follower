@@ -104,7 +104,7 @@
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  unsigned long RadarTimeThreshold = 750; // الزمن المسموح للرادار بتذكر الخط خلاله (ملي ثانية)
+  unsigned long RadarTimeThreshold = 450; // الزمن المسموح للرادار بتذكر الخط خلاله (ملي ثانية)
   unsigned long leftRadarStartTime = 0;   // الوقت المسجل لحظة التقاط رادار اليسار
   unsigned long leftRadarStartTime2 = 0;
   unsigned long rightRadarStartTime = 0;  // الوقت المسجل لحظة التقاط رادار اليمين
@@ -177,12 +177,6 @@ int S_Black[10] = {2652, 2431, 2332, 2988, 2961, 2712, 2268, 1940, 2931, 3019};
 int target_White = 194;
 int target_Black = 2570;
 int lineThreshold = 1382;
-
-
-// --- متغيرات تتبع حالة الدوران (مصيدة الديباج) ---
-bool lastTurnLeftState = false;          // أزلنا كلمة static لتصبح عامة
-unsigned long turnLeftChangeCount = 0;   
-unsigned long lastTurnLeftChangeTime = 0;
 
 
 
