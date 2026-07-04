@@ -124,17 +124,27 @@ void loopSensors() {
   rightRadar    = bitRead(sensorBit, 0); // S10
 
   // =========================================================
-  // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory)
+  // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory) - مطورة
   // =========================================================
   
   // --- رادار أقصى اليسار (S1) ---
   if (leftRadar) {
     leftRadarOn = true;
-    leftRadarStartTime = millis(); // تحديث نقطة البداية الزمنية طالما الرادار يرى الخط
-  } else { 
-    // إذا اختفى الخط، نبقي الرادار مفعلاً كـ (ذاكرة) حتى ينقضي الزمن المسموح (RadarTimeThreshold)
-    if (((millis() - leftRadarStartTime) > RadarTimeThreshold) && leftRadarOn) {
-        leftRadarOn = false;
+    leftRadarStartTime = millis(); // تحديث نقطة البداية طالما الرادار يرى الخط
+  } else if (leftRadarOn) { 
+    // إذا لم يعد يرى الخط، نحسب الوقت المنقضي
+    unsigned long elapsedTime = millis() - leftRadarStartTime;
+    
+    if (elapsedTime >= radarMaxTime) {
+      // إذا وصلنا للحد الأقصى المطلق (650)، نطفئه فوراً
+      leftRadarOn = false;
+    } 
+    else if (elapsedTime >= radarMinTime) {
+      // إذا تجاوزنا الحد الأدنى (200)، نتحقق من الرادار المعاكس (أقصى اليمين)
+      if (rightRadarOn == true) {
+        leftRadarOn = false; // الرادار الآخر يعمل، إذن نطفئ هذا الرادار
+      }
+      // إذا كان الرادار الآخر لا يعمل، سيبقى هذا الرادار يعمل حتى يصل لـ 650
     }
   } 
   
@@ -142,9 +152,16 @@ void loopSensors() {
   if (rightRadar) {
     rightRadarOn = true;
     rightRadarStartTime = millis(); 
-  } else { 
-    if (((millis() - rightRadarStartTime) > RadarTimeThreshold) && rightRadarOn) {
+  } else if (rightRadarOn) {
+    unsigned long elapsedTime = millis() - rightRadarStartTime;
+    
+    if (elapsedTime >= radarMaxTime) {
+      rightRadarOn = false;
+    } 
+    else if (elapsedTime >= radarMinTime) {
+      if (leftRadarOn == true) {
         rightRadarOn = false;
+      }
     }
   }
 
@@ -152,9 +169,16 @@ void loopSensors() {
   if (leftMidRadar) {
     leftMidRadarOn = true;
     leftMidRadarStartTime = millis();
-  } else { 
-    if (((millis() - leftMidRadarStartTime) > RadarTimeThreshold) && leftMidRadarOn) {
+  } else if (leftMidRadarOn) {
+    unsigned long elapsedTime = millis() - leftMidRadarStartTime;
+    
+    if (elapsedTime >= radarMaxTime) {
+      leftMidRadarOn = false;
+    } 
+    else if (elapsedTime >= radarMinTime) {
+      if (rightMidRadarOn == true) {
         leftMidRadarOn = false;
+      }
     }
   } 
   
@@ -162,9 +186,16 @@ void loopSensors() {
   if (rightMidRadar) {
     rightMidRadarOn = true;
     rightMidRadarStartTime = millis();
-  } else { 
-    if (((millis() - rightMidRadarStartTime) > RadarTimeThreshold) && rightMidRadarOn) {
+  } else if (rightMidRadarOn) {
+    unsigned long elapsedTime = millis() - rightMidRadarStartTime;
+    
+    if (elapsedTime >= radarMaxTime) {
+      rightMidRadarOn = false;
+    } 
+    else if (elapsedTime >= radarMinTime) {
+      if (leftMidRadarOn == true) {
         rightMidRadarOn = false;
+      }
     }
   }
 
