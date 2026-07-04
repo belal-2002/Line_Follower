@@ -48,7 +48,7 @@ void loopPrint() {
   
   // إذا لم نكن في وضع المعايرة (لأن الاستراتيجية 0 تتولى طباعة بياناتها بنفسها)
   if (strategy != 0) {
-    if (millis() - lastPrintTime > 1500) { // الطباعة كل ثانية ونصف
+    if (millis() - lastPrintTime > 100) { // الطباعة كل ثانية ونصف
       
       /*TelnetStream.println("\n-------------------------------------------------");
       TelnetStream.println();
