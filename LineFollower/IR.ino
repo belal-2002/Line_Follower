@@ -191,6 +191,7 @@ void loopSensors() {
         leftRadarOn2 = false;
     }
   }
+  checkStateChanges();
 
 }
 
