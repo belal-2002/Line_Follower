@@ -97,7 +97,7 @@
   bool rightRadar = 0;            // حالة الحساس الجانبي الأيمن المتطرف (S10)
   bool leftMidRadar = 0;          // حالة الحساس الجانبي الأيسر الداخلي (S2)
   bool rightMidRadar = 0;         // حالة الحساس الجانبي الأيمن الداخلي (S9)
-
+  
   bool leftRadarOn = false;       // راية (Flag) لتفعيل حدث التقاط رادار اليسار
   bool leftRadarOn2 = false;
   bool rightRadarOn = false;      // راية (Flag) لتفعيل حدث التقاط رادار اليمين
