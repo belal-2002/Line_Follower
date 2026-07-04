@@ -68,7 +68,7 @@ bool activateGo_3() {
   return false;
 }
 
-bool noLine_401() {
+bool noLine_4() {
   if (midMidMidSensor == 0) {
     forwardMotor();
     return true;
@@ -76,7 +76,7 @@ bool noLine_401() {
   return false;
 }
 
-bool noLine_402() {
+bool gap_4() {
   static unsigned long lostTimeStart = 0;
   static bool isSearching = false;
   static unsigned long lineFoundTime = 0;
@@ -167,7 +167,6 @@ bool activateTurn_5() {
     
     lineWasFound = false;
     turnLeft = true;
-    trackTurnLeftState("activateTurn_6");/////////// 
     leftMotor();
     resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
@@ -217,32 +216,6 @@ bool checkFullLineForward_8() {
   }
   zeroAngleZ = false;
   return false;
-}
-
-
-void trackTurnLeftState(String locationName) {
-  unsigned long currentTime = millis();
-  
-  if (turnLeft != lastTurnLeftState) {
-    turnLeftChangeCount++; 
-    unsigned long duration = currentTime - lastTurnLeftChangeTime; 
-    
-    TelnetStream.print("turnLeft: ");
-    TelnetStream.print(turnLeft ? "ON" : "OFF"); 
-    
-    // الميزة الجديدة: طباعة اسم الدالة التي تسببت في التغيير
-    TelnetStream.print(" | Changed By: ");
-    TelnetStream.print(locationName); 
-    
-    TelnetStream.print(" | Changes Count: ");
-    TelnetStream.print(turnLeftChangeCount);     
-    TelnetStream.print(" | Time elapsed: ");
-    TelnetStream.print(duration);
-    TelnetStream.println(" ms");
-    
-    lastTurnLeftState = turnLeft;
-    lastTurnLeftChangeTime = currentTime;
-  }
 }
 
 void resetRadarMemory() {
