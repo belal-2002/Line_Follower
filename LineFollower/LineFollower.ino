@@ -104,9 +104,10 @@
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  unsigned long RadarTimeThreshold = 200; // الزمن المسموح للرادار بتذكر الخط خلاله (ملي ثانية)
-  //650
+  unsigned long radarMinTime = 200; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
+  unsigned long radarMaxTime = 650; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
+  //650
   unsigned long leftRadarStartTime = 0;   // الوقت المسجل لحظة التقاط رادار اليسار
   unsigned long leftRadarStartTime2 = 0;
   unsigned long rightRadarStartTime = 0;  // الوقت المسجل لحظة التقاط رادار اليمين
