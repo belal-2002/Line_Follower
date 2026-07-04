@@ -6,7 +6,7 @@ void loopStrategy1() { // للأمام ثم لليسار
 
   if (activateGo_3()) return;
 
-  if (noLine_401()) return;
+  if (noLine_4()) return;
 
   cleanIR_6();
 
