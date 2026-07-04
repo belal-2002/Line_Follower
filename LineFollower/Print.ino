@@ -48,7 +48,7 @@ void loopPrint() {
   
   // إذا لم نكن في وضع المعايرة (لأن الاستراتيجية 0 تتولى طباعة بياناتها بنفسها)
   if (strategy != 0) {
-    if (millis() - lastPrintTime > 100) { // الطباعة كل ثانية ونصف
+    if (millis() - lastPrintTime > 1500) { // الطباعة كل ثانية ونصف
       
       /*TelnetStream.println("\n-------------------------------------------------");
       TelnetStream.println();
@@ -114,7 +114,7 @@ void loopPrint() {
 // =================================================================
 // دالة مخصصة لمراقبة وتتبع تغيرات متغيرات الرادار والتوجيه
 // =================================================================
-void checkStateChanges() {
+void checkStateChanges() {/*
   // 1. تعريف الذاكرة (استخدام static يجعل المتغيرات تحتفظ بقيمتها بين كل دورة)
   static bool prevleftRadarOn = 0;
   static bool prevrightRadarOn = 0;
@@ -182,7 +182,7 @@ void checkStateChanges() {
       
       // تحديث وقت آخر طباعة
       lastStateChangePrintTime = currentTime;
-  }
+  }*/
 }
 
 
