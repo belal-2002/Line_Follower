@@ -124,13 +124,13 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 750) {
+  if (millis() - lostTimeStart < 400) {
     // لم تنتهِ الـ 750 ملي ثانية -> استمر بالتقدم للأمام
     forwardMotor();
     return true;
   } 
   else {
-    // انتهى الوقت ولم نجد الخط -> تفعيل الدوران لليمين
+    // انتهى الوقت ولم نجد الخط -> تفعيل الدوران
     goRight = true;
     rightMotor();
     
