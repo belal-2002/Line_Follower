@@ -63,7 +63,7 @@ void loopPrint() {
         TelnetStream.print("\t");               
       }
       TelnetStream.print("midMidMidSensor: ");
-      TelnetStream.print(midMidMidSensor);
+      TelnetStream.println(midMidMidSensor);
 
 
 
@@ -110,3 +110,64 @@ void loopPrint() {
     }
   }
 }
+
+// =================================================================
+// دالة مخصصة لمراقبة وتتبع تغيرات متغيرات الرادار والتوجيه
+// =================================================================
+void checkStateChanges() {
+  // 1. تعريف الذاكرة (استخدام static يجعل المتغيرات تحتفظ بقيمتها بين كل دورة)
+  static byte prevLeftRadar = 0;
+  static byte prevRightRadar = 0;
+  static bool prevGoLeft = false;
+  static bool prevGoRight = false;
+  
+  // متغير لحفظ وقت آخر رسالة تم طباعتها من هذه الدالة فقط
+  static unsigned long lastStateChangePrintTime = millis(); 
+
+  // 2. التحقق مما إذا كان أي من المتغيرات الأربعة قد تغيرت قيمته
+  if (leftRadarOn != prevLeftRadar || rightRadarOn != prevRightRadar ||
+      goLeft != prevGoLeft || goRight != prevGoRight) {
+
+      // 4. فحص أي المتغيرات تغير بالضبط وطباعته
+      if (leftRadarOn != prevLeftRadar) {
+        TelnetStream.print(" - leftRadarOn: "); 
+        TelnetStream.print(leftRadarOn);
+      }
+      if (rightRadarOn != prevRightRadar) {
+        TelnetStream.print(" - rightRadarOn: "); 
+        TelnetStream.print(rightRadarOn);
+      }
+      if (goLeft != prevGoLeft) {
+        TelnetStream.print(" - goLeft: "); 
+        TelnetStream.print(goLeft ? "True (1)" : "False (0)");
+      }
+      if (goRight != prevGoRight) {
+        TelnetStream.print(" - goRight: "); 
+        TelnetStream.print(goRight ? "True (1)" : "False (0)");
+      }
+      
+      // حساب الوقت الحالي وفرق الوقت عن آخر رسالة
+      unsigned long currentTime = millis();
+      unsigned long timeDiff = currentTime - lastStateChangePrintTime;
+
+      // 5. طباعة قيمة midMidMidSensor مع كل رسالة تغيير كما طلبت
+      TelnetStream.print(" | midMidMidSensor: ");
+      TelnetStream.print(midMidMidSensor);
+      TelnetStream.print(" | Time elapsed: ");
+      TelnetStream.println(timeDiff);
+
+      // 6. تحديث الذاكرة بالقيم الجديدة لانتظار التغيير القادم
+      prevLeftRadar = leftRadarOn;
+      prevRightRadar = rightRadarOn;
+      prevGoLeft = goLeft;
+      prevGoRight = goRight;
+      
+      // تحديث وقت آخر طباعة
+      lastStateChangePrintTime = currentTime;
+  }
+}
+
+
+
+
+
