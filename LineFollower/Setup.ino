@@ -1,6 +1,3 @@
-// إضافة متغيرات لحفظ زمن آخر نبضة لتطبيق الفلتر (توضع في الأعلى)
-  const unsigned long debounceDelayMicros = ((3000000 / 175) / 1.5); // فلتر زمني: 11.5 ملي ثانية
-
 void setupMotors() {
   pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
   pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
@@ -65,50 +62,5 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-// دالة مقاطعة العجل الأيسر المعدلة
-void IRAM_ATTR leftEncoderISR() {
-  static volatile unsigned long lastLeftPulseTime = 0;
-  unsigned long currentTime = micros();
-  // التأكد من مرور وقت كافٍ لتجاهل التشويش الوهمي
-  if (currentTime - lastLeftPulseTime > debounceDelayMicros) {
-    if (digitalRead(AIN1) == LOW && digitalRead(AIN2) == HIGH) {
-      leftTicks++;
-    } 
-    else if (digitalRead(AIN1) == HIGH && digitalRead(AIN2) == LOW) {
-      leftTicks--;
-    } 
-    else {
-      leftTicks++;
-    }
-    lastLeftPulseTime = currentTime;
-  }
-}
 
-// دالة مقاطعة العجل الأيمن المعدلة
-void IRAM_ATTR rightEncoderISR() {
-  static volatile unsigned long lastRightPulseTime = 0;
-  unsigned long currentTime = micros();
-  if (currentTime - lastRightPulseTime > debounceDelayMicros) {
-    if (digitalRead(BIN1) == HIGH && digitalRead(BIN2) == LOW) {
-      rightTicks++;
-    } 
-    else if (digitalRead(BIN1) == LOW && digitalRead(BIN2) == HIGH) {
-      rightTicks--;
-    } 
-    else {
-      rightTicks++;
-    }
-    lastRightPulseTime = currentTime;
-  }
-}
-
-void setupEncoder() {
-  // إعداد دبابيس حساسات السرعة
-  pinMode(LEFT_ENCODER, INPUT_PULLUP);
-  pinMode(RIGHT_ENCODER, INPUT_PULLUP);
-
-  // ربط المقاطعات - تعمل فور استشعار ثقب في القرص
-  attachInterrupt(digitalPinToInterrupt(LEFT_ENCODER), leftEncoderISR, RISING);
-  attachInterrupt(digitalPinToInterrupt(RIGHT_ENCODER), rightEncoderISR, RISING);
-}
 
