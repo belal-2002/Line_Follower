@@ -23,9 +23,6 @@ void loopSwitch() {
         
         // 1. تصفير الملاحة والزوايا
         resetPitchOffset(); // <--- لتتم المعايرة مرة واحدة قبل الانطلاق
-        resetAngleZ();
-        totalOdometer = 0.0;
-        lostLineDistance = 0.0;
 
         // 2. تصفير رادارات الاستكشاف 
         resetRadarMemory();
