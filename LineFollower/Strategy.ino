@@ -2,7 +2,6 @@
  // ملف إدارة الاستراتيجيات والدوال المساعدة (Strategy.ino)
  // ====================================================================
 
- static bool zeroAngleZ = false; // متغير لحفظ حالة تصفير الزاوية للمسار العريض
  unsigned long turnCooldownTime = 0; // متغير لحفظ زمن بدء فترة الحصانة
 
  // --------------------------------------------------------------------
@@ -160,7 +159,6 @@ bool activateTurn_5() {
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
     while ((leftMidRadar == 1) || (leftRadar == 1)) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
-      updateDistance();   // تحديث الأودومتري (الإنكودرات) لضمان عدم ضياع نبضات العجلات أثناء الانتظار
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
       if (millis() - waitStartTime > 250) {
@@ -172,7 +170,6 @@ bool activateTurn_5() {
     lineWasFound = false;
     turnLeft = true;
     leftMotor();
-    resetAngleZ(); // تصفير زاوية الـ MPU
     turnStartTime = millis();
     resetRadarMemory();
     turnRight = false;
@@ -208,17 +205,12 @@ void cleanIR_6() {
   } 
 }
 
-// السير للأمام بالإنكودر فقط عند وجود خط عريض (+)
+// السير للأمام عند وجود خط عريض (+)
 bool checkFullLineForward_8() {
   if (midSensor >= 8) { // إذا قرأ 8 حساسات أو أكثر
-    if (!zeroAngleZ) {
-      resetAngleZ();
-      zeroAngleZ = true;
-    }
-    forwardStraight();
+    forwardMotor(); // استبدلنا forwardStraight بـ forwardMotor
     return true;
   }
-  zeroAngleZ = false;
   return false;
 }
 
