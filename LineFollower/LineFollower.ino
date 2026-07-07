@@ -89,14 +89,18 @@
 // ---------------------------------------------------------
 // 5. متغيرات الرادار والاستكشاف الجانبي (Radars & Discovery)
 // ---------------------------------------------------------
-  bool leftRadar = 0;             // حالة الحساس الجانبي الأيسر المتطرف (S1)
-  bool rightRadar = 0;            // حالة الحساس الجانبي الأيمن المتطرف (S10)
-  bool leftMidRadar = 0;          // حالة الحساس الجانبي الأيسر الداخلي (S2)
-  bool rightMidRadar = 0;         // حالة الحساس الجانبي الأيمن الداخلي (S9)
+  bool leftOutRadar = 0;          // حالة الحساس الجانبي الأيسر المتطرف (S1)
+  bool rightOutRadar = 0;         // حالة الحساس الجانبي الأيمن المتطرف (S12)
+  bool leftRadar = 0;             // حالة الحساس الجانبي الأيسر المتطرف (S)
+  bool rightRadar = 0;            // حالة الحساس الجانبي الأيمن المتطرف (S)
+  bool leftMidRadar = 0;          // حالة الحساس الجانبي الأيسر الداخلي (S)
+  bool rightMidRadar = 0;         // حالة الحساس الجانبي الأيمن الداخلي (S)
   
-  bool leftRadarOn = false;       // راية (Flag) لتفعيل حدث التقاط رادار اليسار
-  bool leftRadarOn2 = false;
-  bool rightRadarOn = false;      // راية (Flag) لتفعيل حدث التقاط رادار اليمين
+  bool leftOutRadarOn = false;       
+  bool leftOutRadarOn2 = false;
+  bool rightOutRadarOn = false;
+  bool leftRadarOn = false;       
+  bool rightRadarOn = false;      
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
@@ -104,9 +108,11 @@
   unsigned long radarMaxTime = 450; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
   //700
-  unsigned long leftRadarStartTime = 0;   // الوقت المسجل لحظة التقاط رادار اليسار
-  unsigned long leftRadarStartTime2 = 0;
-  unsigned long rightRadarStartTime = 0;  // الوقت المسجل لحظة التقاط رادار اليمين
+  unsigned long leftOutRadarStartTime = 0;   
+  unsigned long leftOutRadarStartTime2 = 0;
+  unsigned long rightOutRadarStartTime = 0;
+  unsigned long leftRadarStartTime = 0;   
+  unsigned long rightRadarStartTime = 0;  
   unsigned long leftMidRadarStartTime = 0;// الوقت المسجل لحظة التقاط الرادار الأيسر الداخلي
   unsigned long rightMidRadarStartTime = 0;// الوقت المسجل لحظة التقاط الرادار الأيمن الداخلي
 
