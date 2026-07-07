@@ -28,35 +28,34 @@ void loopSensors() {
   // =========================================================
   /*
   int currentBlackCount = 0;
-  
   // حساب عدد الحساسات التي ترى لوناً "أسود فيزيائي" حالياً
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
       currentBlackCount++;
     }
   }
 
   // أ. اكتشاف الدخول في المنطقة المعكوسة (الخلفية أصبحت سوداء والخط أبيض)
-  // الشرط != 10 هو لحماية الروبوت من التقاطعات العادية (+) التي تعطي 10 أسود مؤقتاً
-  if (!isInverted && currentBlackCount >= 7 && currentBlackCount != 10) {
+  // الشرط != 12 هو لحماية الروبوت من التقاطعات العادية (+) التي تعطي 12 أسود مؤقتاً
+  if (!isInverted && currentBlackCount >= 9 && currentBlackCount != 12) {
     inversionCounterBlack++; // زيادة عداد التأكيد
     
     if (inversionCounterBlack > INVERSION_THRESH) {
-      isInverted = true;           // تأكيد الدخول في المنطقة المعكوسة
-      inversionCounterBlack = 0;   // تصفير العداد
-      tone(buzzerPin, 3000, 90);   // إطلاق نغمة سريعة لتأكيد التبديل
+      isInverted = true; // تأكيد الدخول في المنطقة المعكوسة
+      inversionCounterBlack = 0; // تصفير العداد
+      tone(buzzerPin, 3000, 90); // إطلاق نغمة سريعة لتأكيد التبديل
     }
   } 
   
   // ب. اكتشاف الخروج من المنطقة المعكوسة (العودة للوضع الطبيعي)
-  // إذا كنا في وضع معكوس ورأينا حساسين أو أقل باللون الأسود الفيزيائي
-  else if (isInverted && currentBlackCount <= 2) {
+  // إذا كنا في وضع معكوس ورأينا 3 حساسات أو أقل باللون الأسود الفيزيائي
+  else if (isInverted && currentBlackCount <= 3) {
     inversionCounterWhite++; // زيادة عداد التأكيد للعودة
     
     if (inversionCounterWhite > (INVERSION_THRESH / 3)) { // استجابة العودة أسرع بـ 3 مرات
-      isInverted = false;          // تأكيد العودة للوضع الطبيعي
-      inversionCounterWhite = 0;   // تصفير العداد
-      tone(buzzerPin, 3000, 90);   // إطلاق نغمة التبديل
+      isInverted = false; // تأكيد العودة للوضع الطبيعي
+      inversionCounterWhite = 0; // تصفير العداد
+      tone(buzzerPin, 3000, 90); // إطلاق نغمة التبديل
     }
   } 
   
@@ -68,12 +67,13 @@ void loopSensors() {
 
   // د. الخدعة الرياضية: عكس القيم فعلياً إذا تم تأكيد وضع التبديل
   if (isInverted) {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 12; i++) {
       // معادلة العكس السحرية: تحويل الأسود لأبيض والأبيض لأسود رياضياً
       sensorValue[i] = (target_Black + target_White) - sensorValue[i];
     }
   }
   */
+  
 
   // =========================================================
   // 4. مرحلة التشفير الثنائي (Bitmasking) للحساسات
