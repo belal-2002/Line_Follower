@@ -9,8 +9,8 @@ static bool lastIsRunning = false;      // ذاكرة لحالة زر التشغ
 static byte lastStrategyForCalib = 255; // ذاكرة لرقم الاستراتيجية السابقة لاكتشاف لحظة الدخول لوضع المعايرة
 
 // مصفوفات ومتغيرات لتخزين قيم المعايرة مؤقتاً قبل اعتمادها
-static float whiteAvg[10];              // متوسط القراءات الـ 100 للون الأبيض لكل حساس
-static float blackAvg[10];              // متوسط القراءات الـ 100 للون الأسود لكل حساس
+static float whiteAvg[12];              // متوسط القراءات الـ 100 للون الأبيض لكل حساس
+static float blackAvg[12];              // متوسط القراءات الـ 100 للون الأسود لكل حساس
 static float overallWhiteAvg = 0;       // المتوسط العام الموحد للون الأبيض (لجميع الحساسات الوسطى)
 static float overallBlackAvg = 0;       // المتوسط العام الموحد للون الأسود (لجميع الحساسات الوسطى)
 
@@ -92,97 +92,79 @@ void loopStrategy0() {
 // المتغير (isBlack) يحدد ما إذا كنا نحفظ البيانات في مصفوفة الأسود أم الأبيض
 // ====================================================================
 void runCalibrationPhase(bool isBlack) {
-    long sums[10] = {0}; // مصفوفة لتجميع ناتج 100 قراءة لكل حساس
+    long sums[12] = {0}; // مصفوفة لـ 12 حساس
     TelnetStream.println("جاري أخذ 100 قراءة متتالية لضمان الدقة...");
-
-    // أخذ 100 قراءة متتالية
+    
     for (int i = 0; i < 100; i++) {
-        for (int s = 0; s < 10; s++) {
+        for (int s = 0; s < 12; s++) {
             int val = analogRead(sensorPins[s]);
-            sums[s] += val; // إضافة القراءة الحالية للمجموع
+            sums[s] += val; 
         }
-        delay(10); // تأخير 10 ملي ثانية لضمان استقرار محول الـ ADC التناظري
+        delay(10);
     }
 
-    TelnetStream.println("--- متوسط الحساسات الـ 10 ---");
-    float overallSum = 0; // لجمع متوسطات الحساسات الثمانية الوسطى
+    TelnetStream.println("--- متوسط الحساسات الـ 12 ---");
+    float overallSum = 0; 
 
-    // حساب المتوسط لكل حساس
-    for (int s = 0; s < 10; s++) {
-        float avg = (float)sums[s] / 100.0; // القسمة على عدد القراءات
+    for (int s = 0; s < 12; s++) {
+        float avg = (float)sums[s] / 100.0;
         
-        // تخزين المتوسط في المصفوفة المناسبة (أبيض أو أسود)
-        if (isBlack) {
-            blackAvg[s] = avg;
-        } else {
-            whiteAvg[s] = avg;
-        }
+        if (isBlack) blackAvg[s] = avg;
+        else whiteAvg[s] = avg;
 
-        // طباعة قيمة الحساس الحالي للمراقبة
-        TelnetStream.print(avg, 0); 
+        TelnetStream.print(avg, 0);
         TelnetStream.print("\t");
 
-        // استثناء الحساسات الطرفية S1 (رقم 0) و S10 (رقم 9) من المتوسط العام
-        // لأنها مخصصة للتقاطعات (رقمية) وقد تشوه متوسط قراءة تتبع الخط
-        if (s != 0 && s != 9) {
+        // استثناء الحساسات (S1, S2, S11, S12) من المتوسط العام بناءً على طلبك ونصحيتي!
+        // أرقامهم في المصفوفة هي 0 و 1 و 10 و 11
+        if (s != 0 && s != 1 && s != 10 && s != 11) {
             overallSum += avg;
         }
     }
-    TelnetStream.println(); // سطر جديد بعد طباعة الـ 10 حساسات
+    TelnetStream.println(); 
 
-    // حساب المتوسط العام الموحد (قسمة على 8 لأننا استثنينا حساسين طرفيين)
-    float overall = overallSum / 8.0; 
-    
-    // حفظ المتوسط العام في المتغير المناسب
-    if (isBlack) {
-        overallBlackAvg = overall;
-    } else {
-        overallWhiteAvg = overall;
-    }
+    // حساب المتوسط للـ 8 حساسات المتبقية (قسمة على 8)
+    float overall = overallSum / 8.0;
+    if (isBlack) overallBlackAvg = overall;
+    else overallWhiteAvg = overall;
 }
 
 // ====================================================================
 // دالة فرعية: الحسابات النهائية وتحديث المتغيرات الحية وتوليد الكود
 // ====================================================================
 void finalizeCalibration() {
-    // 1. حساب نقطة المنتصف (عتبة التمييز) بين الأبيض والأسود
     int calculatedThreshold = round((overallWhiteAvg + overallBlackAvg) / 2.0);
-
-    // 2. تحديث المتغيرات العامة الحية (تُطبق فوراً في الروبوت دون الحاجة لإعادة تشغيل)
     target_White = round(overallWhiteAvg);
     target_Black = round(overallBlackAvg);
     lineThreshold = calculatedThreshold;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 12; i++) {
         S_White[i] = round(whiteAvg[i]);
         S_Black[i] = round(blackAvg[i]);
     }
 
-    // 3. توليد وطباعة الكود الجاهز لنسخه ولصقه في ملف LineFollower.ino
     TelnetStream.println("\n=======================================================");
     TelnetStream.println("🎉 اكتملت المعايرة بنجاح! تم تحديث الذاكرة الحية.");
     TelnetStream.println("يمكنك نسخ الكود التالي ولصقه في ملف LineFollower.ino لحفظه دائماً:");
-    TelnetStream.println("=======================================================\n");
-
-    // طباعة مصفوفة الأبيض
-    TelnetStream.print("int S_White[10] = {");
-    for (int i = 0; i < 10; i++) {
+    
+    TelnetStream.print("int S_White[12] = {");
+    for (int i = 0; i < 12; i++) {
         TelnetStream.print(S_White[i]);
-        if (i < 9) TelnetStream.print(", ");
+        if (i < 11) TelnetStream.print(", ");
     }
     TelnetStream.println("};");
-
-    // طباعة مصفوفة الأسود
-    TelnetStream.print("int S_Black[10] = {");
-    for (int i = 0; i < 10; i++) {
+    
+    TelnetStream.print("int S_Black[12] = {");
+    for (int i = 0; i < 12; i++) {
         TelnetStream.print(S_Black[i]);
-        if (i < 9) TelnetStream.print(", ");
+        if (i < 11) TelnetStream.print(", ");
     }
     TelnetStream.println("};");
-
-    // طباعة المتغيرات العامة للون
+    
     TelnetStream.print("int target_White = "); TelnetStream.print(target_White); TelnetStream.println(";");
     TelnetStream.print("int target_Black = "); TelnetStream.print(target_Black); TelnetStream.println(";");
     TelnetStream.print("int lineThreshold = "); TelnetStream.print(lineThreshold); TelnetStream.println(";");
     TelnetStream.println("\n=======================================================");
 }
+
+
