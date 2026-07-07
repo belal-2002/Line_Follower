@@ -50,9 +50,9 @@
 // ---------------------------------------------------------
 // 2. متغيرات إعدادات السرعة (Speed Configuration)
 // ---------------------------------------------------------
-  int originalMaximumSpeed = 500; // السرعة القصوى المرجعية
-  int originalBaseSpeed = 250;    // السرعة الأساسية المرجعية في الخط المستقيم
-  int originalTurnSpeed = 290;    // سرعة الانعطاف المرجعية
+  int originalMaximumSpeed = 450; // السرعة القصوى المرجعية
+  int originalBaseSpeed = 225;    // السرعة الأساسية المرجعية في الخط المستقيم
+  int originalTurnSpeed = 250;    // سرعة الانعطاف المرجعية
 
   int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
   int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
@@ -104,8 +104,8 @@
   bool leftMidRadarOn = false;    // راية (Flag) لتفعيل حدث التقاط رادار اليسار الداخلي
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
-  unsigned long radarMinTime = 125; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
-  unsigned long radarMaxTime = 450; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
+  unsigned long radarMinTime = 30; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
+  unsigned long radarMaxTime = 600; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
   //700
   unsigned long leftOutRadarStartTime = 0;   
