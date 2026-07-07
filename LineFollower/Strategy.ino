@@ -37,7 +37,7 @@ void cancelTurn_1() {
     }
 
     if (turnLeft || turnRight) {
-      if (millis() - turnStartTime >= 150) { 
+      if (millis() - turnStartTime >= 250) { 
         turnLeft = false;
         turnRight = false;
         turnCooldownTime = millis();
@@ -79,6 +79,7 @@ bool activateGo_3() {
 
 bool noLine_4() {
   if (midMidMidSensor == 0) {
+    //stopMotor();
     forwardMotor();
     return true;
   }
@@ -104,7 +105,7 @@ bool gap_4() {
       } 
       else {
         // التحقق من مرور 11 ملي ثانية والخط لا يزال موجوداً
-        if (millis() - lineFoundTime >= 11) { 
+        if (millis() - lineFoundTime >= 15) { 
           // تم تأكيد الخط! ننهي البحث ونسلم القيادة
           isSearching = false;
           verifyingLine = false;
@@ -129,7 +130,7 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 250) {
+  if (millis() - lostTimeStart < 325) {
     forwardMotor();
     return true;
   } 
@@ -148,7 +149,7 @@ bool gap_4() {
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
 bool activateTurn_5() {
-  if (millis() - turnCooldownTime < 175) {
+  if (millis() - turnCooldownTime < 250) {
     return false; 
   }
   if ((specialMemory && (leftOutRadar == 1)) ||
@@ -166,7 +167,7 @@ bool activateTurn_5() {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
-      if (millis() - waitStartTime > 175) {
+      if (millis() - waitStartTime > 250) {
         break; 
       }
     }
