@@ -9,14 +9,15 @@ void calculateError() {
   long weightedSum = 0; // مجموع (قراءة الحساس × وزنه الهندسي)
   long sum = 0;         // مجموع قراءات الحساسات الصافية
 
-  // 2. إخفاء الحساسات الطرفية (الرادارات) عن خوارزمية التتبع
-  // نصفر S1 و S10 حتى لا يتسببا بانحراف الروبوت عند المرور بجانب تقاطع (+) أو (T)
-  sensorValue[0] = 0; 
-  sensorValue[9] = 0;
+  // إخفاء الحساسات الطرفية التي طلبتها (S1, S2, S11, S12)
+  // (المصفوفة تبدأ من 0، إذن: S1=0, S2=1, S11=10, S12=11)
+  sensorValue[0] = 0; // تصفير S1
+  sensorValue[1] = 0; // تصفير S2
+  sensorValue[10] = 0; // تصفير S11
+  sensorValue[11] = 0; // تصفير S12
 
   // 3. حلقة حساب المتوسط المرجح للخط الأسود
-  for (int i = 0; i < 10; i++) {
-    // نأخذ فقط الحساسات التي ترى الخط فعلياً (أعلى من العتبة) لتقليل التشويش
+  for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) { 
       weightedSum += (long)sensorValue[i] * sensorWeights[i];
       sum += sensorValue[i];
