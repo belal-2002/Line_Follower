@@ -56,7 +56,7 @@ void loopPrint() {
       TelnetStream.printf("Kp: %.2f  | Kd: %.1f  | Strategy: %d", Kp, Kd, strategy);
       TelnetStream.printf("  | Max: %d   | Base: %d  | Turn: %d", maximumSpeed, baseSpeed, turnSpeed);*/
 
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 12; i++) {
         TelnetStream.print(sensorValue[i]);  
         TelnetStream.print("\t");               
       }
