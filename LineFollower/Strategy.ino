@@ -147,8 +147,8 @@ bool activateTurn_5() {
     return false; 
   }
   if ((specialMemory && (leftRadar == 1)) ||
-      ( leftRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 7) == 1) && (bitRead(sensorBit, 6) == 1) &&
-      (rightRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 2) == 0) && (bitRead(sensorBit, 3) == 0) )){
+      ( leftRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
+      (rightRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -180,28 +180,31 @@ bool activateTurn_5() {
   return false;
 }
 
-// تنظيف البتات لتجاهل التقاطعات (تم تصحيح البتات 10 و 11 الكارثية!)
+// تنظيف البتات لتجاهل التقاطعات
 void cleanIR_6() {
   // 1. اكتشاف تقاطع الزائد (+) وتجاوزه مستقيماً
   if (leftMidRadar && rightMidRadar && midMidSensor) {
-  sensorValue[1] = 0; 
-  sensorValue[8] = 0;
+    sensorValue[2] = 0; // تصفير S3 (كما طلبت)
+    sensorValue[9] = 0; // تصفير S10 (كما طلبت)
   }
-  // 2. تجاهل الفخاخ اليمنى (حرف T المتجه لليمين)
+  // 2. تجاهل الفخاخ اليمنى
   else if (rightMidRadar && midMidSensor) {
-    sensorValue[1] = 0; 
+    sensorValue[2] = 0; // تصفير S3
   }
-  // 3. تجاهل الفخاخ اليسرى (ميزة إضافية مجانية!)
+  // 3. تجاهل الفخاخ اليسرى
   else if (leftMidRadar && midMidSensor) {
-    sensorValue[8] = 0;
+    sensorValue[9] = 0; // تصفير S10
   }
-  if (bitRead(sensorBit, 4) && bitRead(sensorBit, 5)){
-    sensorValue[1] = 0; 
-    sensorValue[2] = 0;
-    sensorValue[3] = 0; 
-    sensorValue[6] = 0;
-    sensorValue[7] = 0; 
-    sensorValue[8] = 0;
+  
+  // فلتر التشويش المركزي: إذا كانت الحساسات المركزية S6 و S7 ترى الخط (البت 6 و 5)
+  if (bitRead(sensorBit, 6) && bitRead(sensorBit, 5)){
+    // نصفر الحساسات المجاورة للرادارات لضمان الهدوء
+    sensorValue[2] = 0; // S3
+    sensorValue[3] = 0; // S4
+    sensorValue[4] = 0; // S5
+    sensorValue[7] = 0; // S8
+    sensorValue[8] = 0; // S9
+    sensorValue[9] = 0; // S10
   } 
 }
 
