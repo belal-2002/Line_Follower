@@ -110,16 +110,50 @@ void loopSensors() {
   // =========================================================
   // 6. تخصيص قراءات الرادارات الموضعية
   // =========================================================
-  leftRadar     = bitRead(sensorBit, 11); // S1
-  leftMidRadar  = bitRead(sensorBit, 9);  // S3 
-  rightMidRadar = bitRead(sensorBit, 2);  // S10 
-  rightRadar    = bitRead(sensorBit, 0);  // S12
+  leftOutRadar   = bitRead(sensorBit, 11); // S1
+  leftRadar    = bitRead(sensorBit, 11); // S2
+  leftMidRadar   = bitRead(sensorBit, 9);  // S3 
+  rightMidRadar  = bitRead(sensorBit, 2);  // S10 
+  rightRadar   = bitRead(sensorBit, 0);  // S11
+  rightOutRadar  = bitRead(sensorBit, 0); // S12
 
   // =========================================================
   // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory) - مطورة
   // =========================================================
   
   // --- رادار أقصى اليسار (S1) ---
+  if (leftOutRadar) { //
+    leftOutRadarOn = true; //
+    leftOutRadarStartTime = millis(); //
+  } else if (leftOutRadarOn) { //
+    unsigned long elapsedTime = millis() - leftOutRadarStartTime; //
+    if (elapsedTime >= radarMaxTime) { //
+      leftOutRadarOn = false; //
+    } 
+    else if (elapsedTime >= radarMinTime) { //
+      if (rightOutRadarOn == true) { //
+        leftOutRadarOn = false; //
+      }
+    }
+  } 
+  
+  // --- رادار أقصى اليمين (S12) ---
+  if (rightOutRadar) { //
+    rightOutRadarOn = true; //
+    rightOutRadarStartTime = millis(); //
+  } else if (rightOutRadarOn) { //
+    unsigned long elapsedTime = millis() - rightOutRadarStartTime; //
+    if (elapsedTime >= radarMaxTime) { //
+      rightOutRadarOn = false; //
+    } 
+    else if (elapsedTime >= radarMinTime) { //
+      if (leftOutRadarOn == true) { //
+        rightOutRadarOn = false; //
+      }
+    }
+  }
+
+  // --- رادار أقصى اليسار (S2) ---
   if (leftRadar) {
     leftRadarOn = true;
     leftRadarStartTime = millis(); // تحديث نقطة البداية طالما الرادار يرى الخط
@@ -140,7 +174,7 @@ void loopSensors() {
     }
   } 
   
-  // --- رادار أقصى اليمين (S10) ---
+  // --- رادار أقصى اليمين (S11) ---
   if (rightRadar) {
     rightRadarOn = true;
     rightRadarStartTime = millis(); 
@@ -157,36 +191,34 @@ void loopSensors() {
     }
   }
 
-  // --- رادار اليسار الداخلي (S2) ---
-  if (leftMidRadar) {
-    leftMidRadarOn = true;
-    leftMidRadarStartTime = millis();
-  } else if (leftMidRadarOn) {
-    unsigned long elapsedTime = millis() - leftMidRadarStartTime;
-    
-    if (elapsedTime >= radarMaxTime) {
-      leftMidRadarOn = false;
+  // --- رادار اليسار الداخلي (S3) ---
+  if (leftMidRadar) { //
+    leftMidRadarOn = true; //
+    leftMidRadarStartTime = millis(); //
+  } else if (leftMidRadarOn) { //
+    unsigned long elapsedTime = millis() - leftMidRadarStartTime; //
+    if (elapsedTime >= radarMaxTime) { //
+      leftMidRadarOn = false; //
     } 
-    else if (elapsedTime >= radarMinTime) {
-      if (rightMidRadarOn == true) {
-        leftMidRadarOn = false;
+    else if (elapsedTime >= radarMinTime) { //
+      if (rightMidRadarOn == true) { //
+        leftMidRadarOn = false; //
       }
     }
   } 
   
-  // --- رادار اليمين الداخلي (S9) ---
-  if (rightMidRadar) {
-    rightMidRadarOn = true;
-    rightMidRadarStartTime = millis();
-  } else if (rightMidRadarOn) {
-    unsigned long elapsedTime = millis() - rightMidRadarStartTime;
-    
-    if (elapsedTime >= radarMaxTime) {
-      rightMidRadarOn = false;
+  // --- رادار اليمين الداخلي (S10) ---
+  if (rightMidRadar) { //
+    rightMidRadarOn = true; //
+    rightMidRadarStartTime = millis(); //
+  } else if (rightMidRadarOn) { //
+    unsigned long elapsedTime = millis() - rightMidRadarStartTime; //
+    if (elapsedTime >= radarMaxTime) { //
+      rightMidRadarOn = false; //
     } 
-    else if (elapsedTime >= radarMinTime) {
-      if (leftMidRadarOn == true) {
-        rightMidRadarOn = false;
+    else if (elapsedTime >= radarMinTime) { // //
+      if (leftMidRadarOn == true) { //
+        rightMidRadarOn = false; //
       }
     }
   }
@@ -194,28 +226,26 @@ void loopSensors() {
   // =========================================================
   // 8. خوارزمية الذاكرة للشرط المخصص (Special Condition Memory)
   // =========================================================
-  
   if ((leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && 
-      (rightMidRadar == 0) && (rightRadar == 0)) {
-    specialMemory = true;
-    specialMemoryStartTime = millis(); 
+      (rightMidRadar == 0) && (rightOutRadar == 0)) { //
+    specialMemory = true; //
+    specialMemoryStartTime = millis(); //
   } else { 
-    if (specialMemory && ((millis() - specialMemoryStartTime) > 75)) {
-        specialMemory = false;
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 75)) { //
+        specialMemory = false; //
     }
   }
 
   // --- رادار أقصى اليسار (S1) ---
-  if (leftRadar) {
-    leftRadarOn2 = true;
-    leftRadarStartTime2 = millis();
+  if (leftOutRadar) { //
+    leftOutRadarOn2 = true; //
+    leftOutRadarStartTime2 = millis(); //
   } else { 
-    if (((millis() - leftRadarStartTime2) > 75) && leftRadarOn2) {
-        leftRadarOn2 = false;
+    if (((millis() - leftOutRadarStartTime2) > 75) && leftOutRadarOn2) { //
+        leftOutRadarOn2 = false; //
     }
   }
   checkStateChanges();
-
 }
 
 
