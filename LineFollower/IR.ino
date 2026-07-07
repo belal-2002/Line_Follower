@@ -200,7 +200,7 @@ void loopSensors() {
     specialMemory = true;
     specialMemoryStartTime = millis(); 
   } else { 
-    if (specialMemory && ((millis() - specialMemoryStartTime) > 100)) {
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 75)) {
         specialMemory = false;
     }
   }
@@ -210,7 +210,7 @@ void loopSensors() {
     leftRadarOn2 = true;
     leftRadarStartTime2 = millis();
   } else { 
-    if (((millis() - leftRadarStartTime2) > 100) && leftRadarOn2) {
+    if (((millis() - leftRadarStartTime2) > 75) && leftRadarOn2) {
         leftRadarOn2 = false;
     }
   }
