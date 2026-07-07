@@ -14,7 +14,7 @@ void loopSensors() {
     }
     sensorValue[i] = tempSum / 3;
   }
-  sensorValue[6] = 0;
+  //sensorValue[6] = 0;
   
   // =========================================================
   // 2. مرحلة المعايرة الخطية وتقييد القيم (Linear Mapping)
