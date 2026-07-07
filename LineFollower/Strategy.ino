@@ -58,11 +58,17 @@ bool isTurning_2() {
 bool activateGo_3() {
   if (midMidMidSensor == 0) {
     lineWasFound = false;
-   
+    
     if (leftMidRadarOn && rightMidRadarOn){
-      if (leftRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
-      if (rightRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+      if (leftRadarOn && rightRadarOn){
+        if (leftOutRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+        if (rightOutRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+    } else {
+        if (leftRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+        if (rightRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+      }
     }
+    
     if (leftMidRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
     if (rightMidRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
 
@@ -145,9 +151,9 @@ bool activateTurn_5() {
   if (millis() - turnCooldownTime < 175) {
     return false; 
   }
-  if ((specialMemory && (leftRadar == 1)) ||
-      ( leftRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
-      (rightRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) )){
+  if ((specialMemory && (leftOutRadar == 1)) ||
+      ( leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
+      (rightOutRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -156,7 +162,7 @@ bool activateTurn_5() {
     unsigned long waitStartTime = millis();
 
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
-    while ((leftMidRadar == 1) || (leftRadar == 1)) {
+    while ((leftMidRadar == 1) || (leftOutRadar == 1)) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
@@ -217,8 +223,10 @@ bool checkFullLineForward_8() {
 }
 
 void resetRadarMemory() {
+  leftOutRadarOn = false; 
+  leftOutRadarOn2 = false; 
+  rightOutRadarOn = false; 
   leftRadarOn = false;
-  leftRadarOn2 = false;
   rightRadarOn = false;
   leftMidRadarOn = false;
   rightMidRadarOn = false;
