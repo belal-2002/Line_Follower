@@ -111,10 +111,10 @@ void loopSensors() {
   // 6. تخصيص قراءات الرادارات الموضعية
   // =========================================================
   leftOutRadar   = bitRead(sensorBit, 11); // S1
-  leftRadar    = bitRead(sensorBit, 11); // S2
+  leftRadar    = bitRead(sensorBit, 10); // S2
   leftMidRadar   = bitRead(sensorBit, 9);  // S3 
   rightMidRadar  = bitRead(sensorBit, 2);  // S10 
-  rightRadar   = bitRead(sensorBit, 0);  // S11
+  rightRadar   = bitRead(sensorBit, 1);  // S11
   rightOutRadar  = bitRead(sensorBit, 0); // S12
 
   // =========================================================
