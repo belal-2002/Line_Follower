@@ -120,7 +120,7 @@ void loopSensors() {
 
   // =========================================================
   // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory) - مطورة
-  // =========================================================
+ // =========================================================
   
   // --- رادار أقصى اليسار (S1) ---
   if (leftOutRadar) { //
@@ -224,15 +224,15 @@ void loopSensors() {
     }
   }
 
-  // =========================================================
+ // =========================================================
   // 8. خوارزمية الذاكرة للشرط المخصص (Special Condition Memory)
   // =========================================================
-  if ((leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && 
-      (rightMidRadar == 0) && (rightOutRadar == 0)) { //
+  if ( (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
+       (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightRadar == 0) && (rightOutRadar == 0) ){ //
     specialMemory = true; //
     specialMemoryStartTime = millis(); //
   } else { 
-    if (specialMemory && ((millis() - specialMemoryStartTime) > 75)) { //
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 20)) { //
         specialMemory = false; //
     }
   }
@@ -242,7 +242,7 @@ void loopSensors() {
     leftOutRadarOn2 = true; //
     leftOutRadarStartTime2 = millis(); //
   } else { 
-    if (((millis() - leftOutRadarStartTime2) > 75) && leftOutRadarOn2) { //
+    if (((millis() - leftOutRadarStartTime2) > 20) && leftOutRadarOn2) { //
         leftOutRadarOn2 = false; //
     }
   }
