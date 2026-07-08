@@ -35,14 +35,14 @@ void updateMPU() {
   if (pitchAngle > 10.0) { 
     // أ. حالة الصعود: الروبوت مائل للأعلى -> زيادة السرعة فوراً للتغلب على الجاذبية
     maximumSpeed = originalMaximumSpeed * 2;
-    baseSpeed = originalBaseSpeed * 2;
-    turnSpeed = originalTurnSpeed * 2;
+    baseSpeed = originalBaseSpeed * 1.65;
+    turnSpeed = originalTurnSpeed * 1.65;
   } 
   else if (pitchAngle < -10.0) {
     // ب. حالة النزول: الروبوت مائل للأسفل -> تقليل السرعة لمنع الانزلاق أو فقدان الخط بسبب القصور الذاتي
     maximumSpeed = originalMaximumSpeed / 2;
-    baseSpeed = originalBaseSpeed / 2;
-    turnSpeed = originalTurnSpeed / 2;
+    baseSpeed = originalBaseSpeed / 1.5;
+    turnSpeed = originalTurnSpeed / 1.5;
   } 
   else {
     // ج. الأرض المستوية: العودة للسرعات القياسية الطبيعية
