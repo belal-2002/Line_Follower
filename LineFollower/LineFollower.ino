@@ -178,7 +178,7 @@ void setup() {
 
 void loop() {
   loopSwitch();
-  //updateMPU();
+  updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
     
