@@ -130,7 +130,7 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 325) {
+  if (millis() - lostTimeStart < 250) {
     forwardMotor();
     return true;
   } 
@@ -153,8 +153,8 @@ bool activateTurn_5() {
     return false; 
   }
   if ((specialMemory && (leftOutRadar == 1)) ||
-      ( leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
-      (rightOutRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) )){
+      ( leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) && 
+      (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightRadar == 0) && (rightOutRadar == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
