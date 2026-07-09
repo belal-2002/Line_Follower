@@ -233,7 +233,7 @@ void loopSensors() {
     specialMemory = true; //
     specialMemoryStartTime = millis(); //
   } else { 
-    if (specialMemory && ((millis() - specialMemoryStartTime) > 20)) { //
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 100)) { //
         specialMemory = false; //
     }
   }
@@ -243,7 +243,7 @@ void loopSensors() {
     leftOutRadarOn2 = true; //
     leftOutRadarStartTime2 = millis(); //
   } else { 
-    if (((millis() - leftOutRadarStartTime2) > 50) && leftOutRadarOn2) { //
+    if (((millis() - leftOutRadarStartTime2) > 100) && leftOutRadarOn2) { //
         leftOutRadarOn2 = false; //
     }
   }
