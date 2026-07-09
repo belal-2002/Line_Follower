@@ -49,8 +49,6 @@ void loopSwitch() {
         inversionCounterBlack = 0;
         inversionCounterWhite = 0;
 
-        skippedTurnsCounter = 0; // <--- إضافة: تصفير العداد عند الانطلاق
-
       } else {
         stopMotor();  
       }
