@@ -34,6 +34,7 @@ void cancelTurn_1() {
       lastError = 0;
       PD_Value = 0;
       resetRadarMemory();
+      executeInversionReset();
     }
 
     if (turnLeft || turnRight) {
@@ -45,6 +46,7 @@ void cancelTurn_1() {
         lastError = 0;
         PD_Value = 0;
         resetRadarMemory();
+        executeInversionReset();
       }
     }
   }
@@ -60,15 +62,9 @@ bool activateGo_3() {
     lineWasFound = false;
     
     if (leftMidRadarOn && rightMidRadarOn){
-      if (leftRadarOn && rightRadarOn){
-        if (leftOutRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
-        if (rightOutRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
-    } else {
-        if (leftRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
-        if (rightRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
-      }
+      if (leftOutRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+      if (rightOutRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
     }
-    
     if (leftMidRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
     if (rightMidRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
 
@@ -79,8 +75,8 @@ bool activateGo_3() {
 
 bool noLine_4() {
   if (midMidMidSensor == 0) {
-    //stopMotor();
-    forwardMotor();
+    stopMotor();
+    //forwardMotor();
     return true;
   }
   return false;
@@ -153,8 +149,9 @@ bool activateTurn_5() {
     return false; 
   }
   if ((specialMemory && (leftOutRadar == 1)) ||
-      ( leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) && 
-      (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightRadar == 0) && (rightOutRadar == 0) )){
+      ( leftOutRadarOn2 && (leftMidRadar == 1) && 
+      (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
+      (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightOutRadar == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -163,11 +160,11 @@ bool activateTurn_5() {
     unsigned long waitStartTime = millis();
 
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
-    while ((leftMidRadar == 1) || (leftOutRadar == 1)) {
+    while (leftOutRadar == 1) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
-      if (millis() - waitStartTime > 250) {
+      if (millis() - waitStartTime > 170) {
         break; 
       }
     }
@@ -233,6 +230,43 @@ void resetRadarMemory() {
   rightMidRadarOn = false;
   specialMemory = false;
   checkStateChanges();
+}
+
+// ====================================================================
+// دالة إعادة ضبط النظام عند حدوث تبديل في الألوان
+// ====================================================================
+void executeInversionReset() {
+    // 1. إيقاف المحركات تماماً
+    stopMotor();
+    
+    // 2. إطلاق نغمة التنبيه (كما في الكود القديم)
+    //tone(buzzerPin, 3000, 90);
+    
+    // 3. توقيف المعالج بالكامل لمدة 10 ملي ثانية (حسب طلبك)
+    delay(30);
+    
+    // 4. إعادة تفعيل درايفر المحركات
+    digitalWrite(STBY, HIGH);
+    
+    // 5. تصفير جميع الأعلام والمتغيرات الملاحية (باستثناء pitchOffset)
+    resetRadarMemory();
+    goLeft = false;
+    goRight = false;
+    turnLeft = false;
+    turnRight = false;
+    currentError = 0;
+    lastError = 0;
+    PD_Value = 0;
+    lineWasFound = true;
+    Turn180now = false;
+    sweep180Done = false;
+    turnCooldownTime = 0;
+
+    // 6. تصفير عدادات التبديل نفسها لتبدأ نظيفة للمرة القادمة
+    //invBlackCounter = 0;
+    //invWhiteCounter = 0;
+    //invIsCounting = false;
+    //invMissedLoops = 0;
 }
 
 
