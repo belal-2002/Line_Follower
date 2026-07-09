@@ -171,8 +171,6 @@ int lineThreshold = 1472;
 
 
 
-bool activateTurn_5(int skipsAllowed = 0);
-
 void setup() {
   //Serial.begin(115200);
   setupMotors();
