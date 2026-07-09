@@ -8,7 +8,8 @@ void loopStrategy4() { // لليسار
 
   if (gap_4()) return;
 
-  if (activateTurn_5()) return; 
+  // تحديد العدد هنا: نمرر الرقم 1 ليتجاهل المنعطف مرة واحدة ويلتف في الثانية
+  if (activateTurn_5(1)) return; 
 
   cleanIR_6();
 
