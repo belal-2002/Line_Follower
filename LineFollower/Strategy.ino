@@ -126,7 +126,8 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 250) {
+  //if (millis() - lostTimeStart < 250) {
+  if (millis() - lostTimeStart < 1) {
     forwardMotor();
     return true;
   } 
@@ -144,32 +145,39 @@ bool gap_4() {
 }
 
 // نقطة تفعيل دوران حاد جديد (تُرجع true إذا بدأ الدوران)
-bool activateTurn_5() {
+bool activateTurn_5(int skipsAllowed = 0) {
   if (millis() - turnCooldownTime < 250) {
-    return false; 
+    return false;
   }
+  
   if ((specialMemory && (leftOutRadar == 1)) ||
       ( leftOutRadarOn2 && (leftMidRadar == 1) && 
       (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
       (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightOutRadar == 0) )){
-    // =================================================================
-    // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
-    // =================================================================
     
-    // 1. أخذ نقطة مرجعية للوقت والمسافة كعامل أمان (Failsafe)
+    // 1. أخذ نقطة مرجعية للوقت والمسافة
     unsigned long waitStartTime = millis();
 
-    // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
+    // 2. حلقة الانتظار لاختراق الخط وعدم الالتفاف المبكر
     while (leftOutRadar == 1) {
-      loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
-      forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
-
+      loopSensors();
+      forwardMotor();
       if (millis() - waitStartTime > 220) {
-        break; 
+        break;
       }
+    }
+    
+    // =================================================================
+    // 3. التحقق من العداد لتجاهل المنعطف
+    // =================================================================
+    if (skippedTurnsCounter < skipsAllowed) {
+      skippedTurnsCounter++; // زيادة العداد لأننا تجاهلنا المنعطف هذه المرة
+      resetRadarMemory();    // تصفير الرادارات
+      return false;          // إرجاع false لإكمال السير للأمام وعدم الالتفاف
     }
     // =================================================================
     
+    // 4. التنفيذ الفعلي للدوران (إذا كان العداد مساوياً أو أكبر من العدد المطلوب)
     lineWasFound = false;
     turnLeft = true;
     leftMotor();
@@ -178,7 +186,11 @@ bool activateTurn_5() {
     turnRight = false;
     goLeft = false;
     goRight = false;
-    return true;  
+    
+    // 5. تصفير العداد بعد الالتفاف (استعداداً للمنعطفات القادمة في حال تكرر النمط)
+    skippedTurnsCounter = 0; 
+    
+    return true;
   }
   return false;
 }
