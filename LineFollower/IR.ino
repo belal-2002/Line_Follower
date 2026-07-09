@@ -104,7 +104,8 @@ void loopSensors() {
   
   // midMidMidSensor = S5 إلى S8 (البتات من 7 إلى 4) (4 حساسات مركزية)
   midMidMidSensor = __builtin_popcount((sensorBit >> 4) & 0x0F);
-  
+  //midMidMidSensor = bitRead(sensorBit, 4) + bitRead(sensorBit, 6) + bitRead(sensorBit, 7);
+
   // إجمالي الحساسات النشطة (12 بت)
   allSensor = __builtin_popcount(sensorBit & 0xFFF);
 
@@ -226,9 +227,9 @@ void loopSensors() {
 
  // =========================================================
   // 8. خوارزمية الذاكرة للشرط المخصص (Special Condition Memory)
-  // =========================================================
-  if ( (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
-       (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightRadar == 0) && (rightOutRadar == 0) ){ //
+ // =========================================================
+  if ( (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&  (bitRead(sensorBit, 6) == 1) &&
+       (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightOutRadar == 0) ){ //
     specialMemory = true; //
     specialMemoryStartTime = millis(); //
   } else { 
@@ -242,7 +243,7 @@ void loopSensors() {
     leftOutRadarOn2 = true; //
     leftOutRadarStartTime2 = millis(); //
   } else { 
-    if (((millis() - leftOutRadarStartTime2) > 20) && leftOutRadarOn2) { //
+    if (((millis() - leftOutRadarStartTime2) > 50) && leftOutRadarOn2) { //
         leftOutRadarOn2 = false; //
     }
   }
