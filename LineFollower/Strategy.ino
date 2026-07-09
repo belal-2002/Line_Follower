@@ -164,7 +164,7 @@ bool activateTurn_5() {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
-      if (millis() - waitStartTime > 170) {
+      if (millis() - waitStartTime > 220) {
         break; 
       }
     }
