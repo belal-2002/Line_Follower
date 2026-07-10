@@ -1,5 +1,7 @@
 void loopStrategy7() {
-    if (midSensor >= 5){
+  enableInversionDetection = false;
+
+  if (midSensor >= 5){
     leftMotor();
     return;
   }
