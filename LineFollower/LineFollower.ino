@@ -109,7 +109,7 @@
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
   unsigned long radarMinTime = 30; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
-  unsigned long radarMaxTime = 500; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
+  unsigned long radarMaxTime = 1000; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
   //700
   unsigned long leftOutRadarStartTime = 0;   
@@ -176,11 +176,12 @@
 
 int skippedTurnsCounter = 0; // عداد يحفظ عدد المرات التي تم فيها تجاهل الدوران
 
-int S_White[12] = {184, 236, 177, 176, 215, 187, 173, 175, 173, 223, 285, 198};
-int S_Black[12] = {2405, 3201, 2257, 2203, 3197, 3218, 2877, 2585, 2492, 3230, 3714, 2964};
-int target_White = 187;
-int target_Black = 2758;
-int lineThreshold = 1472;
+int S_White[12] = {185, 248, 184, 181, 232, 196, 179, 177, 175, 232, 369, 199};
+int S_Black[12] = {1009, 2803, 1697, 1478, 2757, 2533, 1561, 1766, 1402, 2596, 2980, 1379};
+int target_White = 195;
+int target_Black = 1974;
+int lineThreshold = 1084;
+
 
 
 
