@@ -44,10 +44,13 @@ void loopSwitch() {
         sweep180Done = false;
         turnCooldownTime = 0;
         
-        // 6. تصفير حالة الألوان المعكوسة
+        // 6. تصفير حالة الألوان المعكوسة (التحديث الجديد)
         isInverted = false;
-        inversionCounterBlack = 0;
-        inversionCounterWhite = 0;
+        invBlackCounter = 0;
+        invWhiteCounter = 0;
+        invIsCounting = false;
+        invMissedLoops = 0;
+        enableInversionDetection = false;
 
       } else {
         stopMotor();  
