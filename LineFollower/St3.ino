@@ -1,4 +1,6 @@
 void loopStrategy3() { // للأمام ثم لليسار
+  enableInversionDetection = false;
+  
   if (midSensor >= 4){
     leftMotor();
     return;
