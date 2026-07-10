@@ -1,5 +1,6 @@
 void loopStrategy4() { // لليسار
 
+
   cancelTurn_1();
 
   if (isTurning_2()) return;
@@ -10,7 +11,7 @@ void loopStrategy4() { // لليسار
 
   if (activateTurn_5()) return; 
 
-  //cleanIR_6();
+  cleanIR_6();
 
   calculateError();
 }
