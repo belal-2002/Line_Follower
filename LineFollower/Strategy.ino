@@ -126,7 +126,7 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 17) {
+  if (millis() - lostTimeStart < 200) {
     forwardMotor();
     return true;
   } 
