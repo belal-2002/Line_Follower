@@ -8,7 +8,7 @@ void loopStrategy1() { // للأمام ثم لليسار
 
   if (gap_4()) return;
 
-  //cleanIR_6();
+  cleanIR_6();
 
   calculateError();
 }
