@@ -1,7 +1,7 @@
 void loopStrategy2() { // للأمام ثم لليسار
   enableInversionDetection = false;
 
-  if (leftOutRadar && leftRadar && leftMidRadar && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) ){
+  if (leftOutRadar && leftRadar && leftMidRadar && (bitRead(sensorBit, 8) == 1) ){
     leftMotor();
     return;
   }
