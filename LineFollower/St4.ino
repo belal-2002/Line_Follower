@@ -1,6 +1,5 @@
 void loopStrategy4() { // لليسار
 
-
   cancelTurn_1();
 
   if (isTurning_2()) return;
