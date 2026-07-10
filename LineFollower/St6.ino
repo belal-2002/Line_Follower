@@ -1,4 +1,6 @@
 void loopStrategy6() {
+  enableInversionDetection = false;
+  
   if (midSensor >= 4){
     leftMotor();
     return;
