@@ -150,8 +150,8 @@ bool activateTurn_5() {
   }
   if ((specialMemory && (leftOutRadar == 1)) ||
       ( leftOutRadarOn2 && (leftMidRadar == 1) && 
-      (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
-      (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightOutRadar == 0) )){
+      (bitRead(sensorBit, 8) == 1) &&
+       (rightMidRadar == 0) && (rightOutRadar == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
