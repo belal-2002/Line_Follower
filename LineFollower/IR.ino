@@ -58,7 +58,7 @@ void loopSensors() {
                   }
                   invBlackCounter++;
                   
-                  if (invBlackCounter >= 100) { // شرط الدخول الصعب (100 دورة)
+                  if (invBlackCounter >= 33) { // شرط الدخول الصعب (100 دورة)
                       isInverted = true;
                       executeInversionReset();
                   }
@@ -91,7 +91,7 @@ void loopSensors() {
 
           // د. تصفير العدادات إذا مر 10 ملي ثانية أو 5 لفات متتالية بدون استقرار في الشرط
           if (invIsCounting) {
-              if ((millis() - invFirstTriggerTime >= 10) || (invMissedLoops >= 5)) {
+              if ((millis() - invFirstTriggerTime >= 150) || (invMissedLoops >= 15)) {
                   invBlackCounter = 0;
                   invWhiteCounter = 0;
                   invIsCounting = false;
