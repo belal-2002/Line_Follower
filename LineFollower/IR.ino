@@ -228,8 +228,8 @@ void loopSensors() {
  // =========================================================
   // 8. خوارزمية الذاكرة للشرط المخصص (Special Condition Memory)
  // =========================================================
-  if ( (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&  (bitRead(sensorBit, 6) == 1) &&
-       (bitRead(sensorBit, 3) == 0) && (rightMidRadar == 0) && (rightOutRadar == 0) ){ //
+  if ( (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && 
+        (rightMidRadar == 0) && (rightOutRadar == 0) ){ //
     specialMemory = true; //
     specialMemoryStartTime = millis(); //
   } else { 
