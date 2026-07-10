@@ -34,30 +34,28 @@ void loopSensors() {
   // أو إذا كنا بالفعل في وضع معكوس (لكي يستمر قلب الألوان بشكل صحيح)
   if (enableInversionDetection || isInverted) {
       
-      // أ. حساب عدد حساسات (midSensor) التي ترى لوناً "أسود فيزيائياً" بناءً على النسخة الأصلية
-      // الحساسات هي S3 إلى S10 (يقابلها في المصفوفة index من 2 إلى 9)
-      int midBlackCount = 0;
-      for (int i = 2; i <= 9; i++) {
+      // أ. حساب عدد جميع الحساسات التي ترى لوناً "أسود فيزيائياً" بناءً على النسخة الأصلية
+      // الحساسات هي S1 إلى S12 (يقابلها في المصفوفة index من 0 إلى 11)
+      int allBlackCount = 0;
+      for (int i = 0; i < 12; i++) {
           if (originalSensorValue[i] > lineThreshold) {
-              midBlackCount++;
+              allBlackCount++;
           }
       }
 
       // ب. خوارزمية اكتشاف التبديل (تُنفذ فقط إذا كانت الميزة مفعلة للاستراتيجية)
       if (enableInversionDetection) {
           bool conditionMet = false;
-
           // الحالة الأولى: نحن في الوضع الطبيعي ونبحث عن خلفية سوداء للدخول في الوضع المعكوس
           if (!isInverted) {
-              // إذا كانت معظم حساسات المنتصف ترى أسود (مثلاً 6 أو أكثر من أصل 8)
-              if (midBlackCount >= 6) { 
+              // إذا كانت معظم الحساسات الـ 12 ترى أسود (مثلاً 9 أو أكثر من أصل 12)
+              if (allBlackCount >= 9) { 
                   conditionMet = true;
                   if (!invIsCounting) {
                       invFirstTriggerTime = millis();
                       invIsCounting = true;
                   }
                   invBlackCounter++;
-                  
                   if (invBlackCounter >= 33) { // شرط الدخول الصعب (100 دورة)
                       isInverted = true;
                       executeInversionReset();
@@ -66,15 +64,14 @@ void loopSensors() {
           } 
           // الحالة الثانية: نحن في الوضع المعكوس ونبحث عن العودة للوضع الطبيعي (السهل)
           else {
-              // إذا كانت معظم حساسات المنتصف ترى أبيض (2 أو أقل يرون أسود)
-              if (midBlackCount <= 2) { 
+              // إذا كانت معظم الحساسات الـ 12 ترى أبيض (3 أو أقل يرون أسود)
+              if (allBlackCount <= 3) { 
                   conditionMet = true;
                   if (!invIsCounting) {
                       invFirstTriggerTime = millis();
                       invIsCounting = true;
                   }
                   invWhiteCounter++;
-                  
                   if (invWhiteCounter >= 20) { // شرط الخروج السهل (20 دورة)
                       isInverted = false;
                       executeInversionReset();
@@ -86,7 +83,7 @@ void loopSensors() {
           if (conditionMet) {
               invMissedLoops = 0; // تصفير عداد اللفات الضائعة لأننا حققنا الشرط في هذه اللفة
           } else {
-              invMissedLoops++;   // زيادة العداد لأننا لم نحقق الشرط في هذه اللفة
+              invMissedLoops++; // زيادة العداد لأننا لم نحقق الشرط في هذه اللفة
           }
 
           // د. تصفير العدادات إذا مر 10 ملي ثانية أو 5 لفات متتالية بدون استقرار في الشرط
