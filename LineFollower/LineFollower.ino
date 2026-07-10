@@ -9,13 +9,13 @@
   #define SCL_PIN 16  // إضافة رقم الدبوس
 
 // --- إعدادات شبكة الواي فاي ---
-  const char* ssid = "Zain_B530_A013";      
-  const char* password = "F8BLmiFRedB"; 
+  //const char* ssid = "Zain_B530_A013";      
+  //const char* password = "F8BLmiFRedB"; 
   //192.168.8.28
 
-  //const char* ssid = "Galaxy S20+2db9";      
-  //const char* password = "55555555";
-  //10.189.201.71
+  const char* ssid = "Galaxy S20+2db9";      
+  const char* password = "55555555";
+  //10.89.131.71
 
   //const char* ssid = "Zain-B315-2B47";      
   //const char* password = "RB6RRY10M1Y";
