@@ -1,4 +1,8 @@
 void loopStrategy2() { // للأمام ثم لليسار
+  if (midSensor >= 6){
+    leftMotor();
+    return;
+  }
 
   cancelTurn_1();
 
@@ -6,9 +10,9 @@ void loopStrategy2() { // للأمام ثم لليسار
 
   if (activateGo_3()) return;
 
-  if (noLine_4()) return;
+  if (gap_4()) return;
 
-  //cleanIR_6();
+  cleanIR_6();
 
   calculateError();
 }
