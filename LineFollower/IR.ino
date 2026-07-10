@@ -6,7 +6,7 @@ void loopSensors() {
   
   // =========================================================
   // 1. مرحلة قراءة الحساسات والفلترة (Oversampling Filter)
-  // =========================================================
+ // =========================================================
   for (int i = 0; i < 12; i++) {
     long tempSum = 0;
     for (int j = 0; j < 3; j++) {
@@ -14,82 +14,116 @@ void loopSensors() {
     }
     sensorValue[i] = tempSum / 3;
   }
-  //sensorValue[6] = 0;
-  
-  // =========================================================
-  // 2. مرحلة المعايرة الخطية وتقييد القيم (Linear Mapping)
-  // =========================================================
+
+ // =========================================================
+  // 2. مرحلة المعايرة الخطية وتقييد القيم (Linear Mapping) والنسخ الاحتياطي
+ // =========================================================
   for (int i = 0; i < 12; i++) {
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
     sensorValue[i] = constrain(sensorValue[i], 0, 4095);
-  }
-  
-  // =========================================================
-  // 3. مرحلة اكتشاف التبديل الشفاف للألوان (Inversion Zone)
-  // =========================================================
-  /*
-  int currentBlackCount = 0;
-  // حساب عدد الحساسات التي ترى لوناً "أسود فيزيائي" حالياً
-  for (int i = 0; i < 12; i++) {
-    if (sensorValue[i] > lineThreshold) {
-      currentBlackCount++;
-    }
-  }
-
-  // أ. اكتشاف الدخول في المنطقة المعكوسة (الخلفية أصبحت سوداء والخط أبيض)
-  // الشرط != 12 هو لحماية الروبوت من التقاطعات العادية (+) التي تعطي 12 أسود مؤقتاً
-  if (!isInverted && currentBlackCount >= 9 && currentBlackCount != 12) {
-    inversionCounterBlack++; // زيادة عداد التأكيد
     
-    if (inversionCounterBlack > INVERSION_THRESH) {
-      isInverted = true; // تأكيد الدخول في المنطقة المعكوسة
-      inversionCounterBlack = 0; // تصفير العداد
-      tone(buzzerPin, 3000, 90); // إطلاق نغمة سريعة لتأكيد التبديل
-    }
-  } 
+    // --- التعديل الأول: أخذ نسخة احتياطية دائماً (بغض النظر عن الاستراتيجية) ---
+    originalSensorValue[i] = sensorValue[i];
+  }
   
-  // ب. اكتشاف الخروج من المنطقة المعكوسة (العودة للوضع الطبيعي)
-  // إذا كنا في وضع معكوس ورأينا 3 حساسات أو أقل باللون الأسود الفيزيائي
-  else if (isInverted && currentBlackCount <= 3) {
-    inversionCounterWhite++; // زيادة عداد التأكيد للعودة
-    
-    if (inversionCounterWhite > (INVERSION_THRESH / 3)) { // استجابة العودة أسرع بـ 3 مرات
-      isInverted = false; // تأكيد العودة للوضع الطبيعي
-      inversionCounterWhite = 0; // تصفير العداد
-      tone(buzzerPin, 3000, 90); // إطلاق نغمة التبديل
-    }
-  } 
+ // =========================================================
+  // 3. مرحلة اكتشاف التبديل الشفاف للألوان V2.0 (Inversion Zone)
+ // =========================================================
   
-  // ج. تصفير العدادات إذا كانت الحالات مؤقتة (مثل المرور فوق أوساخ أو تقاطع)
-  else {
-    inversionCounterBlack = 0;
-    inversionCounterWhite = 0;
+  // سنقوم بمعالجة التبديل فقط إذا كانت الميزة مفعلة في الاستراتيجية
+  // أو إذا كنا بالفعل في وضع معكوس (لكي يستمر قلب الألوان بشكل صحيح)
+  if (enableInversionDetection || isInverted) {
+      
+      // أ. حساب عدد حساسات (midSensor) التي ترى لوناً "أسود فيزيائياً" بناءً على النسخة الأصلية
+      // الحساسات هي S3 إلى S10 (يقابلها في المصفوفة index من 2 إلى 9)
+      int midBlackCount = 0;
+      for (int i = 2; i <= 9; i++) {
+          if (originalSensorValue[i] > lineThreshold) {
+              midBlackCount++;
+          }
+      }
+
+      // ب. خوارزمية اكتشاف التبديل (تُنفذ فقط إذا كانت الميزة مفعلة للاستراتيجية)
+      if (enableInversionDetection) {
+          bool conditionMet = false;
+
+          // الحالة الأولى: نحن في الوضع الطبيعي ونبحث عن خلفية سوداء للدخول في الوضع المعكوس
+          if (!isInverted) {
+              // إذا كانت معظم حساسات المنتصف ترى أسود (مثلاً 6 أو أكثر من أصل 8)
+              if (midBlackCount >= 6) { 
+                  conditionMet = true;
+                  if (!invIsCounting) {
+                      invFirstTriggerTime = millis();
+                      invIsCounting = true;
+                  }
+                  invBlackCounter++;
+                  
+                  if (invBlackCounter >= 100) { // شرط الدخول الصعب (100 دورة)
+                      isInverted = true;
+                      executeInversionReset();
+                  }
+              }
+          } 
+          // الحالة الثانية: نحن في الوضع المعكوس ونبحث عن العودة للوضع الطبيعي (السهل)
+          else {
+              // إذا كانت معظم حساسات المنتصف ترى أبيض (2 أو أقل يرون أسود)
+              if (midBlackCount <= 2) { 
+                  conditionMet = true;
+                  if (!invIsCounting) {
+                      invFirstTriggerTime = millis();
+                      invIsCounting = true;
+                  }
+                  invWhiteCounter++;
+                  
+                  if (invWhiteCounter >= 20) { // شرط الخروج السهل (20 دورة)
+                      isInverted = false;
+                      executeInversionReset();
+                  }
+              }
+          }
+
+          // ج. إدارة استقرار العدادات (منع التشويش)
+          if (conditionMet) {
+              invMissedLoops = 0; // تصفير عداد اللفات الضائعة لأننا حققنا الشرط في هذه اللفة
+          } else {
+              invMissedLoops++;   // زيادة العداد لأننا لم نحقق الشرط في هذه اللفة
+          }
+
+          // د. تصفير العدادات إذا مر 10 ملي ثانية أو 5 لفات متتالية بدون استقرار في الشرط
+          if (invIsCounting) {
+              if ((millis() - invFirstTriggerTime >= 10) || (invMissedLoops >= 5)) {
+                  invBlackCounter = 0;
+                  invWhiteCounter = 0;
+                  invIsCounting = false;
+                  invMissedLoops = 0;
+              }
+          }
+      }
+
+      // هـ. تطبيق العكس الرياضي للقيم الفعلية قبل الـ Bitmasking
+      if (isInverted) {
+          for (int i = 0; i < 12; i++) {
+              // نستخدم originalSensorValue لضمان عدم تأثر القيم بتعديلات سابقة
+              sensorValue[i] = (target_Black + target_White) - originalSensorValue[i];
+          }
+      }
   }
 
-  // د. الخدعة الرياضية: عكس القيم فعلياً إذا تم تأكيد وضع التبديل
-  if (isInverted) {
-    for (int i = 0; i < 12; i++) {
-      // معادلة العكس السحرية: تحويل الأسود لأبيض والأبيض لأسود رياضياً
-      sensorValue[i] = (target_Black + target_White) - sensorValue[i];
-    }
-  }
-  */
-  
-
-  // =========================================================
+ // =========================================================
   // 4. مرحلة التشفير الثنائي (Bitmasking) للحساسات
-  // =========================================================
+  // (سيستخدم الآن sensorValue سواء كانت مقلوبة أو طبيعية)
+ // =========================================================
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
-      bitSet(sensorBit, 11 - i); 
+      bitSet(sensorBit, 11 - i);
     } else {
       bitClear(sensorBit, 11 - i);
     }
   }
 
-  // =========================================================
+ // =========================================================
   // 5. استخراج البيانات وعدّ الحساسات النشطة (Popcount Logic)
-  // =========================================================
+ // =========================================================
   
   // leftSensor = S1 إلى S6 (أول 6 حساسات يسار)
   leftSensor = __builtin_popcount((sensorBit >> 6) & 0x3F);
@@ -109,9 +143,9 @@ void loopSensors() {
   // إجمالي الحساسات النشطة (12 بت)
   allSensor = __builtin_popcount(sensorBit & 0xFFF);
 
-  // =========================================================
+ // =========================================================
   // 6. تخصيص قراءات الرادارات الموضعية
-  // =========================================================
+ // =========================================================
   leftOutRadar   = bitRead(sensorBit, 11); // S1
   leftRadar    = bitRead(sensorBit, 10); // S2
   leftMidRadar   = bitRead(sensorBit, 9);  // S3 
@@ -119,7 +153,7 @@ void loopSensors() {
   rightRadar   = bitRead(sensorBit, 1);  // S11
   rightOutRadar  = bitRead(sensorBit, 0); // S12
 
-  // =========================================================
+ // =========================================================
   // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory) - مطورة
  // =========================================================
   
