@@ -250,6 +250,43 @@ void stop() {
   turnCooldownTime = 0;
 }
 
+// ====================================================================
+// دالة إعادة ضبط النظام عند حدوث تبديل في الألوان
+// ====================================================================
+void executeInversionReset() {
+    // 1. إيقاف المحركات تماماً
+    stopMotor();
+    
+    // 2. إطلاق نغمة التنبيه (كما في الكود القديم)
+    tone(buzzerPin, 3000, 90);
+    
+    // 3. توقيف المعالج بالكامل لمدة 10 ملي ثانية (حسب طلبك)
+    delay(60);
+    
+    // 4. إعادة تفعيل درايفر المحركات
+    digitalWrite(STBY, HIGH);
+    
+    // 5. تصفير جميع الأعلام والمتغيرات الملاحية (باستثناء pitchOffset)
+    resetRadarMemory();
+    goLeft = false;
+    goRight = false;
+    turnLeft = false;
+    turnRight = false;
+    currentError = 0;
+    lastError = 0;
+    PD_Value = 0;
+    lineWasFound = true;
+    Turn180now = false;
+    sweep180Done = false;
+    turnCooldownTime = 0;
+
+    // 6. تصفير عدادات التبديل نفسها لتبدأ نظيفة للمرة القادمة
+    invBlackCounter = 0;
+    invWhiteCounter = 0;
+    invIsCounting = false;
+    invMissedLoops = 0;
+}
+
 
 
 
