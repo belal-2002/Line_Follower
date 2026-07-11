@@ -24,21 +24,22 @@ void loopStrategy() {
 // الدوال المساعدة (Helper Functions) لتوحيد أكواد السباق
 // ====================================================================
 
-//  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
+// إلغاء الدوران أو السير المستقيم الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelTurn_1() {
-  if (midMidMidSensor) { 
-    if (goLeft || goRight) {
+  if (midMidMidSensor) {
+    // تمت إضافة straight هنا ضمن الشرط
+    if (goLeft || goRight || straight) { 
       goLeft = false;
       goRight = false;
+      straight = false; // إيقاف حالة المستقيم
       currentError = 0;
       lastError = 0;
       PD_Value = 0;
       resetRadarMemory();
       //stop();
     }
-
     if (turnLeft || turnRight) {
-      if (millis() - turnStartTime >= 250) { 
+      if (millis() - turnStartTime >= 250) {
         turnLeft = false;
         turnRight = false;
         turnCooldownTime = millis();
@@ -52,23 +53,42 @@ void cancelTurn_1() {
   }
 }
 
-// التحقق مما إذا كان الروبوت في حالة دوران حالياً
+
+// التحقق مما إذا كان الروبوت في حالة دوران أو عبور تقاطع حالياً
 bool isTurning_2() {
-  return (turnLeft || turnRight || goLeft || goRight);
+  // تمت إضافة straight للتحقق من الحالة
+  return (turnLeft || turnRight || goLeft || goRight || straight);
 }
 
-bool activateGo_3() {
+// قمنا بإزالة = false من هنا لأننا أعلنا عنها في الملف الرئيسي
+bool activateGo_3(bool isStrategy1) {
   if (midMidMidSensor == 0) {
     lineWasFound = false;
+      // نتحقق: هل نحن في الاستراتيجية الأولى؟ وهل العداد لم يصل للرقم 5 بعد؟
+      if (isStrategy1 && (straightCounter < 3) ) {
+        straight = true;
+        forwardMotor();
+        resetRadarMemory();
+        straightCounter++; // زيادة العداد بمقدار 1
+        return true;
+      }
+    // إذا التقط حساس اليسار نقطة التقاطع
+    if (leftMidRadarOn) {
+        goLeft = true;
+        leftMotor();
+        resetRadarMemory();
+        return true;
+      }
     
-    if (leftMidRadarOn && rightMidRadarOn){
-      if (leftOutRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
-      if (rightOutRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+    // حساس اليمين يبقى يعمل كالمعتاد في جميع الحالات
+    if (rightMidRadarOn) { 
+      goRight = true; 
+      rightMotor(); 
+      resetRadarMemory(); 
+      return true; 
     }
-    if (leftMidRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
-    if (rightMidRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
-
-    return false; 
+    
+    return false;
   }
   return false;
 }
@@ -101,7 +121,7 @@ bool gap_4() {
       } 
       else {
         // التحقق من مرور 11 ملي ثانية والخط لا يزال موجوداً
-        if (millis() - lineFoundTime >= 75) { 
+        if (millis() - lineFoundTime >= 20) { 
           // تم تأكيد الخط! ننهي البحث ونسلم القيادة
           isSearching = false;
           verifyingLine = false;
@@ -126,7 +146,7 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 400) {
+  if (millis() - lostTimeStart < 200) {
     forwardMotor();
     return true;
   } 
