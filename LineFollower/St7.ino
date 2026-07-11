@@ -1,5 +1,5 @@
 void loopStrategy7() {
-  if (isBackgroundBlack) { 
+  if (inverted) { 
     isPostInversion = true; 
   }
 
