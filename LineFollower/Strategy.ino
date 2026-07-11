@@ -101,7 +101,7 @@ bool gap_4() {
       } 
       else {
         // التحقق من مرور 11 ملي ثانية والخط لا يزال موجوداً
-        if (millis() - lineFoundTime >= 15) { 
+        if (millis() - lineFoundTime >= 75) { 
           // تم تأكيد الخط! ننهي البحث ونسلم القيادة
           isSearching = false;
           verifyingLine = false;
