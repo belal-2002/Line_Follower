@@ -57,7 +57,7 @@ void rightMotor_2() {
   digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
 
   ledcWrite(PWMA, baseSpeed);
-  ledcWrite(PWMB, 0);
+  ledcWrite(PWMB, baseSpeed - 25);
 }
 
 
