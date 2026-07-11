@@ -9,12 +9,12 @@
   #define SCL_PIN 16  // إضافة رقم الدبوس
 
 // --- إعدادات شبكة الواي فاي ---
-  const char* ssid = "Zain_B530_A013";      
-  const char* password = "F8BLmiFRedB"; 
+  //const char* ssid = "Zain_B530_A013";      
+  //const char* password = "F8BLmiFRedB"; 
   //192.168.8.28
 
-  //const char* ssid = "Galaxy S20+2db9";      
-  //const char* password = "55555555";
+  const char* ssid = "Galaxy S20+2db9";      
+  const char* password = "55555555";
   //10.89.131.71
 
   //const char* ssid = "Zain-B315-2B47";      
@@ -109,7 +109,7 @@
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
   unsigned long radarMinTime = 30; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
-  unsigned long radarMaxTime = 500; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
+  unsigned long radarMaxTime = 400; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
   //700
   unsigned long leftOutRadarStartTime = 0;   
@@ -178,6 +178,8 @@ int skippedTurnsCounter = 0; // عداد يحفظ عدد المرات التي �
 // متغير لحفظ حالة ما بعد عكس الألوان
 bool isPostInversion = false;
 
+bool straight = false;
+int straightCounter = 0; // هذا العداد سيحسب كم مرة سار الروبوت للأمام
 
 
 
@@ -185,15 +187,24 @@ bool isPostInversion = false;
 int S_Black[12] = {308, 2285, 1029, 550, 2174, 1993, 769, 913, 555, 2165, 2728, 852};
 int target_White = 193;
 int target_Black = 1268;
-int lineThreshold = 731;
-*/
+int lineThreshold = 731;*/
 
-int S_White[12] = {209, 271, 196, 194, 228, 201, 191, 191, 189, 228, 315, 217};
-int S_Black[12] = {2756, 3612, 2794, 2679, 3367, 2975, 2626, 2977, 2763, 3277, 3691, 2840};
-int target_White = 202;
-int target_Black = 2932;
+
+/*int S_White[12] = {199, 296, 188, 182, 210, 184, 173, 171, 171, 213, 540, 218};
+int S_Black[12] = {2625, 3572, 2479, 2413, 2883, 2922, 1856, 1997, 1865, 2811, 3713, 2765};
+int target_White = 186;
+int target_Black = 2403;
+int lineThreshold = 1295;*/
+
+
+int S_White[12] = {191, 603, 227, 219, 613, 224, 196, 200, 196, 357, 1198, 212};
+int S_Black[12] = {2638, 3248, 2586, 2470, 3474, 3095, 2597, 2749, 2437, 3429, 3536, 2379};
+int target_White = 279;
+int target_Black = 2855;
 int lineThreshold = 1567;
 
+
+bool activateGo_3(bool isStrategy1 = false);
 
 
 void setup() {
@@ -207,7 +218,7 @@ void setup() {
 }
 
 void loop() {
-  loopSwitch();
+loopSwitch();
   updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
