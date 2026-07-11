@@ -5,11 +5,14 @@ if (isInverted) {
 
   if (!isPostInversion) {
     enableInversionDetection = true;
+    if (midSensor >= 6){
+      leftMotor();
+      return;
+    }
     cancelTurn_1();
     if (isTurning_2()) return;
-    if (activateGo_3()) return;
+    if (activateGo_3(true)) return; 
     if (gap_4()) return;
-    if (activateTurn_5()) return; 
     cleanIR_6();
     calculateError();
   } else {
