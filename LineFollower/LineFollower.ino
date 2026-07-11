@@ -183,11 +183,11 @@ int straightCounter = 0; // هذا العداد سيحسب كم مرة سار ا
 
 
 
-/*int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
+int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
 int S_Black[12] = {308, 2285, 1029, 550, 2174, 1993, 769, 913, 555, 2165, 2728, 852};
 int target_White = 193;
 int target_Black = 1268;
-int lineThreshold = 731;*/
+int lineThreshold = 731;
 
 
 /*int S_White[12] = {199, 296, 188, 182, 210, 184, 173, 171, 171, 213, 540, 218};
@@ -197,11 +197,11 @@ int target_Black = 2403;
 int lineThreshold = 1295;*/
 
 
-int S_White[12] = {191, 603, 227, 219, 613, 224, 196, 200, 196, 357, 1198, 212};
+/*int S_White[12] = {191, 603, 227, 219, 613, 224, 196, 200, 196, 357, 1198, 212};
 int S_Black[12] = {2638, 3248, 2586, 2470, 3474, 3095, 2597, 2749, 2437, 3429, 3536, 2379};
 int target_White = 279;
 int target_Black = 2855;
-int lineThreshold = 1567;
+int lineThreshold = 1567;*/
 
 
 bool activateGo_3(bool isStrategy1 = false);
