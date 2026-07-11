@@ -9,12 +9,12 @@
   #define SCL_PIN 16  // إضافة رقم الدبوس
 
 // --- إعدادات شبكة الواي فاي ---
-  //const char* ssid = "Zain_B530_A013";      
-  //const char* password = "F8BLmiFRedB"; 
+  const char* ssid = "Zain_B530_A013";      
+  const char* password = "F8BLmiFRedB"; 
   //192.168.8.28
 
-  const char* ssid = "Galaxy S20+2db9";      
-  const char* password = "55555555";
+  //const char* ssid = "Galaxy S20+2db9";      
+  //const char* password = "55555555";
   //10.89.131.71
 
   //const char* ssid = "Zain-B315-2B47";      
@@ -54,9 +54,9 @@
 // ---------------------------------------------------------
 // 2. متغيرات إعدادات السرعة (Speed Configuration)
 // ---------------------------------------------------------
-  int originalMaximumSpeed = 420; // السرعة القصوى المرجعية
-  int originalBaseSpeed = 210;    // السرعة الأساسية المرجعية في الخط المستقيم
-  int originalTurnSpeed = 210;    // سرعة الانعطاف المرجعية
+  int originalMaximumSpeed = 600; // السرعة القصوى المرجعية
+  int originalBaseSpeed = 300;    // السرعة الأساسية المرجعية في الخط المستقيم
+  int originalTurnSpeed = 300;    // سرعة الانعطاف المرجعية
 
   int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
   int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
@@ -109,7 +109,7 @@
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
   unsigned long radarMinTime = 30; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
-  unsigned long radarMaxTime = 1000; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
+  unsigned long radarMaxTime = 500; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
   //700
   unsigned long leftOutRadarStartTime = 0;   
@@ -176,12 +176,18 @@
 
 int skippedTurnsCounter = 0; // عداد يحفظ عدد المرات التي تم فيها تجاهل الدوران
 
-int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
+/*int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
 int S_Black[12] = {308, 2285, 1029, 550, 2174, 1993, 769, 913, 555, 2165, 2728, 852};
 int target_White = 193;
 int target_Black = 1268;
 int lineThreshold = 731;
+*/
 
+int S_White[12] = {209, 271, 196, 194, 228, 201, 191, 191, 189, 228, 315, 217};
+int S_Black[12] = {2756, 3612, 2794, 2679, 3367, 2975, 2626, 2977, 2763, 3277, 3691, 2840};
+int target_White = 202;
+int target_Black = 2932;
+int lineThreshold = 1567;
 
 
 
