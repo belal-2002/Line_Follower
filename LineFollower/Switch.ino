@@ -52,6 +52,8 @@ void loopSwitch() {
         invMissedLoops = 0;
         enableInversionDetection = false;
 
+        isPostInversion = false;
+
       } else {
         stopMotor();  
       }
