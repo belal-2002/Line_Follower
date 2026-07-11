@@ -1,5 +1,5 @@
 void loopStrategy7() {
-  if (inverted) { 
+if (isInverted) { 
     isPostInversion = true; 
   }
 
