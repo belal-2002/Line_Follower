@@ -33,8 +33,8 @@ void cancelTurn_1() {
       currentError = 0;
       lastError = 0;
       PD_Value = 0;
-      //resetRadarMemory();
-      stop();
+      resetRadarMemory();
+      //stop();
     }
 
     if (turnLeft || turnRight) {
@@ -45,8 +45,8 @@ void cancelTurn_1() {
         currentError = 0;
         lastError = 0;
         PD_Value = 0;
-        //resetRadarMemory();
-        stop();
+        resetRadarMemory();
+        //stop();
       }
     }
   }
