@@ -26,6 +26,11 @@ void loopStrategy() {
 
 // إلغاء الدوران أو السير المستقيم الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelTurn_1() {
+
+  if (midSensor && straight){
+    straight = false; // إيقاف حالة المستقيم
+  }
+
   if (midMidMidSensor) {
     // تمت إضافة straight هنا ضمن الشرط
     if (goLeft || goRight || straight) { 
@@ -39,7 +44,7 @@ void cancelTurn_1() {
       //stop();
     }
     if (turnLeft || turnRight) {
-      if (millis() - turnStartTime >= 250) {
+      if (millis() - turnStartTime >= 350) {
         turnLeft = false;
         turnRight = false;
         turnCooldownTime = millis();
@@ -65,7 +70,7 @@ bool activateGo_3(bool isStrategy1) {
   if (midMidMidSensor == 0) {
     lineWasFound = false;
       // نتحقق: هل نحن في الاستراتيجية الأولى؟ وهل العداد لم يصل للرقم 5 بعد؟
-      if (isStrategy1 && (straightCounter < 3) ) {
+      if (isStrategy1 && (straightCounter < 4) ) {
         straight = true;
         forwardMotor();
         resetRadarMemory();
@@ -171,7 +176,8 @@ bool activateTurn_5() {
   if ((specialMemory && (leftOutRadar == 1)) ||
       ( leftOutRadarOn2 && (leftMidRadar == 1) && 
       (bitRead(sensorBit, 8) == 1) &&
-       (rightMidRadar == 0) && (rightOutRadar == 0) )){
+      (rightMidRadar == 0) && (rightOutRadar == 0) ) ||
+      (leftMidRadar && leftRadar)){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -180,14 +186,14 @@ bool activateTurn_5() {
     unsigned long waitStartTime = millis();
 
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
-    while (leftOutRadar == 1) {
+    /*while (leftOutRadar == 1) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
       if (millis() - waitStartTime > 220) {
         break; 
       }
-    }
+    }*/
     // =================================================================
     
     lineWasFound = false;
