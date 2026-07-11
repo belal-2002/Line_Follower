@@ -54,9 +54,9 @@
 // ---------------------------------------------------------
 // 2. متغيرات إعدادات السرعة (Speed Configuration)
 // ---------------------------------------------------------
-  int originalMaximumSpeed = 600; // السرعة القصوى المرجعية
-  int originalBaseSpeed = 300;    // السرعة الأساسية المرجعية في الخط المستقيم
-  int originalTurnSpeed = 300;    // سرعة الانعطاف المرجعية
+  int originalMaximumSpeed = 470; // السرعة القصوى المرجعية
+  int originalBaseSpeed = 235;    // السرعة الأساسية المرجعية في الخط المستقيم
+  int originalTurnSpeed = 235;    // سرعة الانعطاف المرجعية
 
   int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
   int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
@@ -183,11 +183,11 @@ int straightCounter = 0; // هذا العداد سيحسب كم مرة سار ا
 
 
 
-int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
+/*int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
 int S_Black[12] = {308, 2285, 1029, 550, 2174, 1993, 769, 913, 555, 2165, 2728, 852};
 int target_White = 193;
 int target_Black = 1268;
-int lineThreshold = 731;
+int lineThreshold = 731;*/
 
 
 /*int S_White[12] = {199, 296, 188, 182, 210, 184, 173, 171, 171, 213, 540, 218};
@@ -202,6 +202,15 @@ int S_Black[12] = {2638, 3248, 2586, 2470, 3474, 3095, 2597, 2749, 2437, 3429, 3
 int target_White = 279;
 int target_Black = 2855;
 int lineThreshold = 1567;*/
+
+
+
+int S_White[12] = {178, 236, 175, 175, 231, 191, 178, 179, 178, 236, 575, 204};
+int S_Black[12] = {635, 2539, 1376, 1236, 2734, 2361, 1637, 1746, 1437, 2670, 3141, 1922};
+int target_White = 193;
+int target_Black = 1900;
+int lineThreshold = 1046;
+
 
 
 bool activateGo_3(bool isStrategy1 = false);
