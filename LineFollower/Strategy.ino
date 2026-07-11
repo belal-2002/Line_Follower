@@ -44,7 +44,7 @@ void cancelTurn_1() {
       //stop();
     }
     if (turnLeft || turnRight) {
-      if (millis() - turnStartTime >= 350) {
+      if (millis() - turnStartTime >= 290) {
         turnLeft = false;
         turnRight = false;
         turnCooldownTime = millis();
@@ -177,7 +177,7 @@ bool activateTurn_5() {
       ( leftOutRadarOn2 && (leftMidRadar == 1) && 
       (bitRead(sensorBit, 8) == 1) &&
       (rightMidRadar == 0) && (rightOutRadar == 0) ) ||
-      (leftMidRadar && leftRadar)){
+      (leftMidRadar && leftRadar && (bitRead(sensorBit, 8) == 1) && (rightMidRadar == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
