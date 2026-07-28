@@ -54,9 +54,9 @@
 // ---------------------------------------------------------
 // 2. متغيرات إعدادات السرعة (Speed Configuration)
 // ---------------------------------------------------------
-  int originalMaximumSpeed = 470; // السرعة القصوى المرجعية
-  int originalBaseSpeed = 235;    // السرعة الأساسية المرجعية في الخط المستقيم
-  int originalTurnSpeed = 235;    // سرعة الانعطاف المرجعية
+  int originalMaximumSpeed = 500; // السرعة القصوى المرجعية
+  int originalBaseSpeed = 250;    // السرعة الأساسية المرجعية في الخط المستقيم
+  int originalTurnSpeed = 250;    /    / سرعة الانعطاف المرجعية
 
   int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
   int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
@@ -197,19 +197,19 @@ int target_Black = 2403;
 int lineThreshold = 1295;*/
 
 
-int S_White[12] = {191, 603, 227, 219, 613, 224, 196, 200, 196, 357, 1198, 212};
+/*int S_White[12] = {191, 603, 227, 219, 613, 224, 196, 200, 196, 357, 1198, 212};
 int S_Black[12] = {2638, 3248, 2586, 2470, 3474, 3095, 2597, 2749, 2437, 3429, 3536, 2379};
 int target_White = 279;
 int target_Black = 2855;
-int lineThreshold = 1567;
+int lineThreshold = 1567;*/
 
 
 
-/*int S_White[12] = {178, 236, 175, 175, 231, 191, 178, 179, 178, 236, 575, 204};
+int S_White[12] = {178, 236, 175, 175, 231, 191, 178, 179, 178, 236, 575, 204};
 int S_Black[12] = {635, 2539, 1376, 1236, 2734, 2361, 1637, 1746, 1437, 2670, 3141, 1922};
 int target_White = 193;
 int target_Black = 1900;
-int lineThreshold = 1046;*/
+int lineThreshold = 1046;
 
 
 
