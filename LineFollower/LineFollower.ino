@@ -13,13 +13,14 @@
   //const char* password = "F8BLmiFRedB"; 
   //192.168.8.28
 
-  const char* ssid = "Galaxy S20+2db9";      
-  const char* password = "55555555";
-  //10.89.131.71
+  //const char* ssid = "Galaxy S20+2db9";      
+  //const char* password = "55555555";
+  //10.189.201.71
 
-  //const char* ssid = "Zain-B315-2B47";      
-  //const char* password = "RB6RRY10M1Y";
+  const char* ssid = "Zain-B315-2B47";      
+  const char* password = "RB6RRY10M1Y";
   //192.168.8.101
+
 
 // --- تعريف دبابيس المحركات ---
   #define PWMA 42   
@@ -54,9 +55,9 @@
 // ---------------------------------------------------------
 // 2. متغيرات إعدادات السرعة (Speed Configuration)
 // ---------------------------------------------------------
-  int originalMaximumSpeed = 500; // السرعة القصوى المرجعية
-  int originalBaseSpeed = 250;    // السرعة الأساسية المرجعية في الخط المستقيم
-  int originalTurnSpeed = 250;    /    / سرعة الانعطاف المرجعية
+  int originalMaximumSpeed = 450; // السرعة القصوى المرجعية
+  int originalBaseSpeed = 225;    // السرعة الأساسية المرجعية في الخط المستقيم
+  int originalTurnSpeed = 250;    // سرعة الانعطاف المرجعية
 
   int maximumSpeed = originalMaximumSpeed; // السرعة القصوى الفعّالة (تتغير حسب المنحدر)
   int baseSpeed = originalBaseSpeed;       // السرعة الأساسية الفعّالة
@@ -70,8 +71,8 @@
 // ---------------------------------------------------------
 // 3. متغيرات التحكم وتصحيح المسار (PID Control)
 // ---------------------------------------------------------
-  float Kp = 0.45;                // معامل التصحيح التناسبي (شراسة العودة للمنتصف)
-  float Kd = 5.5;               // معامل التصحيح التفاضلي (نعومة الحركة وإخماد الاهتزاز)
+  float Kp = 0.50;                // معامل التصحيح التناسبي (شراسة العودة للمنتصف)
+  float Kd = 5.0;               // معامل التصحيح التفاضلي (نعومة الحركة وإخماد الاهتزاز)
   float currentError = 0;         // نسبة الخطأ اللحظية عن مركز الخط
   float lastError = 0;            // نسبة الخطأ السابقة (لحساب المعامل التفاضلي D)
   float PD_Value = 0;
@@ -109,7 +110,7 @@
   bool rightMidRadarOn = false;   // راية (Flag) لتفعيل حدث التقاط رادار اليمين الداخلي
 
   unsigned long radarMinTime = 30; // الحد الأدنى للذاكرة: بعدها يبدأ الرادار بسؤال الرادار المقابل
-  unsigned long radarMaxTime = 400; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
+  unsigned long radarMaxTime = 600; // الحد الأقصى المطلق: المدة التي بعدها ينطفئ الرادار إجبارياً
   //200
   //700
   unsigned long leftOutRadarStartTime = 0;   
@@ -159,63 +160,20 @@
   int inversionCounterWhite = 0;   // عداد مرشح (Filter) لاكتشاف الخروج والعودة للمنطقة البيضاء
 
 // ---------------------------------------------------------
-// ---------------------------------------------------------
-// 10. متغيرات منطقة التبديل الشفاف للألوان (Inversion Zone - V2.0)
-// ---------------------------------------------------------
-  bool enableInversionDetection = false; // مفتاح التحكم بالميزة من داخل الاستراتيجيات
-  int originalSensorValue[12];           // مصفوفة النسخ الاحتياطي الدائم لقراءات الحساسات الفيزيائية
 
-  int invBlackCounter = 0;               // عداد الدخول في المنطقة المعكوسة (الهدف 100)
-  int invWhiteCounter = 0;               // عداد الخروج للوضع الطبيعي (الهدف 20)
-  unsigned long invFirstTriggerTime = 0; // تسجيل وقت أول مرة تحقق فيها الشرط
-  int invMissedLoops = 0;                // عداد اللفات التي لم يتحقق فيها الشرط لحساب الاستقرار
-  bool invIsCounting = false;            // راية لمعرفة هل بدأنا نعد أم لا
-// ---------------------------------------------------------
+
+int S_White[12] = {183, 240, 179, 178, 227, 192, 178, 180, 179, 268, 749, 226};
+int S_Black[12] = {1208, 2897, 1960, 1816, 2853, 2708, 1745, 1975, 1915, 3096, 3639, 2746};
+int target_White = 198;
+int target_Black = 2259; 
+int lineThreshold = 1228;
 
 
 
-int skippedTurnsCounter = 0; // عداد يحفظ عدد المرات التي تم فيها تجاهل الدوران
-// متغير لحفظ حالة ما بعد عكس الألوان
-bool isPostInversion = false;
-
-bool straight = false;
-int straightCounter = 0; // هذا العداد سيحسب كم مرة سار الروبوت للأمام
 
 
 
-/*int S_White[12] = {180, 240, 185, 180, 232, 194, 179, 179, 176, 223, 284, 194};
-int S_Black[12] = {308, 2285, 1029, 550, 2174, 1993, 769, 913, 555, 2165, 2728, 852};
-int target_White = 193;
-int target_Black = 1268;
-int lineThreshold = 731;*/
 
-
-/*int S_White[12] = {199, 296, 188, 182, 210, 184, 173, 171, 171, 213, 540, 218};
-int S_Black[12] = {2625, 3572, 2479, 2413, 2883, 2922, 1856, 1997, 1865, 2811, 3713, 2765};
-int target_White = 186;
-int target_Black = 2403;
-int lineThreshold = 1295;*/
-
-
-/*int S_White[12] = {191, 603, 227, 219, 613, 224, 196, 200, 196, 357, 1198, 212};
-int S_Black[12] = {2638, 3248, 2586, 2470, 3474, 3095, 2597, 2749, 2437, 3429, 3536, 2379};
-int target_White = 279;
-int target_Black = 2855;
-int lineThreshold = 1567;*/
-
-
-
-int S_White[12] = {178, 236, 175, 175, 231, 191, 178, 179, 178, 236, 575, 204};
-int S_Black[12] = {635, 2539, 1376, 1236, 2734, 2361, 1637, 1746, 1437, 2670, 3141, 1922};
-int target_White = 193;
-int target_Black = 1900;
-int lineThreshold = 1046;
-
-
-
-bool activateGo_3(bool isStrategy1 = false);
-
-     
 void setup() {
   //Serial.begin(115200);
   setupMotors();
@@ -227,7 +185,7 @@ void setup() {
 }
 
 void loop() {
-loopSwitch();
+  loopSwitch();
   updateMPU();
   loopSensors();
   if (isRunning || strategy == 0) {
