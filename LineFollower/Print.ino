@@ -61,11 +61,7 @@ void loopPrint() {
         TelnetStream.print("\t");               
       }
       TelnetStream.print("midMidMidSensor: ");
-      TelnetStream.print(midMidMidSensor);
-      TelnetStream.print("   allSensor: ");
-      TelnetStream.print(allSensor);
-      TelnetStream.print("   strategy: ");
-      TelnetStream.println(strategy);
+      TelnetStream.println(midMidMidSensor);
 
 
 
