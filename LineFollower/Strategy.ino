@@ -24,27 +24,20 @@ void loopStrategy() {
 // الدوال المساعدة (Helper Functions) لتوحيد أكواد السباق
 // ====================================================================
 
-// إلغاء الدوران أو السير المستقيم الأعمى فور ملامسة حساسات المنتصف للخط
+//  إلغاء الدوران الأعمى فور ملامسة حساسات المنتصف للخط
 void cancelTurn_1() {
-
-  if (midSensor && straight){
-    straight = false; // إيقاف حالة المستقيم
-  }
-
-  if (midMidMidSensor) {
-    // تمت إضافة straight هنا ضمن الشرط
-    if (goLeft || goRight || straight) { 
+  if (midMidMidSensor) { 
+    if (goLeft || goRight) {
       goLeft = false;
       goRight = false;
-      straight = false; // إيقاف حالة المستقيم
       currentError = 0;
       lastError = 0;
       PD_Value = 0;
       resetRadarMemory();
-      //stop();
     }
+
     if (turnLeft || turnRight) {
-      if (millis() - turnStartTime >= 290) {
+      if (millis() - turnStartTime >= 250) { 
         turnLeft = false;
         turnRight = false;
         turnCooldownTime = millis();
@@ -52,48 +45,34 @@ void cancelTurn_1() {
         lastError = 0;
         PD_Value = 0;
         resetRadarMemory();
-        //stop();
       }
     }
   }
 }
 
-
-// التحقق مما إذا كان الروبوت في حالة دوران أو عبور تقاطع حالياً
+// التحقق مما إذا كان الروبوت في حالة دوران حالياً
 bool isTurning_2() {
-  // تمت إضافة straight للتحقق من الحالة
-  return (turnLeft || turnRight || goLeft || goRight || straight);
+  return (turnLeft || turnRight || goLeft || goRight);
 }
 
-// قمنا بإزالة = false من هنا لأننا أعلنا عنها في الملف الرئيسي
-bool activateGo_3(bool isStrategy1) {
+bool activateGo_3() {
   if (midMidMidSensor == 0) {
     lineWasFound = false;
-      // نتحقق: هل نحن في الاستراتيجية الأولى؟ وهل العداد لم يصل للرقم 5 بعد؟
-      if (isStrategy1 && (straightCounter < 4) ) {
-        straight = true;
-        forwardMotor();
-        resetRadarMemory();
-        straightCounter++; // زيادة العداد بمقدار 1
-        return true;
-      }
-    // إذا التقط حساس اليسار نقطة التقاطع
-    if (leftMidRadarOn) {
-        goLeft = true;
-        leftMotor();
-        resetRadarMemory();
-        return true;
-      }
     
-    // حساس اليمين يبقى يعمل كالمعتاد في جميع الحالات
-    if (rightMidRadarOn) { 
-      goRight = true; 
-      rightMotor(); 
-      resetRadarMemory(); 
-      return true; 
+    if (leftMidRadarOn && rightMidRadarOn){
+      if (leftRadarOn && rightRadarOn){
+        if (leftOutRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+        if (rightOutRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+    } else {
+        if (leftRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+        if (rightRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+      }
     }
     
-    return false;
+    if (leftMidRadarOn) { goLeft = true; leftMotor(); resetRadarMemory(); return true; }
+    if (rightMidRadarOn) { goRight = true; rightMotor(); resetRadarMemory(); return true; }
+
+    return false; 
   }
   return false;
 }
@@ -126,7 +105,7 @@ bool gap_4() {
       } 
       else {
         // التحقق من مرور 11 ملي ثانية والخط لا يزال موجوداً
-        if (millis() - lineFoundTime >= 20) { 
+        if (millis() - lineFoundTime >= 15) { 
           // تم تأكيد الخط! ننهي البحث ونسلم القيادة
           isSearching = false;
           verifyingLine = false;
@@ -151,7 +130,7 @@ bool gap_4() {
   }
 
   // ج. مرحلة البحث 
-  if (millis() - lostTimeStart < 200) {
+  if (millis() - lostTimeStart < 325) {
     forwardMotor();
     return true;
   } 
@@ -173,13 +152,9 @@ bool activateTurn_5() {
   if (millis() - turnCooldownTime < 250) {
     return false; 
   }
-if (
-      (specialMemory && (leftOutRadar == 1)) ||
-      (leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (rightMidRadar == 0) && (rightOutRadar == 0)) ||
-      (leftMidRadar && leftRadar && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) && (bitRead(sensorBit, 5) == 0))
-) {
-    // ضع الكود المراد تنفيذه هنا
-
+  if ((specialMemory && (leftOutRadar == 1)) ||
+      ( leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) &&
+      (rightOutRadar == 0) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) )){
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -188,11 +163,11 @@ if (
     unsigned long waitStartTime = millis();
 
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
-    while (leftOutRadar == 1) {
+    while ((leftMidRadar == 1) || (leftOutRadar == 1)) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
-      if (millis() - waitStartTime > 220) {
+      if (millis() - waitStartTime > 250) {
         break; 
       }
     }
@@ -257,65 +232,8 @@ void resetRadarMemory() {
   leftMidRadarOn = false;
   rightMidRadarOn = false;
   specialMemory = false;
+  checkStateChanges();
 }
-
-void stop() {
-  stopMotor();
-  delay(30);
-  digitalWrite(STBY, HIGH);
-    
-  resetRadarMemory();
-  goLeft = false;
-  goRight = false;
-  turnLeft = false;
-  turnRight = false;
-  currentError = 0;
-  lastError = 0;
-  PD_Value = 0;
-  lineWasFound = true;
-  Turn180now = false;
-  sweep180Done = false;
-  turnCooldownTime = 0;
-}
-
-// ====================================================================
-// دالة إعادة ضبط النظام عند حدوث تبديل في الألوان
-// ====================================================================
-void executeInversionReset() {
-    // 1. إيقاف المحركات تماماً
-    stopMotor();
-    
-    // 2. إطلاق نغمة التنبيه (كما في الكود القديم)
-    tone(buzzerPin, 3000, 90);
-    
-    // 3. توقيف المعالج بالكامل لمدة 10 ملي ثانية (حسب طلبك)
-    delay(60);
-    
-    // 4. إعادة تفعيل درايفر المحركات
-    digitalWrite(STBY, HIGH);
-    
-    // 5. تصفير جميع الأعلام والمتغيرات الملاحية (باستثناء pitchOffset)
-    resetRadarMemory();
-    goLeft = false;
-    goRight = false;
-    turnLeft = false;
-    turnRight = false;
-    currentError = 0;
-    lastError = 0;
-    PD_Value = 0;
-    lineWasFound = true;
-    Turn180now = false;
-    sweep180Done = false;
-    turnCooldownTime = 0;
-
-    // 6. تصفير عدادات التبديل نفسها لتبدأ نظيفة للمرة القادمة
-    invBlackCounter = 0;
-    invWhiteCounter = 0;
-    invIsCounting = false;
-    invMissedLoops = 0;
-}
-
-
 
 
 
