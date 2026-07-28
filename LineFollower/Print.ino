@@ -50,18 +50,22 @@ void loopPrint() {
   if (strategy != 0) {
     if (millis() - lastPrintTime > 1500) { // الطباعة كل ثانية ونصف
       
-      /*TelnetStream.println("\n-------------------------------------------------");
+      //TelnetStream.println("\n-------------------------------------------------");
       TelnetStream.println();
-      
-      TelnetStream.printf("Kp: %.2f  | Kd: %.1f  | Strategy: %d", Kp, Kd, strategy);
-      TelnetStream.printf("  | Max: %d   | Base: %d  | Turn: %d", maximumSpeed, baseSpeed, turnSpeed);*/
 
-      for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 12; i++) {
         TelnetStream.print(sensorValue[i]);  
         TelnetStream.print("\t");               
       }
-      TelnetStream.print("midMidMidSensor: ");
-      TelnetStream.println(midMidMidSensor);
+      
+      TelnetStream.printf("Kp: %.2f  | Kd: %.1f  | Strategy: %d", Kp, Kd, strategy);
+      //TelnetStream.printf("  | Max: %d   | Base: %d  | Turn: %d", maximumSpeed, baseSpeed, turnSpeed);
+
+      TelnetStream.println();
+
+
+      //TelnetStream.print("strategy: ");
+      //TelnetStream.println(strategy);
 
 
 
