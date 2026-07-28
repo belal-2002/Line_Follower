@@ -51,15 +51,6 @@ void forwardMotor() {
   ledcWrite(PWMB, baseSpeed);
 }
 
-void rightMotor_2() {
-  // السير في خط مستقيم
-  digitalWrite(AIN1, LOW);  digitalWrite(AIN2, HIGH); 
-  digitalWrite(BIN1, HIGH); digitalWrite(BIN2, LOW);
-
-  ledcWrite(PWMA, baseSpeed);
-  ledcWrite(PWMB, baseSpeed - 25);
-}
-
 
 
 
