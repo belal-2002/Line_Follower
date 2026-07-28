@@ -1,5 +1,4 @@
 void loopStrategy1() { // للأمام ثم لليسار
- enableInversionDetection = true;
 
   cancelTurn_1();
 
