@@ -6,7 +6,7 @@ void loopSensors() {
   
   // =========================================================
   // 1. مرحلة قراءة الحساسات والفلترة (Oversampling Filter)
- // =========================================================
+  // =========================================================
   for (int i = 0; i < 12; i++) {
     long tempSum = 0;
     for (int j = 0; j < 3; j++) {
@@ -14,113 +14,82 @@ void loopSensors() {
     }
     sensorValue[i] = tempSum / 3;
   }
-
- // =========================================================
-  // 2. مرحلة المعايرة الخطية وتقييد القيم (Linear Mapping) والنسخ الاحتياطي
- // =========================================================
+  //sensorValue[6] = 0;
+  
+  // =========================================================
+  // 2. مرحلة المعايرة الخطية وتقييد القيم (Linear Mapping)
+  // =========================================================
   for (int i = 0; i < 12; i++) {
     sensorValue[i] = map(sensorValue[i], S_White[i], S_Black[i], target_White, target_Black);
     sensorValue[i] = constrain(sensorValue[i], 0, 4095);
-    
-    // --- التعديل الأول: أخذ نسخة احتياطية دائماً (بغض النظر عن الاستراتيجية) ---
-    originalSensorValue[i] = sensorValue[i];
   }
   
- // =========================================================
-  // 3. مرحلة اكتشاف التبديل الشفاف للألوان V2.0 (Inversion Zone)
- // =========================================================
-  
-  // سنقوم بمعالجة التبديل فقط إذا كانت الميزة مفعلة في الاستراتيجية
-  // أو إذا كنا بالفعل في وضع معكوس (لكي يستمر قلب الألوان بشكل صحيح)
-  if (enableInversionDetection || isInverted) {
-      
-      // أ. حساب عدد جميع الحساسات التي ترى لوناً "أسود فيزيائياً" بناءً على النسخة الأصلية
-      // الحساسات هي S1 إلى S12 (يقابلها في المصفوفة index من 0 إلى 11)
-      int allBlackCount = 0;
-      for (int i = 0; i < 12; i++) {
-          if (originalSensorValue[i] > lineThreshold) {
-              allBlackCount++;
-          }
-      }
-
-      // ب. خوارزمية اكتشاف التبديل (تُنفذ فقط إذا كانت الميزة مفعلة للاستراتيجية)
-      if (enableInversionDetection) {
-          bool conditionMet = false;
-          // الحالة الأولى: نحن في الوضع الطبيعي ونبحث عن خلفية سوداء للدخول في الوضع المعكوس
-          if (!isInverted) {
-              // إذا كانت معظم الحساسات الـ 12 ترى أسود (مثلاً 9 أو أكثر من أصل 12)
-              if (allBlackCount >= 9) { 
-                  conditionMet = true;
-                  if (!invIsCounting) {
-                      invFirstTriggerTime = millis();
-                      invIsCounting = true;
-                  }
-                  invBlackCounter++;
-                  if (invBlackCounter >= 33) { // شرط الدخول الصعب (100 دورة)
-                      isInverted = true;
-                      executeInversionReset();
-                  }
-              }
-          } 
-          // الحالة الثانية: نحن في الوضع المعكوس ونبحث عن العودة للوضع الطبيعي (السهل)
-          else {
-              // إذا كانت معظم الحساسات الـ 12 ترى أبيض (3 أو أقل يرون أسود)
-              if (allBlackCount <= 3) { 
-                  conditionMet = true;
-                  if (!invIsCounting) {
-                      invFirstTriggerTime = millis();
-                      invIsCounting = true;
-                  }
-                  invWhiteCounter++;
-                  if (invWhiteCounter >= 20) { // شرط الخروج السهل (20 دورة)
-                      isInverted = false;
-                      executeInversionReset();
-                  }
-              }
-          }
-
-          // ج. إدارة استقرار العدادات (منع التشويش)
-          if (conditionMet) {
-              invMissedLoops = 0; // تصفير عداد اللفات الضائعة لأننا حققنا الشرط في هذه اللفة
-          } else {
-              invMissedLoops++; // زيادة العداد لأننا لم نحقق الشرط في هذه اللفة
-          }
-
-          // د. تصفير العدادات إذا مر 10 ملي ثانية أو 5 لفات متتالية بدون استقرار في الشرط
-          if (invIsCounting) {
-              if ((millis() - invFirstTriggerTime >= 150) || (invMissedLoops >= 15)) {
-                  invBlackCounter = 0;
-                  invWhiteCounter = 0;
-                  invIsCounting = false;
-                  invMissedLoops = 0;
-              }
-          }
-      }
-
-      // هـ. تطبيق العكس الرياضي للقيم الفعلية قبل الـ Bitmasking
-      if (isInverted) {
-          for (int i = 0; i < 12; i++) {
-              // نستخدم originalSensorValue لضمان عدم تأثر القيم بتعديلات سابقة
-              sensorValue[i] = (target_Black + target_White) - originalSensorValue[i];
-          }
-      }
-  }
-
- // =========================================================
-  // 4. مرحلة التشفير الثنائي (Bitmasking) للحساسات
-  // (سيستخدم الآن sensorValue سواء كانت مقلوبة أو طبيعية)
- // =========================================================
+  // =========================================================
+  // 3. مرحلة اكتشاف التبديل الشفاف للألوان (Inversion Zone)
+  // =========================================================
+  /*
+  int currentBlackCount = 0;
+  // حساب عدد الحساسات التي ترى لوناً "أسود فيزيائي" حالياً
   for (int i = 0; i < 12; i++) {
     if (sensorValue[i] > lineThreshold) {
-      bitSet(sensorBit, 11 - i);
+      currentBlackCount++;
+    }
+  }
+
+  // أ. اكتشاف الدخول في المنطقة المعكوسة (الخلفية أصبحت سوداء والخط أبيض)
+  // الشرط != 12 هو لحماية الروبوت من التقاطعات العادية (+) التي تعطي 12 أسود مؤقتاً
+  if (!isInverted && currentBlackCount >= 9 && currentBlackCount != 12) {
+    inversionCounterBlack++; // زيادة عداد التأكيد
+    
+    if (inversionCounterBlack > INVERSION_THRESH) {
+      isInverted = true; // تأكيد الدخول في المنطقة المعكوسة
+      inversionCounterBlack = 0; // تصفير العداد
+      tone(buzzerPin, 3000, 90); // إطلاق نغمة سريعة لتأكيد التبديل
+    }
+  } 
+  
+  // ب. اكتشاف الخروج من المنطقة المعكوسة (العودة للوضع الطبيعي)
+  // إذا كنا في وضع معكوس ورأينا 3 حساسات أو أقل باللون الأسود الفيزيائي
+  else if (isInverted && currentBlackCount <= 3) {
+    inversionCounterWhite++; // زيادة عداد التأكيد للعودة
+    
+    if (inversionCounterWhite > (INVERSION_THRESH / 3)) { // استجابة العودة أسرع بـ 3 مرات
+      isInverted = false; // تأكيد العودة للوضع الطبيعي
+      inversionCounterWhite = 0; // تصفير العداد
+      tone(buzzerPin, 3000, 90); // إطلاق نغمة التبديل
+    }
+  } 
+  
+  // ج. تصفير العدادات إذا كانت الحالات مؤقتة (مثل المرور فوق أوساخ أو تقاطع)
+  else {
+    inversionCounterBlack = 0;
+    inversionCounterWhite = 0;
+  }
+
+  // د. الخدعة الرياضية: عكس القيم فعلياً إذا تم تأكيد وضع التبديل
+  if (isInverted) {
+    for (int i = 0; i < 12; i++) {
+      // معادلة العكس السحرية: تحويل الأسود لأبيض والأبيض لأسود رياضياً
+      sensorValue[i] = (target_Black + target_White) - sensorValue[i];
+    }
+  }
+  */
+  
+
+  // =========================================================
+  // 4. مرحلة التشفير الثنائي (Bitmasking) للحساسات
+  // =========================================================
+  for (int i = 0; i < 12; i++) {
+    if (sensorValue[i] > lineThreshold) {
+      bitSet(sensorBit, 11 - i); 
     } else {
       bitClear(sensorBit, 11 - i);
     }
   }
 
- // =========================================================
+  // =========================================================
   // 5. استخراج البيانات وعدّ الحساسات النشطة (Popcount Logic)
- // =========================================================
+  // =========================================================
   
   // leftSensor = S1 إلى S6 (أول 6 حساسات يسار)
   leftSensor = __builtin_popcount((sensorBit >> 6) & 0x3F);
@@ -135,14 +104,13 @@ void loopSensors() {
   
   // midMidMidSensor = S5 إلى S8 (البتات من 7 إلى 4) (4 حساسات مركزية)
   midMidMidSensor = __builtin_popcount((sensorBit >> 4) & 0x0F);
-  //midMidMidSensor = bitRead(sensorBit, 4) + bitRead(sensorBit, 6) + bitRead(sensorBit, 7);
-
+  
   // إجمالي الحساسات النشطة (12 بت)
   allSensor = __builtin_popcount(sensorBit & 0xFFF);
 
- // =========================================================
+  // =========================================================
   // 6. تخصيص قراءات الرادارات الموضعية
- // =========================================================
+  // =========================================================
   leftOutRadar   = bitRead(sensorBit, 11); // S1
   leftRadar    = bitRead(sensorBit, 10); // S2
   leftMidRadar   = bitRead(sensorBit, 9);  // S3 
@@ -150,9 +118,9 @@ void loopSensors() {
   rightRadar   = bitRead(sensorBit, 1);  // S11
   rightOutRadar  = bitRead(sensorBit, 0); // S12
 
- // =========================================================
+  // =========================================================
   // 7. خوارزمية الذاكرة الزمنية للرادارات (Radar Time Memory) - مطورة
- // =========================================================
+  // =========================================================
   
   // --- رادار أقصى اليسار (S1) ---
   if (leftOutRadar) { //
@@ -256,15 +224,15 @@ void loopSensors() {
     }
   }
 
- // =========================================================
+  // =========================================================
   // 8. خوارزمية الذاكرة للشرط المخصص (Special Condition Memory)
- // =========================================================
-  if ( (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && 
-        (rightMidRadar == 0) && (rightOutRadar == 0) ){ //
+  // =========================================================
+  if ((leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && 
+      (rightMidRadar == 0) && (rightOutRadar == 0)) { //
     specialMemory = true; //
     specialMemoryStartTime = millis(); //
   } else { 
-    if (specialMemory && ((millis() - specialMemoryStartTime) > 10)) { //
+    if (specialMemory && ((millis() - specialMemoryStartTime) > 75)) { //
         specialMemory = false; //
     }
   }
@@ -274,15 +242,12 @@ void loopSensors() {
     leftOutRadarOn2 = true; //
     leftOutRadarStartTime2 = millis(); //
   } else { 
-    if (((millis() - leftOutRadarStartTime2) > 10) && leftOutRadarOn2) { //
+    if (((millis() - leftOutRadarStartTime2) > 75) && leftOutRadarOn2) { //
         leftOutRadarOn2 = false; //
     }
   }
   checkStateChanges();
 }
-
-
-
 
 
 
