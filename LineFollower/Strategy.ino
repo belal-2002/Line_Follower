@@ -173,11 +173,13 @@ bool activateTurn_5() {
   if (millis() - turnCooldownTime < 250) {
     return false; 
   }
-  if ((specialMemory && (leftOutRadar == 1)) ||
-      ( leftOutRadarOn2 && (leftMidRadar == 1) && 
-      (bitRead(sensorBit, 8) == 1) &&
-      (rightMidRadar == 0) && (rightOutRadar == 0) ) ||
-      (leftMidRadar && leftRadar && (bitRead(sensorBit, 8) == 1) && (rightMidRadar == 0) )){
+if (
+      (specialMemory && (leftOutRadar == 1)) ||
+      (leftOutRadarOn2 && (leftMidRadar == 1) && (bitRead(sensorBit, 8) == 1) && (rightMidRadar == 0) && (rightOutRadar == 0)) ||
+      (leftMidRadar && leftRadar && (bitRead(sensorBit, 8) == 1) && (bitRead(sensorBit, 7) == 1) && (rightMidRadar == 0) && (bitRead(sensorBit, 3) == 0) && (bitRead(sensorBit, 4) == 0) && (bitRead(sensorBit, 5) == 0))
+) {
+    // ضع الكود المراد تنفيذه هنا
+
     // =================================================================
     // التعديل الجديد: حبس الكود حتى ينطفئ الحساس (تجاوز عرض الخط)
     // =================================================================
@@ -186,14 +188,14 @@ bool activateTurn_5() {
     unsigned long waitStartTime = millis();
 
     // 2. حلقة الانتظار: الكود سيبقى عالقاً هنا ولن ينفذ أي شرط آخر في أي مكان
-    /*while (leftOutRadar == 1) {
+    while (leftOutRadar == 1) {
       loopSensors();      // تحديث قراءات الحساسات الحية لاكتشاف لحظة انطفاء leftMidRadar
       forwardMotor();     // إبقاء المحركات تدفع للأمام لاختراق الخط وعدم الالتفاف المبكر
 
       if (millis() - waitStartTime > 220) {
         break; 
       }
-    }*/
+    }
     // =================================================================
     
     lineWasFound = false;
